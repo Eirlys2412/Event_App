@@ -3,11 +3,10 @@
 namespace App\Modules\Resource\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\Resource\Models\ResourceLinkType;
+
 use App\Modules\Resource\Models\ResourceType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+
 
 class ResourceTypeController extends Controller
 {

@@ -1,10 +1,8 @@
 @extends('backend.layouts.master')
-@section ('scriptop')
-
-<meta name="csrf-token" content="{{ csrf_token() }}">
-
-<script src="{{asset('js/js/tom-select.complete.min.js')}}"></script>
-<link rel="stylesheet" href="{{ asset('/js/css/tom-select.min.css') }}">
+@section('scriptop')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="{{ asset('js/js/tom-select.complete.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('/js/css/tom-select.min.css') }}">
 @endsection
 
 @section('content')
@@ -14,50 +12,80 @@
             Thêm tài nguyên
         </h2>
     </div>
+
     <div class="grid grid-cols-12 gap-12 mt-5">
         <div class="intro-y col-span-12 lg:col-span-12">
             <!-- BEGIN: Form Layout -->
-            <form method="post" action="{{route('admin.resources.store')}}" enctype="multipart/form-data">
+            <form id="resource-form" method="post" action="{{ route('admin.resources.store') }}"
+                enctype="multipart/form-data">
                 @csrf
                 <div class="intro-y box p-5">
                     <div>
-                        <label for="regular-form-1" class="form-label">Tiêu đề</label>
-                        <input id="title" name="title" type="text" class="form-control" placeholder="Nhập tiêu đề" value="{{ old('title') }}" required>
-                    </div>
+                        <label class="form-label">Loại tài nguyên</label>
+                        <div class="mt-2">
+                            <input type="radio" id="resource" name="resource_type" value="resource" checked>
+                            <label for="resource" class="ml-2">Tài nguyên</label>
 
+                            <input type="radio" id="link" name="resource_type" value="link" class="ml-4">
+                            <label for="link" class="ml-2">Liên kết tài nguyên</label>
+                        </div>
+                    </div>
+                    <label for="title" class="form-label">Tiêu đề</label>
+                    <input id="title" name="title" type="text" class="form-control" placeholder="Nhập tiêu đề"
+                        value="{{ old('title') }}" required>
+                    <div class="mt-3">
+                        <label for="description" class="form-label">Mô tả chi tiết</label>
+                        <textarea id="description" name="description" class="form-control" placeholder="Nhập mô tả chi tiết">{{ old('description') }}</textarea>
+                    </div>
                     <div class="mt-3">
                         <label for="" class="form-label">Loại tài nguyên</label>
-                        <select name="resource_type_id" class="form-select mt-2">
+                        <select name="resource_type_id" class="form-select mt-2" required>
                             <option value="">- Chọn loại tài nguyên -</option>
-                            @foreach($resourceTypes as $type)
+                            @foreach ($resourceTypes as $type)
                                 <option value="{{ $type->id }}">{{ $type->title }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <div class="mt-3">
+                    <div id="resourceFields" class="mt-3">
+                        <div class="mt-3">
+                            <label for="file-input" class="form-label">Tệp phương tiện</label>
+                            <input type="file" name="file" class="form-control" id="file-input">
+                        </div>
+                    </div>
+
+                    <div id="linkFields" class="mt-3 hidden">
                         <label for="" class="form-label">Loại liên kết tài nguyên</label>
                         <select name="resource_link_type_id" class="form-select mt-2">
                             <option value="">- Chọn loại liên kết -</option>
-                            @foreach($linkTypes as $type)
+                            @foreach ($linkTypes as $type)
                                 <option value="{{ $type->id }}">{{ $type->title }}</option>
                             @endforeach
                         </select>
-                    </div>
 
-                    <div class="mt-3">
-                        <label for="" class="form-label">Mô tả tài nguyên</label>
-                        <textarea class="editor" name="description" id="editor2">{{ old('description') }}</textarea>
-                    </div>
+                        <div class="mt-3">
+                            <label for="" class="form-label">Liên kết YouTube</label>
+                            <input type="url" name="youtube_url" class="form-control"
+                                placeholder="Nhập liên kết YouTube (nếu có)" value="{{ old('youtube_url') }}">
+                        </div>
 
-                    <div class="mt-3">
-                        <label for="" class="form-label">Tệp phương tiện</label>
-                        <input type="file" name="file" class="form-control" required>
+                        <div class="mt-3">
+                            <label for="" class="form-label">Liên kết Tài liệu</label>
+                            <input type="url" name="document_url" class="form-control"
+                                placeholder="Nhập liên kết tài liệu (nếu có)" value="{{ old('document_url') }}">
+                        </div>
+
+                        <div class="mt-3">
+                            <label for="" class="form-label">Liên kết Hình ảnh</label>
+                            <input type="url" name="image_url" class="form-control"
+                                placeholder="Nhập liên kết hình ảnh (nếu có)" value="{{ old('image_url') }}">
+                        </div>
                     </div>
 
                     <div class="mt-3">
                         <label for="tags" class="form-label">Tags</label>
-                        <input id="tags" name="tags" type="text" class="form-control" placeholder="Nhập tags, cách nhau bằng dấu phẩy" value="{{ old('tags') }}">
+                        <input id="tags" name="tags" type="text" class="form-control"
+                            placeholder="Nhập tags, cách nhau bằng dấu phẩy" value="{{ old('tags') }}">
                     </div>
 
                     <div class="text-right mt-5">
@@ -70,52 +98,64 @@
 
 @endsection
 
-@section ('scripts')
-
-<script>
-    var select = new TomSelect('#select-junk',{
-        maxItems: null,
-        allowEmptyOption: true,
-        plugins: ['remove_button'],
-        sortField: {
-            field: "text",
-            direction: "asc"
-        },
-        onItemAdd:function(){
+@section('scripts')
+    <script>
+        var select = new TomSelect('#tags', {
+            create: true,
+            plugins: ['remove_button'],
+            onItemAdd: function(value) {
                 this.setTextboxValue('');
                 this.refreshOptions();
-            },
-        create: true
-    });
-    select.clear();
-</script>
-
-<script src="{{asset('js/js/ckeditor.js')}}"></script>
-<script>
-    ClassicEditor
-        .create(document.querySelector('#editor2'), {
-            ckfinder: {
-                uploadUrl: '{{route("admin.upload.ckeditor")."?_token=".csrf_token()}}'
-            },
-            mediaEmbed: { previewsInData: true }
-        })
-        .then(editor => {
-            console.log(editor);
-        })
-        .catch(error => {
-            console.error(error);
+            }
         });
-</script>
 
-<script>
-    var select = new TomSelect('#tags', {
-        create: true,
-        plugins: ['remove_button'],
-        onItemAdd: function(value) {
-            this.setTextboxValue('');
-            this.refreshOptions();
-        }
-    });
-</script>
+        // JavaScript để ẩn/hiện các trường
+        document.querySelectorAll('input[name="resource_type"]').forEach(function(elem) {
+            elem.addEventListener("change", function(event) {
+                if (event.target.value === "resource") {
+                    document.getElementById("resourceFields").classList.remove("hidden");
+                    document.getElementById("linkFields").classList.add("hidden");
+                } else {
+                    document.getElementById("resourceFields").classList.add("hidden");
+                    document.getElementById("linkFields").classList.remove("hidden");
+                }
+            });
+        });
+
+        document.getElementById('resource-form').addEventListener('submit', function(event) {
+            if (document.querySelector('input[name="resource_type"]:checked').value === 'link') {
+                var youtubeUrl = document.querySelector('input[name="youtube_url"]').value.trim();
+                var documentUrl = document.querySelector('input[name="document_url"]').value.trim();
+                var imageUrl = document.querySelector('input[name="image_url"]').value.trim();
+
+                if (!youtubeUrl && !documentUrl && !imageUrl) {
+                    event.preventDefault();
+                    alert('Vui lòng nhập ít nhất một liên kết (YouTube, Tài liệu, hoặc Hình ảnh).');
+                }
+            }
+        });
+        
+    </script>
+
+    <script src="{{ asset('js/js/ckeditor.js') }}"></script>
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#description'), {
+                ckfinder: {
+                    uploadUrl: '{{ route('admin.upload.ckeditor') . '?_token=' . csrf_token() }}'
+                },
+                mediaEmbed: {
+                    previewsInData: true
+                }
+            })
+            .then(editor => {
+                console.log(editor);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
+
+
 
 @endsection

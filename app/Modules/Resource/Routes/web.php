@@ -9,13 +9,12 @@ Route::group(['prefix' => 'admin/', 'as' => 'admin.'], function () {
     
     // Phần quản lý Tài nguyên
     Route::resource('resources', ResourceController::class)->except(['show']); 
-    Route::get('resources/{slug}', [ResourceController::class, 'show'])->name('resources.show'); 
-    Route::get('resources/search', [ResourceController::class, 'search'])->name('admin.resources.search');
+    Route::get('resources/{id}', [ResourceController::class, 'show'])->where('id', '[0-9]+')->name('resources.show');
+    Route::get('resources/search', [ResourceController::class, 'resourceSearch'])->name('resources.search');
 
     // Phần quản lý Loại Liên kết Tài nguyên
-    Route::resource('resource-link-types', ResourceLinkTypeController::class)->except(['create', 'edit']); 
+    Route::resource('resource-link-types', ResourceLinkTypeController::class); 
 
     // Phần quản lý Loại Tài nguyên
-    Route::resource('resource-types', ResourceTypeController::class)->except(['create', 'edit']); 
-
+    Route::resource('resource-types', ResourceTypeController::class); 
 });
