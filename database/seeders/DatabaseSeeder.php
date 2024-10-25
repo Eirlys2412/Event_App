@@ -97,8 +97,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-            ResourceTypeSeeder::class,
-            ResourceLinkTypeSeeder::class,
+            
+            
             RecommendSeeder::class,
         ]);
     }
