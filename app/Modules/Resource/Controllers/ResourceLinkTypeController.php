@@ -8,67 +8,76 @@ use Illuminate\Http\Request;
 
 class ResourceLinkTypeController extends Controller
 {
+    protected $pagesize;
+
     public function __construct()
     {
-        $this->middleware(function ($request, $next) {
-            if (!$this->check_function('resource_link_type_access')) { // Thay đổi alias phù hợp
-                return redirect()->route('admin.login'); // Hoặc xử lý theo cách bạn muốn
-            }
-            return $next($request);
-        });
+        $this->pagesize = env('NUMBER_PER_PAGE', '20');
+        $this->middleware('auth');
     }
 
     public function index()
     {
-        $resourceLinkTypes = ResourceLinkType::all();
-        return response()->json($resourceLinkTypes);
+        $resourceLinkTypes = ResourceLinkType::orderBy('id', 'DESC')->paginate($this->pagesize);
+        $breadcrumb = '
+        <li class="breadcrumb-item"><a href="#">/</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Danh sách loại liên kết tài nguyên</li>';
+        $active_menu = "resource_link_type_list";
+
+        return view('Resource::linktype.index', compact('resourceLinkTypes', 'breadcrumb', 'active_menu'));
     }
 
     public function create()
     {
-        // Có thể thêm logic cho view nếu cần
-        return response()->json(['message' => 'Create Resource Link Type']);
+        $breadcrumb = '
+        <li class="breadcrumb-item"><a href="#">/</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Tạo loại liên kết tài nguyên</li>';
+        $active_menu = "resource_link_type_add";
+
+        return view('Resource::linktype.create', compact('breadcrumb', 'active_menu'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string',
-            'code' => 'required|string',
+            'title' => 'required|string|max:255',
+            'code' => 'required|string|max:50',
         ]);
 
-        $resourceLinkType = ResourceLinkType::create($request->all());
-        return response()->json($resourceLinkType, 201);
-    }
+        ResourceLinkType::create($request->all());
 
-    public function show($id)
-    {
-        $resourceLinkType = ResourceLinkType::findOrFail($id);
-        return response()->json($resourceLinkType);
+        return redirect()->route('admin.resource-link-types.index')->with('success', 'Tạo loại liên kết tài nguyên thành công.');
     }
 
     public function edit($id)
     {
-        // Có thể thêm logic cho view nếu cần
-        return response()->json(['message' => 'Edit Resource Link Type', 'id' => $id]);
+        $resourceLinkType = ResourceLinkType::findOrFail($id);
+        $breadcrumb = '
+        <li class="breadcrumb-item"><a href="#">/</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa loại liên kết tài nguyên</li>';
+        $active_menu = "resource_link_type_edit";
+
+        return view('Resource::linktype.edit', compact('resourceLinkType', 'breadcrumb', 'active_menu'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'title' => 'string',
-            'code' => 'string',
+            'title' => 'required|string|max:255',
+            'code' => 'string|max:50',
         ]);
 
         $resourceLinkType = ResourceLinkType::findOrFail($id);
         $resourceLinkType->update($request->all());
-        return response()->json($resourceLinkType);
+
+        return redirect()->route('admin.resource-link-types.index')->with('success', 'Cập nhật loại liên kết tài nguyên thành công.');
     }
 
     public function destroy($id)
     {
         $resourceLinkType = ResourceLinkType::findOrFail($id);
         $resourceLinkType->delete();
-        return response()->json(null, 204);
+
+        return redirect()->route('admin.resource-link-types.index')->with('success', 'Xóa loại liên kết tài nguyên thành công.');
     }
 }
