@@ -21,7 +21,12 @@ class HelpController extends Controller
         $this->s3 = "";
         
     }
-    
+    public static function getYouTubeID($url)
+    {
+        $pattern = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|.+\?v=)|youtu\.be\/)([^&\n?#]+)/';
+        preg_match($pattern, $url, $matches);
+        return $matches[1] ?? null;
+    }
 
     public function uploadImageInContent($content)
     {

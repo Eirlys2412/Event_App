@@ -23,7 +23,12 @@ class ResourceController extends Controller
 
     public function index()
     {
-        $resources = Resource::orderBy('id', 'DESC')->paginate($this->pagesize);
+        $resources = DB::table('resources')
+        ->select ('resources.*','np.viewcode','np.code')
+        ->where('is_delete',0)
+        ->leftJoin(\DB::raw("( select * from resource_link_types) as np "),'resources.link_code','=','np.code')
+        ->paginate($this->pagesize);
+        // dd( $resources);
         $breadcrumb = '
         <li class="breadcrumb-item"><a href="#">/</a></li>
         <li class="breadcrumb-item active" aria-current="page">Danh sách tài nguyên</li>';
@@ -48,13 +53,11 @@ class ResourceController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'resource_type_id' => 'nullable|exists:resource_types,id',
-            'resource_link_type_id' => 'nullable|exists:resource_link_types,id',
+            'type_code' => 'required|exists:resource_types,code',
+            'link_code' => 'nullable|exists:resource_link_types,code',
             'file' => 'nullable|file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:204800',
             'tags' => 'nullable|string',
-            'youtube_url' => 'nullable|url',
-            'document_url' => 'nullable|url',
-            'image_url' => 'nullable|url',
+            'url' => 'nullable|url',
             'description' => 'nullable|string|max:25555'
         ]);
 
@@ -65,9 +68,13 @@ class ResourceController extends Controller
             $slug .= '-' . ($count + 1);
         }
         $slug .= '-' . $timestamp;
-
-        $youtubeID = $this->getYouTubeID($request->youtube_url);
-
+        $url = $request->url ?$request->url: null;
+        $youtubeID = $this->getYouTubeID($request->url);
+        if($youtubeID)
+        {
+            $url = "https://www.youtube.com/watch?v=".$youtubeID;
+        }
+        // dd($youtubeID );
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
@@ -81,7 +88,7 @@ class ResourceController extends Controller
                 $url = Storage::url($filePath);
                 $url = Str::after($url, 'http://localhost');
             }
-
+             
             Resource::create([
                 'title' => $request->title,
                 'slug' => $slug,
@@ -91,30 +98,27 @@ class ResourceController extends Controller
                 'file_size' => $file->getSize(),
                 'path' => $filePath ? $filePath : null,
                 'url' => $url ? $url : null,
-                'resource_type_id' => $request->resource_type_id,
-                'resource_link_type_id' => $request->resource_link_type_id,
+                'type_code' => $request->type_code,
+                'link_code' => $request->link_code,
                 'tags' => $request->tags,
-                'youtube_url' => $youtubeID ? "https://www.youtube.com/watch?v=$youtubeID" : null,
-                'document_url' => $request->document_url,
-                'image_url' => $request->image_url,
+            
             ]);
         } else {
+           
             // Nếu không có tệp, kiểm tra các loại URL
-            if ($youtubeID || $request->document_url || $request->image_url) {
+            // if ($youtubeID || $request->document_url || $request->image_url) {
                 Resource::create([
                     'title' => $request->title,
                     'slug' => $slug,
                     'description' => $request->description,
-                    'youtube_url' => $youtubeID ? "https://www.youtube.com/watch?v=$youtubeID" : null,
-                    'document_url' => $request->document_url,
-                    'image_url' => $request->image_url,
-                    'resource_type_id' => $request->resource_type_id,
-                    'resource_link_type_id' => $request->resource_link_type_id,
+                    'url' => $url ? $url : null,
+                    'type_code' => $request->type_code,
+                    'link_code' => $request->link_code,
                     'tags' => $request->tags,
                 ]);
-            } else {
-                return redirect()->back()->withErrors(['file' => 'Bạn phải chọn tệp hoặc nhập ít nhất một trong các liên kết YouTube, Document hoặc Image.']);
-            }
+            // } else {
+            //     return redirect()->back()->withErrors(['file' => 'Bạn phải chọn tệp hoặc nhập ít nhất một trong các liên kết YouTube, Document hoặc Image.']);
+            // }
         }
         return redirect()->route('admin.resources.index')->with('success', 'Tạo tài nguyên thành công.');
     }
@@ -139,16 +143,18 @@ class ResourceController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
-            'resource_type_id' => 'nullable|exists:resource_types,id',
-            'resource_link_type_id' => 'nullable|exists:resource_link_types,id',
+            'resource_type_id' => 'nullable|exists:resource_types,code',
+            'resource_link_type_id' => 'nullable|exists:resource_link_types,code',
             'file' => 'nullable|file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:2048000',
             'tags' => 'nullable|string',
-            'youtube_url' => 'nullable|url',
-            'document_url' => 'nullable|url',
-            'image_url' => 'nullable|url',
+            'url' => 'nullable|url',
             'description' => 'nullable|string|max:25555'
         ]);
-
+        $youtubeID = $this->getYouTubeID($request->url);
+        if($youtubeID)
+        {
+            $url = "https://www.youtube.com/watch?v=".$youtubeID;
+        }
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
@@ -176,15 +182,12 @@ class ResourceController extends Controller
         }
 
         $resource->title = $request->title;
-        $resource->resource_type_id = $request->resource_type_id;
-        $resource->resource_link_type_id = $request->resource_link_type_id;
+        $resource->type_code = $request->type_code;
+        $resource->link_code = $request->link_code;
         $resource->description = $request->description;
         $resource->tags = $request->tags;
 
-        $youtubeID = $this->getYouTubeID($request->youtube_url);
-        $resource->youtube_url = $youtubeID ? "https://www.youtube.com/watch?v=$youtubeID" : null;
-        $resource->document_url = $request->document_url;
-        $resource->image_url = $request->image_url;
+         
         $resource->save();
 
         return redirect()->route('admin.resources.index')->with('success', 'Cập nhật tài nguyên thành công.');
@@ -218,8 +221,9 @@ class ResourceController extends Controller
     }
     private function getYouTubeID($url)
     {
-        parse_str(parse_url($url, PHP_URL_QUERY), $query);
-        return isset($query['v']) ? $query['v'] : null;
+        $pattern = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|.+\?v=)|youtu\.be\/)([^&\n?#]+)/';
+        preg_match($pattern, $url, $matches);
+        return $matches[1] ?? null;
     }
 
     public function resourceSearch(Request $request)

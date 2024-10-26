@@ -7,70 +7,90 @@
         <h3 class="text-xl font-semibold mb-2">{{ $resource->title }}</h3>
 
         <div class="mb-4">
-            @if (strpos($resource->file_type, 'image/') === 0 && !$resource->image_url)
-                <img src="{{ $resource->url }}" alt="{{ $resource->title }}" class="max-w-full h-auto rounded shadow-lg" />
-            @elseif (strpos($resource->file_type, 'video/') === 0)
-                <video controls class="max-w-full h-auto rounded shadow-lg">
-                    <source src="{{ $resource->url }}" type="{{ $resource->file_type }}">
-                    Trình duyệt của bạn không hỗ trợ video.
-                </video>
-            @elseif (strpos($resource->file_type, 'audio/') === 0)
-                <audio controls class="max-w-full h-auto rounded shadow-lg">
-                    <source src="{{ $resource->url }}" type="{{ $resource->file_type }}">
-                    Trình duyệt của bạn không hỗ trợ audio.
-                </audio>
-            @elseif ($resource->file_type === 'application/pdf')
-                <img src="link_to_default_pdf_image.png" alt="Hình ảnh tài liệu PDF"
-                    class="max-w-full h-auto rounded shadow-lg" />
-            @elseif ($resource->youtube_url)
-                <iframe class="w-full h-screen rounded shadow-lg"
-                    src="{{ str_replace('watch?v=', 'embed/', $resource->youtube_url) }}" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen>
-                </iframe>
-            @elseif ($resource->image_url)
-                <img src="{{ $resource->image_url }}" alt="Hình ảnh từ link" class="max-w-full h-auto rounded shadow-lg" />
-            @else
-                <p class="text-red-600">Không thể hiển thị tài liệu này.</p>
-            @endif
-
-            @if ($resource->url)
-                <p class="font-medium mt-2">
-                    URL:
-                    <a href="{{ $resource->url }}" target="_blank"
-                        class="font-normal text-blue-500 underline">{{ $resource->url }}</a>
-                </p>
-            @endif
-
-
-            @if ($resource->description)
-                <p class="font-medium mt-2">Mô tả: <span
-                        class="font-normal">{{ strip_tags($resource->description) }}</span></p>
-            @endif
-
-            @if ($resource->document_url || $resource->image_url || $resource->youtube_url)
-                <p class="font-medium mt-2">Liên kết tài nguyên:</p>
-                <ul class="list-disc ml-5">
-                    @if ($resource->document_url)
-                        <li>
-                            <a href="{{ $resource->document_url }}" target="_blank"
-                                class="text-blue-500 underline">{{ $resource->document_url }}</a>
-                        </li>
+            
+                @if($resource->link_code )
+                    @if($resource->type_code == 'image')
+                        <img src="{{ $resource->url }}" alt="{{ $resource->title }}"
+                        class="w-full h-40 object-cover rounded resource-image" />
                     @endif
-                    @if ($resource->youtube_url)
-                        <li>
-                            <a href="{{ $resource->youtube_url }}" target="_blank"
-                                class="text-blue-500 underline">{{ $resource->youtube_url }}</a>
-                        </li>
+                    @if ($resource->type_code == 'document')
+                    <!-- Hiển thị liên kết tải file từ document_url -->
+                        <a href="{{$resource->url }}" class="text-blue-500 underline">
+                            Tải tài liệu
+                        </a>
                     @endif
-                    @if ($resource->image_url)
-                        <li>
-                            <a href="{{ $resource->image_url }}" target="_blank" class="text-blue-500 underline">URL Hình
-                                ảnh: {{ $resource->image_url }}</a>
-                        </li>
+                    @if ($resource->type_code == 'video' && $resource->link_code=='youtube')
+                    <!-- Hiển thị liên kết tải file từ document_url -->
+                            <iframe width="100%" height="160"
+                            src="{{ str_replace('watch?v=', 'embed/', $resource->url) }}"
+                            frameborder="0" allowfullscreen></iframe>
                     @endif
-                </ul>
-            @endif
+                   
+               
+                @else
+                    <!-- Kiểm tra loại file và hiển thị tương ứng -->
+                    @switch(true)
+                        @case(strpos( $resource->file_type, 'image/') === 0)
+
+                            <img src="{{ $resource->url }}" alt="{{ $resource->title }}"
+                                class="w-full h-40 object-cover rounded resource-image" />
+                        @break
+
+                        @case(strpos($fileType, 'video/') === 0)
+                            <video controls class="w-full h-40 object-cover rounded resource-video">
+                                <source src="{{ $resource->url }}" type="{{ $fileType }}">
+                                Trình duyệt của bạn không hỗ trợ thẻ video.
+                            </video>
+                        @break
+
+                        @case(strpos($fileType, 'audio/') === 0)
+                            <audio controls class="w-full rounded resource-audio">
+                                <source src="{{ $resource->url }}" type="{{ $fileType }}">
+                                Trình duyệt của bạn không hỗ trợ thẻ audio.
+                            </audio>
+                        @break
+
+                        @case($fileType === 'application/pdf')
+                            <embed src="{{ $resource->url }}" type="application/pdf"
+                                class="w-full h-40 object-cover rounded resource-pdf" />
+                        @break
+
+                        @case(in_array($fileType, [
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            ]))
+                            <img src="{{ asset('backend/assets/icons/icon1.png') }}" alt="{{ $resource->title }}"
+                                class="w-full h-40 object-cover rounded resource-doc" />
+                        @break
+
+                        @case(in_array($fileType, [
+                                'application/vnd.ms-powerpoint',
+                                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                            ]))
+                            <img src="{{ asset('backend/assets/icons/icon1.png') }}" alt="{{ $resource->title }}"
+                                class="w-full h-40 object-cover rounded resource-ppt" />
+                        @break
+
+                        @case(in_array($fileType, [
+                                'application/vnd.ms-excel',
+                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            ]))
+                            <img src="{{ asset('backend/assets/icons/icon1.png') }}" alt="{{ $resource->title }}"
+                                class="w-full h-40 object-cover rounded resource-excel" />
+                        @break
+
+                        @default
+                            <img src="{{ asset('backend/assets/icons/icon1.png') }}" alt="{{ $resource->title }}"
+                                class="w-full h-40 object-cover rounded resource-default" />
+                    @endswitch
+                @endif
+
+                <div
+                    class="image-title absolute inset-x-0 bottom-0 p-2 text-black bg-white bg-opacity-80 text-center rounded-b">
+                    {{ $resource->title }}
+                    
+                </div>
+             
         </div>
 
         <div class="mb-4">

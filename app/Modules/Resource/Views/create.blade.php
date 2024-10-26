@@ -21,10 +21,10 @@
                 @csrf
                 <div class="intro-y box p-5">
                     <div>
-                        <label class="form-label">Loại tài nguyên</label>
+                        <label class="form-label">Loại liên kết</label>
                         <div class="mt-2">
                             <input type="radio" id="resource" name="resource_type" value="resource" checked>
-                            <label for="resource" class="ml-2">Tài nguyên</label>
+                            <label for="resource" class="ml-2">Upload tài nguyên</label>
 
                             <input type="radio" id="link" name="resource_type" value="link" class="ml-4">
                             <label for="link" class="ml-2">Liên kết tài nguyên</label>
@@ -39,10 +39,10 @@
                     </div>
                     <div class="mt-3">
                         <label for="" class="form-label">Loại tài nguyên</label>
-                        <select name="resource_type_id" class="form-select mt-2" required>
+                        <select name="type_code" class="form-select mt-2" required>
                             <option value="">- Chọn loại tài nguyên -</option>
                             @foreach ($resourceTypes as $type)
-                                <option value="{{ $type->id }}">{{ $type->title }}</option>
+                                <option value="{{ $type->code }}">{{ $type->title }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -56,30 +56,20 @@
 
                     <div id="linkFields" class="mt-3 hidden">
                         <label for="" class="form-label">Loại liên kết tài nguyên</label>
-                        <select name="resource_link_type_id" class="form-select mt-2">
+                        <select name="link_code" class="form-select mt-2">
                             <option value="">- Chọn loại liên kết -</option>
                             @foreach ($linkTypes as $type)
-                                <option value="{{ $type->id }}">{{ $type->title }}</option>
+                                <option value="{{ $type->code}}">{{ $type->title }}</option>
                             @endforeach
                         </select>
 
                         <div class="mt-3">
-                            <label for="" class="form-label">Liên kết YouTube</label>
-                            <input type="url" name="youtube_url" class="form-control"
-                                placeholder="Nhập liên kết YouTube (nếu có)" value="{{ old('youtube_url') }}">
+                            <label for="" class="form-label">Liên kết</label>
+                            <input type="url" name="url" class="form-control"
+                                placeholder="Nhập liên kết YouTube (nếu có)" value="{{ old('url') }}">
                         </div>
 
-                        <div class="mt-3">
-                            <label for="" class="form-label">Liên kết Tài liệu</label>
-                            <input type="url" name="document_url" class="form-control"
-                                placeholder="Nhập liên kết tài liệu (nếu có)" value="{{ old('document_url') }}">
-                        </div>
-
-                        <div class="mt-3">
-                            <label for="" class="form-label">Liên kết Hình ảnh</label>
-                            <input type="url" name="image_url" class="form-control"
-                                placeholder="Nhập liên kết hình ảnh (nếu có)" value="{{ old('image_url') }}">
-                        </div>
+                       
                     </div>
 
                     <div class="mt-3">

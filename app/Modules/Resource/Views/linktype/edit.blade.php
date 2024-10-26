@@ -12,12 +12,16 @@
                 <div class="intro-y box p-5">
                     <div>
                         <label for="name" class="form-label">Tên loại liên kết tài nguyên</label>
-                        <input id="name" name="title" type="text" class="form-control" placeholder="Nhập tên loại liên kết tài nguyên" value="{{ old('name', $resourceLinkType->name) }}" required>
+                        <input id="name" name="title" type="text" class="form-control" placeholder="Nhập tên loại liên kết tài nguyên" value="{{ old('title', $resourceLinkType->title) }}" required>
                     </div>
 
                     <div class="mt-4">
                         <label for="code" class="form-label">Mã loại liên kết tài nguyên</label>
                         <input id="code" name="code" type="text" class="form-control" placeholder="Nhập mã loại liên kết tài nguyên" value="{{ old('code', $resourceLinkType->code) }}" required>
+                    </div>
+                    <div class="mt-4">
+                        <label for="viewcode" class="form-label">Code hiện liên kết tài nguyên</label>
+                        <input id="viewcode" name="viewcode" type="text" class="form-control" placeholder="Nhập mã loại liên kết tài nguyên" value="{{ old('viewcode', $resourceLinkType->viewcode) }}" required>
                     </div>
 
                     <div class="text-right mt-5">

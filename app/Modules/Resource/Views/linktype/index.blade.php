@@ -26,6 +26,7 @@
                             <tr class="intro-x">
                                 <td class="text-blue-600">{{ $resourceLinkType->title }}</td>
                                 <td class="text-gray-800">{{ $resourceLinkType->code }}</td>
+                                <td class="text-gray-800">{{ $resourceLinkType->viewcode }}</td>
                                 <td class="table-report__action">
                                     <div class="flex justify-start items-center"> <!-- Canh trái -->
                                         <!-- Nút sửa loại liên kết tài nguyên -->

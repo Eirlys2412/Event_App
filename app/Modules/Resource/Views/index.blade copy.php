@@ -25,32 +25,23 @@
             @foreach ($resources as $resource)
                 @php
                     $fileType = $resource->file_type;
-                 
+                    $imageUrl = $resource->image_url;
+                    $documentUrl = $resource->document_url;
                 @endphp
 
                 <div class="intro-y col-span-6 sm:col-span-4 lg:col-span-3">
                     <div class="card p-4 border rounded shadow-md relative">
                         <a href="{{ route('admin.resources.show', $resource->id) }}">
                             <div class="relative">
-                                @if($resource->link_code )
-                                    @if($resource->type_code == 'image')
-                                        <img src="{{ $resource->url }}" alt="{{ $resource->title }}"
+                                @if (!empty($imageUrl))
+                                    <!-- Hiển thị ảnh từ image_url -->
+                                    <img src="{{ $imageUrl }}" alt="{{ $resource->title }}"
                                         class="w-full h-40 object-cover rounded resource-image" />
-                                    @endif
-                                    @if ($resource->type_code == 'document')
+                                @elseif (!empty($documentUrl))
                                     <!-- Hiển thị liên kết tải file từ document_url -->
-                                        <a href="{{$resource->url }}" class="text-blue-500 underline">
-                                            Tải tài liệu
-                                        </a>
-                                    @endif
-                                    @if ($resource->type_code == 'video' && $resource->link_code=='youtube')
-                                    <!-- Hiển thị liên kết tải file từ document_url -->
-                                            <iframe width="100%" height="160"
-                                            src="{{ str_replace('watch?v=', 'embed/', $resource->url) }}"
-                                            frameborder="0" allowfullscreen></iframe>
-                                    @endif
-                                   
-                               
+                                    <a href="{{ $documentUrl }}" class="text-blue-500 underline">
+                                        Tải tài liệu
+                                    </a>
                                 @else
                                     <!-- Kiểm tra loại file và hiển thị tương ứng -->
                                     @switch(true)
@@ -65,6 +56,15 @@
                                                 <source src="{{ $resource->url }}" type="{{ $fileType }}">
                                                 Trình duyệt của bạn không hỗ trợ thẻ video.
                                             </video>
+                                        @break
+
+                                        @case(
+                                            !empty($resource->youtube_url) &&
+                                                (strpos($resource->youtube_url, 'youtube.com') !== false ||
+                                                    strpos($resource->youtube_url, 'youtu.be') !== false))
+                                            <iframe width="100%" height="160"
+                                                src="{{ str_replace('watch?v=', 'embed/', $resource->youtube_url) }}"
+                                                frameborder="0" allowfullscreen></iframe>
                                         @break
 
                                         @case(strpos($fileType, 'audio/') === 0)

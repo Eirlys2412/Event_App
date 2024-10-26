@@ -26,11 +26,11 @@
                     </div>
 
                     <div class="mt-3">
-                        <label for="resource_type_id" class="form-label">Loại tài nguyên</label>
-                        <select name="resource_type_id" class="form-select mt-2">
+                        <label for="type_code" class="form-label">Loại tài nguyên</label>
+                        <select name="type_code" class="form-select mt-2">
                             @foreach ($resourceTypes as $type)
-                                <option value="{{ $type->id }}"
-                                    {{ $resource->resource_type_id == $type->id ? 'selected' : '' }}>
+                                <option value="{{ $type->code }}"
+                                    {{ $resource->type_code == $type->code ? 'selected' : '' }}>
                                     {{ $type->title }}
                                 </option>
                             @endforeach
@@ -38,11 +38,12 @@
                     </div>
 
                     <div class="mt-3">
-                        <label for="resource_link_type_id" class="form-label">Loại liên kết tài nguyên</label>
-                        <select name="resource_link_type_id" class="form-select mt-2">
+                        <label for="link_code" class="form-label">Loại liên kết tài nguyên</label>
+                        <select name="link_code" class="form-select mt-2">
+                            <option value="">- Chọn loại liên kết -</option>
                             @foreach ($linkTypes as $type)
-                                <option value="{{ $type->id }}"
-                                    {{ $resource->resource_link_type_id == $type->id ? 'selected' : '' }}>
+                                <option value="{{ $type->code }}"
+                                    {{ $resource->link_code == $type->code ? 'selected' : '' }}>
                                     {{ $type->title }}
                                 </option>
                             @endforeach
@@ -71,30 +72,12 @@
 
 
                     <div class="mt-3">
-                        <label for="image_url" class="form-label">Liên kết hình ảnh (nếu có)</label>
-                        <input id="image_url" name="image_url" type="url" class="form-control"
-                            placeholder="Nhập liên kết hình ảnh" value="{{ old('image_url', $resource->image_url) }}">
+                        <label for="url" class="form-label">Liên kết  (nếu có)</label>
+                        <input id="url" name="url" type="url" class="form-control"
+                            placeholder="Nhập liên kết hình ảnh" value="{{$resource->link_code? old('url', $resource->url):'' }}">
                     </div>
 
-                    <div class="mt-3">
-                        <label for="document_url" class="form-label">Liên kết tài liệu (nếu có)</label>
-                        <input id="document_url" name="document_url" type="url" class="form-control"
-                            placeholder="Nhập liên kết tài liệu"
-                            value="{{ old('document_url', $resource->document_url) }}">
-                    </div>
-
-                    <div class="mt-3">
-                        <label for="youtube_url" class="form-label">Liên kết YouTube (nếu có)</label>
-                        <input id="youtube_url" name="youtube_url" type="url" class="form-control"
-                            placeholder="Nhập liên kết YouTube" value="{{ old('youtube_url', $resource->youtube_url) }}">
-                    </div>
-
-                    <div class="mt-3">
-                        <label for="tags" class="form-label">Tags</label>
-                        <input id="tags" name="tags" type="text" class="form-control"
-                            placeholder="Nhập tags, cách nhau bằng dấu phẩy" value="{{ old('tags', $resource->tags) }}">
-                    </div>
-
+                   
                     <div class="text-right mt-5">
                         <button type="submit" class="btn btn-primary w-24">Cập nhật</button>
                     </div>

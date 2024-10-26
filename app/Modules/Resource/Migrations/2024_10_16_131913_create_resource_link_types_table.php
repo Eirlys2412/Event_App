@@ -12,6 +12,7 @@ class CreateResourceLinkTypesTable extends Migration
             $table->id();
             $table->string('title');
             $table->string('code')->unique();
+            $table->string('viewcode')->nullable();
             $table->timestamps();
         });
     }

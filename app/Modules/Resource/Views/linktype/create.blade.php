@@ -25,6 +25,14 @@
                         @endif
                     </div>
 
+                    <div class="mt-4">
+                        <label for="viewcode" class="form-label">Code hiện tài nguyên</label>
+                        <input id="viewcode" name="viewcode" type="text" class="form-control" placeholder="Nhập code hiện tài nguyên" value="{{ old('viewcode') }}" required>
+                        @if ($errors->has('viewcode'))
+                            <div class="text-danger mt-2">{{ $errors->first('viewcode') }}</div>
+                        @endif
+                    </div>
+
                     <div class="text-right mt-5">
                         <button type="submit" class="btn btn-primary w-24">Lưu</button>
                         <a href="{{ route('admin.resource-link-types.index') }}" class="btn btn-secondary w-24">Hủy</a>

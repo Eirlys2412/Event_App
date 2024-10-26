@@ -100,6 +100,7 @@ class DatabaseSeeder extends Seeder
             
             
             RecommendSeeder::class,
+            ResourceSeeder::class,
         ]);
     }
 }

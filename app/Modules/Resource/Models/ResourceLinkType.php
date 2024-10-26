@@ -14,6 +14,7 @@ class ResourceLinkType extends Model
     protected $fillable = [
         'title',
         'code',
+        'viewcode',
     ];
 
     // Nếu cần thiết, bạn có thể thêm các phương thức quan hệ ở đây
