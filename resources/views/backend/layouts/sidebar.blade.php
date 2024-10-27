@@ -39,6 +39,32 @@
             </li>
       </ul>
   </li>
+
+  <!-- UserPage -->
+<li>
+    <a href="javascript:;" class="side-menu {{($active_menu=='userpage_list'|| $active_menu=='userpage_add')?'side-menu--active':''}}">
+        <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
+        <div class="side-menu__title">
+            User Pages
+            <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+        </div>
+    </a>
+    <ul class="{{($active_menu=='userpage_list'|| $active_menu=='userpage_add')?'side-menu__sub-open':''}}">
+        <li>
+            <a href="{{route('admin.userpage.index')}}" class="side-menu {{$active_menu=='userpage_list'?'side-menu--active':''}}">
+                <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                <div class="side-menu__title">Danh sách User Pages</div>
+            </a>
+        </li>
+        <li>
+            <a href="{{route('admin.userpage.create')}}" class="side-menu {{$active_menu=='userpage_add'?'side-menu--active':''}}">
+                <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                <div class="side-menu__title">Thêm User Page</div>
+            </a>
+        </li>
+    </ul>
+</li>
+
      
     <li>
         <a href="javascript:;" class="side-menu  class="side-menu {{($active_menu =='ugroup_add'|| $active_menu=='ugroup_list' || $active_menu =='ctm_add'|| $active_menu=='ctm_list'  )?'side-menu--active':''}}">
