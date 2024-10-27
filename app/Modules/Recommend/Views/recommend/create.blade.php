@@ -12,88 +12,23 @@
  
     <div class="intro-y flex items-center mt-8">
         <h2 class="text-lg font-medium mr-auto">
-            Thêm bài viết
+            Thêm học phần
         </h2>
     </div>
     <div class="grid grid-cols-12 gap-12 mt-5">
         <div class="intro-y col-span-12 lg:col-span-12">
             <!-- BEGIN: Form Layout -->
-            <form method="post" action="{{route('admin.blog.store')}}">
+            <form method="post" action="{{route('admin.recommend.store')}}">
                 @csrf
                 <div class="intro-y box p-5">
                     <div>
-                        <label for="regular-form-1" class="form-label">Tiêu đề</label>
-                        <input id="title" name="title" type="text" class="form-control" placeholder="title">
+                        <label for="regular-form-1" class="form-label">Tên học phần</label>
+                        <input name="name" type="text" class="form-control" placeholder="name">
                     </div>
-                     
-                    <div class="mt-3">
-                        <label for="" class="form-label">Photo</label>
-                        <div class="px-4 pb-4 mt-5 flex items-center  cursor-pointer relative">
-                            <div data-single="true" id="mydropzone" class="dropzone  "    url="{{route('admin.upload.avatar')}}" >
-                                <div class="fallback"> <input name="file" type="file" /> </div>
-                                <div class="dz-message" data-dz-message>
-                                    <div class=" font-medium">Kéo thả hoặc chọn ảnh.</div>
-                                        
-                                </div>
-                            </div>
-                            <input type="hidden" id="photo" name="photo"/>
-                        </div>
+                    <div>
+                        <label for="regular-form-1" class="form-label">Số tín chỉ</label>
+                        <input name="tinchi" type="text" class="form-control" placeholder="number">
                     </div>
-                    <div class="mt-3">
-                        
-                        <label for="" class="form-label">Mô tả ngắn</label>
-                       
-                        <textarea class="form-control"   id="editor1" name="summary" >{{old('summary')}}</textarea>
-                    </div>
-                   
-                    <div class="mt-3">
-                        
-                        <label for="" class="form-label">Nội dung</label>
-                       
-                        <textarea class="editor" name="content" id="editor2"  >
-                            {{old('description')}}
-                        </textarea>
-                    </div>
-                    
-                    
-                    <div class="mt-3">
-                        <div class="flex flex-col sm:flex-row items-center">
-                            <label style="min-width:70px  " class="form-select-label" for="status">Danh mục</label><br/>
-                            <select name="cat_id"  class="form-select mt-2 sm:mr-2"   >
-                                <option value =""> - Chọn danh mục - </option>
-                                @foreach($categories as $cat)
-                                    <option value ="{{$cat->id}}"> {{ $cat->title}} </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                     
-                            <label for="post-form-4" class="form-label">Tags</label>
-                         
-                            <select id="select-junk" name="tag_ids[]" multiple placeholder=" ..." autocomplete="off">
-                    
-                              @foreach ($tags as $tag )
-                              <option value="{{$tag->id}}" >{{$tag->title}}</option>
-                              @endforeach
-                                
-                                 
-                            </select>
-                        
-                    </div>      
-                   
-                    <div class="mt-3">
-                        <div class="flex flex-col sm:flex-row items-center">
-                            <label style="min-width:70px  " class="form-select-label"  for="status">Tình trạng</label>
-                           
-                            <select name="status" class="form-select mt-2 sm:mr-2"   >
-                                
-                                <option value ="active" {{old('status')=='active'?'selected':''}}>Active</option>
-                                <option value = "inactive" {{old('status')=='inactive'?'selected':''}}>Inactive</option>
-                            </select>
-                        </div>
-                    </div>
-                    
                     <div class="text-right mt-5">
                         <button type="submit" class="btn btn-primary w-24">Lưu</button>
                     </div>

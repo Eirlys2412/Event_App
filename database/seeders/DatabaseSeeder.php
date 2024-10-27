@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
                 "role"=>"admin",
                 "phone"=>"111111111",
                 'status'=>'active',
-
+                'code' => '21103118',
             ], 
             [
                 'full_name'=>"manager",
@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
                 "role"=>"manager",
                 "phone"=>"111111119",
                 'status'=>'active',
-
+                'code' => '21103119',
             ],
             
             [
@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
                 "role"=>"giangvien",
                 "phone"=>"111111118",
                 'status'=>'active',
-
+                'code' => '21103120',
             ],
             [
                 'full_name'=>"sinhvien",
@@ -63,7 +63,7 @@ class DatabaseSeeder extends Seeder
                 "role"=>"giangvien",
                 "phone"=>"111111117",
                 'status'=>'active',
-
+                'code' => '21103121',
             ],
 
         ]);
@@ -94,6 +94,13 @@ class DatabaseSeeder extends Seeder
                 'title'=>"soft",
                 'status'=>'active',
             ],
+        ]);
+
+        $this->call([
+            
+            
+            RecommendSeeder::class,
+            ResourceSeeder::class,
         ]);
     }
 }
