@@ -19,9 +19,9 @@ class CreateResourcesTable extends Migration
             $table->string('url')->nullable();
             $table->string('tags')->nullable();
             $table->string('description')->nullable();
-          
-            $table->unsignedBigInteger('type_code');
-            $table->unsignedBigInteger('link_code')->nullable()->default(null);
+
+            $table->string('type_code');
+            $table->string('link_code')->nullable()->default(null);
             $table->timestamps();
         });
     }
