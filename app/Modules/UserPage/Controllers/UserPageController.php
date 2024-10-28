@@ -4,6 +4,7 @@ namespace App\Modules\UserPage\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use App\Modules\UserPage\Models\UserPage;
 
 class UserPageController extends Controller
@@ -23,20 +24,27 @@ class UserPageController extends Controller
         return view('UserPage::userpage.create', compact('active_menu'));
     }
 
-    // Store a new user page
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:user_pages',
             'summary' => 'required',
-            'items' => 'required',
         ]);
 
+        // Tạo slug từ tiêu đề và thêm timestamp để đảm bảo tính duy nhất
+        $validatedData['slug'] = Str::slug($validatedData['title']) . '-' . now()->timestamp;
+
+        // Lấy dữ liệu từ blog và chuyển thành JSON cho trường items
+        $blogs = \App\Models\Blog::select('id', 'title', 'summary')->get();
+        $validatedData['items'] = $blogs->toJson();
+
+        // Tạo mới UserPage
         UserPage::create($validatedData);
 
         return redirect()->route('admin.userpage.index')->with('success', 'User page created successfully.');
     }
+
 
     // Show a specific user page
     public function show(UserPage $userpage)

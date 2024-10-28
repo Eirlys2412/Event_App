@@ -24,20 +24,20 @@
                     <input id="title" name="title" type="text" class="form-control" placeholder="title">
                 </div>
                 
-                <div class="mt-3">
+                {{-- <div class="mt-3">
                     <label for="" class="form-label">Slug</label>
                     <input id="slug" name="slug" type="text" class="form-control" placeholder="slug">
-                </div>
+                </div> --}}
 
                 <div class="mt-3">
                     <label for="" class="form-label">Mô tả ngắn</label>
                     <textarea class="form-control" id="editor1" name="summary">{{old('summary')}}</textarea>
                 </div>
 
-                <div class="mt-3">
+                {{-- <div class="mt-3">
                     <label for="" class="form-label">Nội dung</label>
                     <textarea class="editor" name="items" id="editor2">{{old('items')}}</textarea>
-                </div>
+                </div> --}}
 
                 <div class="mt-3">
                     <div class="flex flex-col sm:flex-row items-center">
