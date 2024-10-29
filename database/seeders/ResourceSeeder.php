@@ -50,10 +50,10 @@ class ResourceSeeder extends Seeder
             [   
                 'title'=>"baihat",
                 'slug'=>"baihat",
-				'file_type'=>"video",
+
 				'link_code'=>"youtube",
-				'type_code'=>"image",
-				'url'=>"https://www.youtube.com/watch?v=PwQmPLjnSPo",
+				'type_code'=>"video",
+				'url'=>"https://www.youtube.com/watch?v=05M5jKoxw78",
 				'description'=>"bai hat",
                  
             ],

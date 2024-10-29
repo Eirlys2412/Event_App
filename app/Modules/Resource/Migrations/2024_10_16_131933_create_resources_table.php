@@ -17,7 +17,7 @@ class CreateResourcesTable extends Migration
             $table->string('file_size')->nullable();
             $table->string('path')->nullable();
             $table->string('url')->nullable();
-            $table->string('tags')->nullable();
+            $table->string('code')->nullable();
             $table->string('description')->nullable();
 
             $table->string('type_code');

@@ -17,7 +17,7 @@
                     <tr>
                         <th class="whitespace-nowrap" style="width: 40%;">Tiêu đề</th>
                         <th class="whitespace-nowrap" style="width: 30%;">Mã</th>
-                        <th class="whitespace-nowrap" style="width: 20%;">Hành động</th> <!-- Giảm chiều rộng cột hành động -->
+                        <th class="whitespace-nowrap" style="width: 20%;">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -26,14 +26,13 @@
                             <tr class="intro-x">
                                 <td class="text-blue-600">{{ $resourceLinkType->title }}</td>
                                 <td class="text-gray-800">{{ $resourceLinkType->code }}</td>
-                                <td class="text-gray-800">{{ $resourceLinkType->viewcode }}</td>
+
                                 <td class="table-report__action">
-                                    <div class="flex justify-start items-center"> <!-- Canh trái -->
-                                        <!-- Nút sửa loại liên kết tài nguyên -->
+                                    <div class="flex justify-start items-center">
                                         <a href="{{ route('admin.resource-link-types.edit', $resourceLinkType->id) }}" class="flex items-center mr-3 text-blue-500">
                                             <i data-lucide="edit" class="w-4 h-4 mr-1"></i> Sửa
                                         </a>
-                                        <!-- Nút xóa loại liên kết tài nguyên -->
+                                        
                                         <form action="{{ route('admin.resource-link-types.destroy', $resourceLinkType->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
@@ -41,7 +40,7 @@
                                                 style="line-height: 1;" 
                                                 onclick="return confirm('Bạn có chắc chắn muốn xóa?');">
                                                 <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> 
-                                                <span class="ml-1">Xóa</span> <!-- Thêm margin-left -->
+                                                <span class="ml-1">Xóa</span>
                                             </button>
                                         </form>
                                     </div>
@@ -60,6 +59,6 @@
         </div>
     </div>
 
-    {{ $resourceLinkTypes->links() }} 
+    {{ $resourceLinkTypes->links() }}
 
 @endsection

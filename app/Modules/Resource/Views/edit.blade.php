@@ -77,7 +77,25 @@
                             placeholder="Nhập liên kết hình ảnh" value="{{$resource->link_code? old('url', $resource->url):'' }}">
                     </div>
 
-                   
+                    <div class="mt-3">
+                        <label for="post-form-4" class="form-label">Tags</label>
+                        <select id="select-junk" name="tag_ids[]" multiple placeholder="..." autocomplete="off">
+                    
+                        <!-- <select name="tag_ids[]" data-placeholder="tag .."   class="tom-select w-full" id="post-form-4" multiple> -->
+                            @foreach ($tags as $tag )
+                                <option value="{{$tag->id}}" 
+                                    <?php 
+                                        foreach($tag_ids as $item)
+                                        {
+                                                if($item->tag_id == $tag->id)
+                                                    echo 'selected';
+                                        } 
+                                    ?>
+                                >{{$tag->title}}</option>
+                            @endforeach
+                        </select>
+                    </div>     
+
                     <div class="text-right mt-5">
                         <button type="submit" class="btn btn-primary w-24">Cập nhật</button>
                     </div>
@@ -88,16 +106,26 @@
 @endsection
 
 @section('scripts')
-    <script>
-        var select = new TomSelect('#tags', {
-            create: true,
-            plugins: ['remove_button'],
-            onItemAdd: function(value) {
+<script>
+    var select = new TomSelect('#select-junk',{
+        maxItems: null,
+        allowEmptyOption: true,
+        plugins: ['remove_button'],
+        sortField: {
+            field: "text", 
+            direction: "asc"
+        },
+        onItemAdd:function(){
                 this.setTextboxValue('');
                 this.refreshOptions();
-            }
-        });
-    </script>
+            },
+        create: true
+        
+    });
+    @if (count($tag_ids)== 0)
+        select.clear();
+     @endif
+</script>
     <script src="{{ asset('js/js/ckeditor.js') }}"></script>
     <script>
         ClassicEditor
