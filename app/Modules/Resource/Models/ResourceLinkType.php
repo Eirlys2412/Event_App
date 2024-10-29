@@ -9,7 +9,7 @@ class ResourceLinkType extends Model
 {
     use HasFactory;
 
-    protected $table = 'resource_link_types'; // Tên bảng trong CSDL
+    protected $table = 'resource_link_types'; 
 
     protected $fillable = [
         'title',
@@ -17,5 +17,5 @@ class ResourceLinkType extends Model
         'viewcode',
     ];
 
-    // Nếu cần thiết, bạn có thể thêm các phương thức quan hệ ở đây
+    
 }

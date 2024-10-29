@@ -59,7 +59,7 @@
                         <select name="link_code" class="form-select mt-2">
                             <option value="">- Chọn loại liên kết -</option>
                             @foreach ($linkTypes as $type)
-                                <option value="{{ $type->code}}">{{ $type->title }}</option>
+                                <option value="{{ $type->code }}">{{ $type->title }}</option>
                             @endforeach
                         </select>
 
@@ -69,13 +69,22 @@
                                 placeholder="Nhập liên kết YouTube (nếu có)" value="{{ old('url') }}">
                         </div>
 
-                       
+
                     </div>
 
                     <div class="mt-3">
-                        <label for="tags" class="form-label">Tags</label>
-                        <input id="tags" name="tags" type="text" class="form-control"
-                            placeholder="Nhập tags, cách nhau bằng dấu phẩy" value="{{ old('tags') }}">
+
+                        <label for="post-form-4" class="form-label">Tags</label>
+
+                        <select id="select-junk" name="tag_ids[]" multiple placeholder=" ..." autocomplete="off">
+
+                            @foreach ($tags as $tag)
+                                <option value="{{ $tag->id }}">{{ $tag->title }}</option>
+                            @endforeach
+
+
+                        </select>
+
                     </div>
 
                     <div class="text-right mt-5">
@@ -90,15 +99,23 @@
 
 @section('scripts')
     <script>
-        var select = new TomSelect('#tags', {
-            create: true,
+        var select = new TomSelect('#select-junk', {
+            maxItems: null,
+            allowEmptyOption: true,
             plugins: ['remove_button'],
-            onItemAdd: function(value) {
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            onItemAdd: function() {
                 this.setTextboxValue('');
                 this.refreshOptions();
-            }
-        });
+            },
+            create: true
 
+        });
+        select.clear();
+    
         // JavaScript để ẩn/hiện các trường
         document.querySelectorAll('input[name="resource_type"]').forEach(function(elem) {
             elem.addEventListener("change", function(event) {
@@ -124,7 +141,7 @@
                 }
             }
         });
-        
+
     </script>
 
     <script src="{{ asset('js/js/ckeditor.js') }}"></script>
@@ -147,5 +164,5 @@
     </script>
 
 
-
+    
 @endsection
