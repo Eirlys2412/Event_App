@@ -17,7 +17,7 @@
             <tr>
                 <th>ID</th>
                 <th>Tên</th>
-                <th>role</th>
+                <th>Vai trò</th>
                 <th>Trạng thái</th>
                 <th>Hành động</th>
             </tr>
@@ -26,9 +26,15 @@
             @foreach($groupMembers as $member)
                 <tr>
                     <td>{{ $member->id }}</td>
-                    <td>{{ $member->name }}</td>
+                    <td>{{ $member->full_name }}</td> <!-- Sử dụng $member->full_name -->
                     <td>{{ $member->role }}</td>
-                    <td>{{ $member->status }}</td>
+                    <td>
+                        @if($member->status == 'active')
+                            <span class="badge badge-success">Hoạt động</span>
+                        @else
+                            <span class="badge badge-danger">Không hoạt động</span>
+                        @endif
+                    </td>
                     <td>
                         <a href="{{ route('admin.groupmember.edit', ['groupId' => $groupId, 'id' => $member->id]) }}">Chỉnh sửa</a>
                         <form action="{{ route('admin.groupmember.destroy', $member->id) }}" method="POST" style="display:inline;">
@@ -43,5 +49,6 @@
     </table>
 
     {{ $groupMembers->links() }} <!-- Phân trang -->
+    
 </div>
 @endsection
