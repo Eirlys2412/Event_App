@@ -21,7 +21,7 @@
 </div>
    
 @endif
-</div>
+
 
 <div class="mt-3">
     @if($errors->any())
@@ -33,4 +33,5 @@
             </ul>
         </div>
     @endif
+</div>
 </div>
