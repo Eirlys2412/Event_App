@@ -46,27 +46,27 @@ class GroupMemberController extends Controller
         return view('Group::groupmember.create', compact('groupId', 'active_menu', 'users')); // Truyền biến $users vào view
     }
     // Lưu thành viên mới
-  // Lưu thành viên mới
-  public function store(Request $request, $groupId)
-  {
-      // Xác thực dữ liệu đầu vào
-      $request->validate([
-          'user_id' => 'required|exists:users,id', // Đảm bảo user_id là bắt buộc
-          'role' => 'required|in:member,admin,lecturer', // Xác thực vai trò
-          'status' => 'required|in:active,inactive', // Xác thực trạng thái
-      ]);
-  
-      // Tạo thành viên mới
-      GroupMember::create([
-          'group_id' => $groupId,
-          'user_id' => $request->user_id, // Lưu user_id
-          'role' => $request->role, // Lưu vai trò
-          'status' => $request->status, // Lưu trạng thái
-      ]);
-  
-      return redirect()->route('admin.groupmember.index', $groupId)
-                       ->with('success', 'Thành viên đã được thêm thành công.');
-  }
+
+public function store(Request $request, $groupId)
+{
+    // Xác thực dữ liệu đầu vào
+    $request->validate([
+        'user_id' => 'required|exists:users,id', // Đảm bảo user_id là bắt buộc
+        'role' => 'required|in:member,admin,lecturer', // Xác thực vai trò
+        'status' => 'required|in:active,inactive', // Xác thực trạng thái
+    ]);
+
+    // Tạo thành viên mới
+    GroupMember::create([
+        'group_id' => $groupId,
+        'user_id' => $request->user_id, // Lưu user_id
+        'role' => $request->role, // Lưu vai trò
+        'status' => $request->status, // Lưu trạng thái
+    ]);
+
+    return redirect()->route('admin.groupmember.index', $groupId)
+                     ->with('success', 'Thành viên đã được thêm thành công.');
+}
 
     // Hiển thị form chỉnh sửa thành viên
     public function edit($groupId, $id)
@@ -79,21 +79,23 @@ class GroupMemberController extends Controller
     }
 
     // Cập nhật thông tin thành viên
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive',
-        ]);
+    public function update(Request $request, $groupId, $id)
+{
+    $request->validate([
+        'full_name' => 'required|string|max:255',
+        'role' => 'required|string|in:admin,member',
+        'status' => 'required|in:active,inactive',
+    ]);
 
-        $member = GroupMember::findOrFail($id);
-        $member->update([
-            'name' => $request->name,
-            'status' => $request->status,
-        ]);
+    $member = GroupMember::findOrFail($id);
+    $member->update([
+        'full_name' => $request->full_name,
+        'role' => $request->role,
+        'status' => $request->status,
+    ]);
 
-        return redirect()->route('admin.groupmember.index', $member->group_id)->with('success', 'Thông tin thành viên đã được cập nhật.');
-    }
+    return redirect()->route('admin.groupmember.index', $groupId)->with('success', 'Thông tin thành viên đã được cập nhật.');
+}
 
     // Xóa thành viên
     public function destroy($id)
