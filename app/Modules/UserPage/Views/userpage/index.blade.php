@@ -8,7 +8,7 @@
     </h2>
     <div class="grid grid-cols-12 gap-6 mt-5">
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
-            <a href="{{route('admin.blog.create')}}" class="btn btn-primary shadow-md mr-2">Thêm UserPage</a>
+            <a href="{{route('admin.userpage.create')}}" class="btn btn-primary shadow-md mr-2">Thêm UserPage</a>
             
             <div class="hidden md:block mx-auto text-slate-500">Hiển thị trang {{$userpage->currentPage()}} trong {{$userpage->lastPage()}} trang</div>
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
