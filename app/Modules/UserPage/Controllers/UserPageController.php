@@ -5,6 +5,7 @@ namespace App\Modules\UserPage\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\Blog; 
 use App\Modules\UserPage\Models\UserPage;
 
 class UserPageController extends Controller
@@ -26,24 +27,33 @@ class UserPageController extends Controller
 
 
     public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'summary' => 'required',
-        ]);
+{
+    $validatedData = $request->validate([
+        'title' => 'required|string|max:255',
+        'summary' => 'required',
+    ]);
 
-        // Tạo slug từ tiêu đề và thêm timestamp để đảm bảo tính duy nhất
-        $validatedData['slug'] = Str::slug($validatedData['title']) . '-' . now()->timestamp;
+    // Fetch the most recent blog entry
+    $latestBlog = Blog::latest()->first();
 
-        // Lấy dữ liệu từ blog và chuyển thành JSON cho trường items
-        $blogs = \App\Models\Blog::select('id', 'title', 'summary')->get();
-        $validatedData['items'] = $blogs->toJson();
+    if ($latestBlog) {
+        // Set the data for the UserPage
+        $userPageData = [
+            'title' => $validatedData['title'],
+            'slug' => Str::slug($validatedData['title']), // Slug generated from the title
+            'summary' => $validatedData['summary'],
+            'items' => json_encode([
+                'id' => $latestBlog->id,
+            ],JSON_UNESCAPED_UNICODE),
+        ];
 
-        // Tạo mới UserPage
-        UserPage::create($validatedData);
+        UserPage::create($userPageData);
 
         return redirect()->route('admin.userpage.index')->with('success', 'User page created successfully.');
     }
+
+    return redirect()->route('admin.userpage.index')->with('error', 'No blog data found.');
+}
 
 
     // Show a specific user page
