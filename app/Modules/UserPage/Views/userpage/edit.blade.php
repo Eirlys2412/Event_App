@@ -26,19 +26,14 @@
                 </div>
 
                 <div class="mt-3">
-                    <label for="" class="form-label">Slug</label>
-                    <input id="slug" name="slug" type="text" class="form-control" placeholder="slug">
-                </div>
-
-                <div class="mt-3">
                     <label for="summary" class="form-label">Mô tả ngắn</label>
                     <textarea class="form-control" name="summary" id="editor1">{{ $userpage->summary }}</textarea>
                 </div>
 
-                <div class="mt-3">
+                {{-- <div class="mt-3">
                     <label for="items" class="form-label">Nội dung</label>
                     <textarea class="editor" name="items" id="editor2">{{ $userpage->items }}</textarea>
-                </div>
+                </div> --}}
 
                 {{-- <div class="mt-3">
                     <label class="form-select-label" for="status">Danh mục</label>

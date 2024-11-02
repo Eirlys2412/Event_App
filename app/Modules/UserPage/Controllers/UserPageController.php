@@ -75,7 +75,6 @@ class UserPageController extends Controller
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:user_pages,slug,' . $userpage->id,
             'summary' => 'required',
             'items' => 'required',
         ]);
