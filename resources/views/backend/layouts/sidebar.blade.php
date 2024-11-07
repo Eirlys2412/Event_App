@@ -64,6 +64,30 @@
                 
           </ul>
         </li>
+        {{-- nganh --}}
+        <li>
+            <a href="javascript:;" class="side-menu side-menu{{ ($active_menu == 'nganh_list' || $active_menu == 'nganh_add') ? '--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="align-center"></i> </div>
+                <div class="side-menu__title">
+                    Ngành
+                    <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+                </div>
+            </a>
+            <ul class="{{ ($active_menu == 'nganh_list' || $active_menu == 'nganh_add') ? 'side-menu__sub-open' : '' }}">
+                <li>
+                    <a href="{{ route('admin.nganh.index') }}" class="side-menu {{ $active_menu == 'nganh_list' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="compass"></i> </div>
+                        <div class="side-menu__title">Danh sách Ngành</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.nganh.create') }}" class="side-menu {{ $active_menu == 'nganh_add' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                        <div class="side-menu__title">Thêm Ngành</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
         <li>
             <a href="javascript:;" class="side-menu  class="side-menu {{($active_menu =='ugroup_add'|| $active_menu=='ugroup_list' || $active_menu =='ctm_add'|| $active_menu=='ctm_list'  )?'side-menu--active':''}}">
                 <div class="side-menu__icon"> <i data-lucide="user"></i> </div>
