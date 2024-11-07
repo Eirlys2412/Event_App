@@ -99,7 +99,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             
             
-            RecommendSeeder::class,
+            HinhThucThiSeeder::class,
             ResourceSeeder::class,
         ]);
     }

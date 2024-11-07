@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Modules\Recommend\Models;
+namespace App\Modules\Teaching_2\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Module extends Model
+class HinhThucThi extends Model
 {
+    //
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'tinchi',
+        'title',
+        'status',
     ];
 }

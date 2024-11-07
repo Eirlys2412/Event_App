@@ -11,9 +11,9 @@
             <div class="hidden md:block mx-auto text-slate-500">Hiển thị trang {{$module->currentPage()}} trong {{$module->lastPage()}} trang</div>
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
                 <div class="w-56 relative text-slate-500">
-                    <form action="{{route('admin.recommend.search')}}" method = "get">
+                    <form action="{{route('admin.module.search')}}" method = "get">
                         @csrf
-                        <input type="text" name="datasearch" value="{{$searchdata}}" class="ipsearch form-control w-56 box pr-10" placeholder="Tra cứu mssv">
+                        <input type="text" name="datasearch" value="{{$searchdata}}" class="ipsearch form-control w-56 box pr-10" placeholder="Seach">
                         <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0" data-lucide="search"></i> 
                     </form>
                 </div>
@@ -24,40 +24,55 @@
             <table class="table table-report -mt-2">
                 <thead>
                     <tr>
-                        <th class="whitespace-nowrap">TÊN</th>
-                        <th class="whitespace-nowrap">SỐ TÍN CHỈ</th>
+                        <th class="whitespace-nowrap">TITLE</th>
+                        <th class="whitespace-nowrap">PHOTO</th>                        
+                        <th class="whitespace-nowrap">CODE</th>
+                        <th class="whitespace-nowrap">SUMMARY</th>
+                        <th class="whitespace-nowrap">TÍN CHỈ</th>
+                        <th class="whitespace-nowrap">HÌNH THỨC THI</th>
+                        <th class="whitespace-nowrap">TRẠNG THÁI</th>
                     </tr>
                 </thead>
                 <tbody>
-                @foreach($module as $item)
+                    @foreach($module as $item)
                     <tr class="intro-x">
                         <td>
-                            <p href="" class="font-medium whitespace-nowrap">{{$item->name}}</a> 
-                        </td>
-                        <td>
-                            <p href="" class="font-medium whitespace-nowrap">{{$item->tinchi}}</a> 
+                            <p target="_blank" href="" class="font-medium whitespace-nowrap">{{$item->title}}</p> 
                         </td>
                         {{-- <td class="text-left">{{$item->cat_id?\App\Models\BlogCategory::find($item->cat_id)->title:''}}</td> --}}
-                        {{-- <td class="w-40">
+                        <td class="w-40">
                             <div class="flex">
                                 <div class="w-10 h-10 image-fit zoom-in">
                                     <img  class="tooltip rounded-full" 
-                                        src="{{$item->photo}}"  >
+                                        src="{{asset('storage/recommend/'.$item->photo)}}">
                                 </div>
                             </div>
-                        </td> --}}
-                        {{-- <td class="text-center"> 
-                            <input type="checkbox" 
-                            data-toggle="switchbutton" 
-                            data-onlabel="active"
-                            data-offlabel="inactive"
-                            {{$item->status=="active"?"checked":""}}
-                            data-size="sm"
-                            name="toogle"
-                            value="{{$item->id}}"
-                            data-style="ios">
-                        </td> --}}
+                        </td>
+                        <td>
+                            <p target="_blank" href="" class="font-medium whitespace-nowrap">{{$item->code}}</p> 
+                        </td>
+                        <td>
+                            <p target="_blank" href="" class="font-medium whitespace-nowrap">{{$item->summary}}</p> 
+                        </td>
+                        <td>
+                            <p target="_blank" href="" class="font-medium whitespace-nowrap">{{$item->tinchi}}</p> 
+                        </td>
+                        <td>
+                            <p target="_blank" href="" class="font-medium whitespace-nowrap">{{$item->hinhthucthi}}</p> 
+                        </td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <a href="{{route('admin.module.edit',$item->id)}}" class="flex items-center mr-3" href="javascript:;"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                                <form action="{{route('admin.module.destroy',$item->id)}}" method = "post">
+                                    @csrf
+                                    @method('DELETE')
+                                    <a class="flex items-center text-danger dltBtn" data-id="{{$item->id}}" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
+                                </form>
+                               
+                            </div>
+                        </td>
                     </tr>
+
                     @endforeach
                 </tbody>
             </table>
