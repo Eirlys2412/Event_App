@@ -33,18 +33,20 @@ class NganhController extends Controller
     }
 
     public function create()
-    {
-        $this->authorizeFunction("nganh_add");
+{
+    $this->authorizeFunction("nganh_add");
 
-        $data['donvis'] = \App\Modules\Teaching_1\Models\Donvi::where('status', 'active')->orderBy('title', 'ASC')->get();
-        $data['active_menu'] = "nganh_add";
-        $data['breadcrumb'] = '
-        <li class="breadcrumb-item"><a href="#">/</a></li>
-        <li class="breadcrumb-item" aria-current="page"><a href="' . route('admin.nganh.index') . '">Ngành</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Tạo Ngành</li>';
-        
-        return view('Teaching_1::nganh.create', $data);
-    }
+    // Lấy danh sách đơn vị từ bảng donvi mà không cần điều kiện status
+    $data['donvis'] = \App\Modules\Teaching_1\Models\Donvi::orderBy('title', 'ASC')->get();
+    
+    $data['active_menu'] = "nganh_add";
+    $data['breadcrumb'] = '
+    <li class="breadcrumb-item"><a href="#">/</a></li>
+    <li class="breadcrumb-item" aria-current="page"><a href="' . route('admin.nganh.index') . '">Ngành</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Tạo Ngành</li>';
+    
+    return view('Teaching_1::nganh.create', $data);
+}
 
     public function store(Request $request)
 {
@@ -65,21 +67,22 @@ class NganhController extends Controller
         : back()->with('error', 'Có lỗi xảy ra!');
 }
 
-    public function edit(string $id)
-    {
-        $this->authorizeFunction("nganh_edit");
+public function edit(string $id)
+{
+    $this->authorizeFunction("nganh_edit");
 
-        $donvis = \App\Modules\Teaching_1\Models\Donvi::where('status', 'active')->orderBy('title', 'ASC')->get();
-        $nganh = Nganh::findOrFail($id);
+    // Lấy danh sách tất cả đơn vị từ bảng donvi
+    $donvis = \App\Modules\Teaching_1\Models\Donvi::orderBy('title', 'ASC')->get();
+    $nganh = Nganh::findOrFail($id);
 
-        $active_menu = "nganh_list";
-        $breadcrumb = '
-        <li class="breadcrumb-item"><a href="#">/</a></li>
-        <li class="breadcrumb-item" aria-current="page"><a href="' . route('admin.nganh.index') . '">Ngành</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa Ngành</li>';
+    $active_menu = "nganh_list";
+    $breadcrumb = '
+    <li class="breadcrumb-item"><a href="#">/</a></li>
+    <li class="breadcrumb-item" aria-current="page"><a href="' . route('admin.nganh.index') . '">Ngành</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa Ngành</li>';
 
-        return view('Teaching_1::nganh.edit', compact('breadcrumb', 'nganh', 'active_menu', 'donvis'));
-    }
+    return view('Teaching_1::nganh.edit', compact('breadcrumb', 'nganh', 'active_menu', 'donvis'));
+}
 
     public function update(Request $request, string $id)
     {
