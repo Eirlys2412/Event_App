@@ -8,6 +8,10 @@ class DonviController extends Controller
 {
     public function index()
     {
-        
+        // Sử dụng Model để lấy dữ liệu
+        $donVis = Donvi::all();
+        return response()->json($donVis);
+        // hoặc
+        // return view('donvi.index', compact('donvis'));
     }
 }

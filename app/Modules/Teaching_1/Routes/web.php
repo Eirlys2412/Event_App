@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Modules\Teaching_1\Controllers\NganhController;
+use App\Modules\Teaching_1\Controllers\TeacherController;
+
 
 
 // Nhóm route cho quản lý ngành
@@ -23,4 +25,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
 
     // Route cho tìm kiếm ngành (nếu có)
     Route::get('nganh/search', [NganhController::class, 'search'])->name('nganh.search');
+    // Route cho giảng viên
+    Route::resource('teacher', TeacherController::class);
 });
