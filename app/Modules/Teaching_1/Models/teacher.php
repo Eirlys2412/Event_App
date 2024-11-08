@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\Teaching_1\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\User;
 class Teacher extends Model
 {
     use HasFactory;
@@ -21,20 +22,20 @@ class Teacher extends Model
         'loai_giangvien',
     ];
 
-    // Khai báo quan hệ với bảng donvi
-    public function donVi()
+    // Quan hệ với bảng DonVi
+    public function donVi(): BelongsTo
     {
         return $this->belongsTo(DonVi::class, 'ma_donvi');
     }
 
-    // Khai báo quan hệ với bảng users
-    public function user()
+    // Quan hệ với bảng User
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // Khai báo quan hệ với bảng chuyen_nganh
-    public function chuyenNganh()
+    // Quan hệ với bảng ChuyenNganh
+    public function chuyenNganh(): BelongsTo
     {
         return $this->belongsTo(ChuyenNganh::class, 'chuyen_nganh');
     }
