@@ -103,17 +103,6 @@
 @section('scripts')
 
 <script>
-    new TomSelect('#ma_donvi', {
-        plugins: ['remove_button'],
-    });
-
-    new TomSelect('#user_id', {
-        plugins: ['remove_button'],
-    });
-
-    new TomSelect('#chuyen_nganh', {
-        plugins: ['remove_button'],
-    });
 </script>
 
 @endsection
