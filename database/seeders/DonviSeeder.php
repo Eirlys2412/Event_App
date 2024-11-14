@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+use Illuminate\Support\Str;
 
 class DonviSeeder extends Seeder
 {
@@ -12,7 +14,7 @@ class DonviSeeder extends Seeder
         // Đơn vị cha: Đại học Tây Nguyên
         $daiHocTayNguyenId = DB::table('donvi')->insertGetId([
             'title' => 'Đại học Tây Nguyên',
-            'slug' => 'dai-hoc-tay-nguyen',
+            'slug' => Str::slug('Đại học Tây Nguyên'),
             'parent_id' => null,
             'children_id' => json_encode([]),
             'created_at' => now(),
@@ -22,7 +24,7 @@ class DonviSeeder extends Seeder
         // Đơn vị con: Khoa Công nghệ Thông tin và Phòng Đào tạo
         $khoaCNTTId = DB::table('donvi')->insertGetId([
             'title' => 'Khoa Công nghệ Thông tin',
-            'slug' => 'khoa-cong-nghe-thong-tin',
+            'slug' => Str::slug('Khoa Công nghệ Thông tin'),
             'parent_id' => $daiHocTayNguyenId,
             'children_id' => json_encode([]),
             'created_at' => now(),
@@ -31,7 +33,7 @@ class DonviSeeder extends Seeder
 
         $phongDaoTaoId = DB::table('donvi')->insertGetId([
             'title' => 'Phòng Đào tạo',
-            'slug' => 'phong-dao-tao',
+            'slug' => Str::slug('Phòng Đào tạo'),
             'parent_id' => $daiHocTayNguyenId,
             'children_id' => json_encode([]),
             'created_at' => now(),
