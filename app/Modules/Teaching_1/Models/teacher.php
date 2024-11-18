@@ -37,6 +37,6 @@ class Teacher extends Model
     // Quan hệ với bảng ChuyenNganh
     public function chuyenNganh(): BelongsTo
     {
-        return $this->belongsTo(ChuyenNganh::class, 'chuyennganhs');
+        return $this->belongsTo(ChuyenNganh::class, 'chuyen_nganh');
     }
 }
