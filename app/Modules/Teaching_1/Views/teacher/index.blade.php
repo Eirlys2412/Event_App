@@ -42,7 +42,7 @@
                 </td>
                 <td class="text-left">{{ $item->user->username ?? 'N/A' }}</td> <!-- Lấy tên người dùng -->
                 <td class="text-left">{{ $item->donVi->title ?? 'N/A' }}</td> <!-- Lấy tên đơn vị -->
-                <td class="text-left">{{ $item->chuyenNganh->title ?? 'N/A' }}</td> <!-- Lấy tên chuyên ngành -->
+                <td class="text-left">{{ $item->chuyenNganhs->title ?? 'N/A' }}</td> <!-- Lấy tên chuyên ngành -->
                 <td class="table-report__action w-56">
                     <div class="flex justify-center items-center">
                         <a href="{{ route('admin.teacher.edit', $item->id) }}" class="flex items-center mr-3"> 

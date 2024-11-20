@@ -17,9 +17,11 @@ class TeacherController extends Controller
     public function index()
     {
         $active_menu = 'teacher_list';
+        $chuyen_nganh = ChuyenNganh::all(); // Lấy danh sách chuyên ngành từ bảng liên quan
+
         // Nạp trước dữ liệu liên kết bằng with() và sử dụng paginate để phân trang
-        $teachers = Teacher::with(['donVi', 'user', 'chuyenNganh'])->paginate(10);
-        return view('Teaching_1::teacher.index', compact('teachers', 'active_menu'));
+        $teachers = Teacher::with(['donVi', 'user', 'chuyenNganhs'])->paginate(10);
+        return view('Teaching_1::teacher.index', compact('teachers','chuyen_nganh', 'active_menu'));
     }
 
     // Hiển thị form thêm mới giảng viên
