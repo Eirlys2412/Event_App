@@ -181,16 +181,50 @@
                     <div class="side-menu__title">Thêm motion</div>
                 </a>
             </li>
-        </ul>
-    </li>
-    <!-- Donvi -->
-    <li>
+            </ul>
+        </li>
+        <!-- Donvi -->
+        <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='donvi_list' || $active_menu=='donvi_add')?'side-menu--active':''}}">
             <div class="side-menu__icon"> <i data-lucide="users"></i> </div>
             <div class="side-menu__title">
                 Đơn vị
                 <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
             </div>
+        </a>
+       <!-- eventtype -->
+<li>
+    <a href="javascript:;" class="side-menu {{($active_menu=='event_list'|| $active_menu=='event_add')?'side-menu--active':''}}">
+        <div class="side-menu__icon"> <i data-lucide="calendar"></i> </div> <!-- Thay đổi icon ở đây -->
+        <div class="side-menu__title">
+            Sự kiện
+            <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+        </div>
+    </a>
+    <ul class="{{($active_menu=='event_list'|| $active_menu=='event_add')?'side-menu__sub-open':''}}">
+        <li>
+            <a href="{{route('admin.eventtype.index')}}" class="side-menu {{$active_menu=='event_list'?'side-menu--active':''}}">
+                <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                <div class="side-menu__title">Danh sách sự kiện</div>
+            </a>
+        </li>
+        <li>
+            <a href="{{route('admin.eventtype.create')}}" class="side-menu {{$active_menu=='event_add'?'side-menu--active':''}}">
+                <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                <div class="side-menu__title">Thêm Sự kiện</div>
+            </a>
+        </li>
+    </ul>
+</li>
+
+     <!-- setting menu -->
+     <li>
+        <a href="javascript:;.html" class="side-menu side-menu{{($active_menu=='cmdfunction_list'||$active_menu=='cmdfunction_add'||$active_menu=='role_list'||$active_menu=='role_add'||$active_menu=='kiot'|| $active_menu=='setting_list'|| $active_menu=='log_list'||$active_menu=='banner_add'|| $active_menu=='banner_list')?'--active':''}}">
+              <div class="side-menu__icon"> <i data-lucide="settings"></i> </div>
+              <div class="side-menu__title">
+                  Cài đặt
+                  <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+              </div>
         </a>
         <ul class="{{($active_menu=='donvi_list' || $active_menu=='donvi_add')?'side-menu__sub-open':''}}">
             <li>

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Modules\Teaching_1\Models;
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,7 +34,7 @@ class Teacher extends Model
     }
 
     // Quan hệ với bảng ChuyenNganh
-    public function chuyenNganh(): BelongsTo
+    public function chuyenNganhs(): BelongsTo
     {
         return $this->belongsTo(ChuyenNganh::class, 'chuyen_nganh');
     }

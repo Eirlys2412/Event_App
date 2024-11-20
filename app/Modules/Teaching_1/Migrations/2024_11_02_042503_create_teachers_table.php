@@ -25,7 +25,7 @@ return new class extends Migration
             // Khai báo các khóa ngoại
             $table->foreign('ma_donvi')->references('id')->on('donvi')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('chuyen_nganh')->references('id')->on('chuyen_nganh')->onDelete('cascade');
+            $table->foreign('chuyen_nganh')->references('id')->on('chuyennganhs')->onDelete('cascade');
         });
     }
 
