@@ -292,6 +292,37 @@
         </li>
     </ul>
 </li>
+<li>
+    <a href="javascript:;" class="side-menu {{($active_menu=='major_list'|| $active_menu=='major_add')?'side-menu--active':''}}">
+        <div class="side-menu__icon"> 
+            <i data-lucide="graduation-cap"></i> <!-- Thay đổi biểu tượng thành mũ tốt nghiệp -->
+        </div>
+        <div class="side-menu__title">
+            Chuyên ngành
+            <div class="side-menu__sub-icon transform"> 
+                <i data-lucide="chevron-down"></i> 
+            </div>
+        </div>
+    </a>
+    <ul class="{{($active_menu=='major_list'|| $active_menu=='major_add')?'side-menu__sub-open':''}}">
+        <li>
+            <a href="{{route('admin.major.index')}}" class="side-menu {{$active_menu=='major_list'?'side-menu--active':''}}">
+                <div class="side-menu__icon"> 
+                    <i data-lucide="list"></i> 
+                </div>
+                <div class="side-menu__title">Danh sách chuyên ngành</div>
+            </a>
+        </li>
+        <li>
+            <a href="{{route('admin.major.create')}}" class="side-menu {{$active_menu=='major_add'?'side-menu--active':''}}">
+                <div class="side-menu__icon"> 
+                    <i data-lucide="plus"></i> 
+                </div>
+                <div class="side-menu__title">Thêm Chuyên ngành</div>
+            </a>
+        </li>
+    </ul>
+</li>
 
      <!-- setting menu -->
      <li>
