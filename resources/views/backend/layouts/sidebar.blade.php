@@ -39,7 +39,7 @@
                 </li>
           </ul>
         </li>
-         <!-- group -->
+         <!-- Group Sidebar Menu -->
         <li>
             <a href="javascript:;.html" class="side-menu side-menu{{( $active_menu=='group_list'|| $active_menu=='group_add' )?'--active':''}}">
                 <div class="side-menu__icon"> <i data-lucide="align-center"></i> </div>
@@ -64,6 +64,33 @@
                 
           </ul>
         </li>
+
+
+        <!-- student -->
+        <li>
+            <a href="javascript:;" class="side-menu side-menu{{ ($active_menu == 'student_list' || $active_menu == 'student_add') ? '--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="user"></i> </div>
+                <div class="side-menu__title">
+                    Sinh Viên
+                    <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+                </div>
+            </a>
+            <ul class="{{ ($active_menu == 'student_list' || $active_menu == 'student_add') ? 'side-menu__sub-open' : '' }}">
+                <li>
+                    <a href="{{ route('student.index') }}" class="side-menu {{ $active_menu == 'student_list' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                        <div class="side-menu__title">Danh sách Sinh Viên</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('student.create') }}" class="side-menu {{ $active_menu == 'student_add' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                        <div class="side-menu__title">Thêm Sinh Viên</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        
         {{-- nganh --}}
         <li>
             <a href="javascript:;" class="side-menu side-menu{{ ($active_menu == 'nganh_list' || $active_menu == 'nganh_add') ? '--active' : '' }}">
@@ -159,6 +186,55 @@
                 </li>
             </ul>
         </li>
+        <!-- Book -->
+        <li>
+            <a href="javascript:;" class="side-menu {{ ($active_menu == 'book_list' || $active_menu == 'book_add' || $active_menu == 'booktype_list' || $active_menu == 'bookpoint_list') ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="book-open"></i> </div>
+                <div class="side-menu__title">
+                    Sách
+                    <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+                </div>
+            </a>
+            <ul class="{{ ($active_menu == 'book_list' || $active_menu == 'book_add' || $active_menu == 'booktype_list' || $active_menu == 'bookpoint_list') ? 'side-menu__sub-open' : '' }}">
+                <li>
+                    <a href="{{ route('admin.books.index') }}" class="side-menu {{ $active_menu == 'book_list' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                        <div class="side-menu__title">Sách</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.books.create') }}" class="side-menu {{ $active_menu == 'book_add' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                        <div class="side-menu__title">Thêm sách</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.booktypes.index') }}" class="side-menu {{ $active_menu == 'booktype_list' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="layers"></i> </div>
+                        <div class="side-menu__title">Danh mục sách</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.bookpoints.index') }}" class="side-menu {{ $active_menu == 'bookpoint_list' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="star"></i> </div>
+                        <div class="side-menu__title">Điểm cho sách</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.bookaccess.index') }}" class="side-menu {{ $active_menu == 'bookpoint_list' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="award"></i> </div>
+                        <div class="side-menu__title">Điểm thưởng</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.bookusers.index') }}" class="side-menu {{ $active_menu == 'bookpoint_list' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="user"></i> </div>
+                        <div class="side-menu__title">Điểm người dùng</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <!-- Motion -->
     <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='motion_list'|| $active_menu=='motion_add')?'side-menu--active':''}}">
@@ -207,6 +283,33 @@
             </li>
         </ul>
     </li>
+
+    <!-- Sidebar Chương Trình Đào Tạo -->
+    <li>
+        <a href="javascript:;" class="side-menu side-menu{{($active_menu=='chuongtrinhdaotao_list'||$active_menu=='chuongtrinhdaotao_add'||$active_menu=='chuongtrinhdaotao_edit') ? '--active' : ''}}">
+            <div class="side-menu__icon"> <i data-lucide="book"></i> </div>
+            <div class="side-menu__title">
+                Chương trình đào tạo
+                <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+            </div>
+        </a>
+        <ul class="{{($active_menu=='chuongtrinhdaotao_list'||$active_menu=='chuongtrinhdaotao_add'||$active_menu=='chuongtrinhdaotao_edit') ? 'side-menu__sub-open' : ''}}">
+        
+            <li>
+                <a href="{{route('admin.chuong_trinh_dao_tao.index')}}" class="side-menu {{$active_menu=='chuongtrinhdaotao_list' ? 'side-menu--active' : ''}}">
+                    <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                    <div class="side-menu__title">Danh sách chương trình đào tạo</div>
+                </a>
+            </li>
+            <li>
+                <a href="{{route('admin.chuong_trinh_dao_tao.create')}}" class="side-menu {{$active_menu=='chuongtrinhdaotao_add' ? 'side-menu--active' : ''}}">
+                    <div class="side-menu__icon"> <i data-lucide="plus-circle"></i> </div>
+                    <div class="side-menu__title">Thêm chương trình đào tạo</div>
+                </a>
+            </li>
+        </ul>
+    </li>
+
          <!-- setting menu -->
          <li>
             <a href="javascript:;.html" class="side-menu side-menu{{($active_menu=='cmdfunction_list'||$active_menu=='cmdfunction_add'||$active_menu=='role_list'||$active_menu=='role_add'||$active_menu=='kiot'|| $active_menu=='setting_list'|| $active_menu=='log_list'||$active_menu=='banner_add'|| $active_menu=='banner_list')?'--active':''}}">

@@ -22,11 +22,11 @@
                     <label for="content" class="form-label">Nội dung</label>
                     <textarea id="content" name="content" class="form-control" placeholder="Nội dung" required>{{ $nganh->content }}</textarea>
                 </div>
-                <div class="mt-3">
-                    <label for="status" class="form-select-label">Tình trạng</label>
-                    <select name="status" class="form-select mt-2" required>
-                        <option value="active" {{ $nganh->status == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ $nganh->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                <div class="form-group">
+                    <label for="status">Trạng thái</label>
+                    <select name="status" id="status" class="form-control">
+                        <option value="active" {{ $nganh->status == 'active' ? 'selected' : '' }}>Kích hoạt</option>
+                        <option value="inactive" {{ $nganh->status == 'inactive' ? 'selected' : '' }}>Không kích hoạt</option>
                     </select>
                 </div>
                 <div class="mt-3">

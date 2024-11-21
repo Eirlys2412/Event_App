@@ -101,6 +101,9 @@ class DatabaseSeeder extends Seeder
             
             HinhThucThiSeeder::class,
             ResourceSeeder::class,
+            DonviSeeder::class,
+            ChuyennganhSeeder::class,
+            NganhSeeder::class
         ]);
     }
 }
