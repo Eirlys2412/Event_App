@@ -27,6 +27,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     // Route cho tìm kiếm ngành (nếu có)
     Route::get('nganh/search', [NganhController::class, 'search'])->name('nganh.search');
     // Route cho giảng viên
+    Route::get('teacher/search', [TeacherController::class, 'search'])->name('teacher.search');
     Route::resource('teacher', TeacherController::class);
     
     // Route cho don vi

@@ -13,9 +13,12 @@
             <div class="hidden md:block mx-auto text-slate-500">Hiển thị trang {{$teachers->currentPage()}} trong {{$teachers->lastPage()}} trang</div>
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
                 <div class="w-56 relative text-slate-500">
-                    <form action="{{route('admin.blog.search')}}" method = "get">
-                        @csrf
-                        <input type="text" name="datasearch" class="ipsearch form-control w-56 box pr-10" placeholder="Search...">
+                    <form action="{{ route('admin.teacher.search') }}" method="get">
+                        <input type="text" 
+                               name="datasearch" 
+                               class="ipsearch form-control w-56 box pr-10" 
+                               placeholder="Search..."
+                               value="{{ isset($search) ? $search : '' }}">
                         <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0" data-lucide="search"></i> 
                     </form>
                 </div>
