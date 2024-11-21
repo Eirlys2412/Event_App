@@ -80,20 +80,13 @@
                     <div class="mt-3">
                         <label for="post-form-4" class="form-label">Tags</label>
                         <select id="select-junk" name="tag_ids[]" multiple placeholder="..." autocomplete="off">
-                    
-                        <!-- <select name="tag_ids[]" data-placeholder="tag .."   class="tom-select w-full" id="post-form-4" multiple> -->
-                            @foreach ($tags as $tag )
-                                <option value="{{$tag->id}}" 
-                                    <?php 
-                                        foreach($tag_ids as $item)
-                                        {
-                                                if($item->tag_id == $tag->id)
-                                                    echo 'selected';
-                                        } 
-                                    ?>
-                                >{{$tag->title}}</option>
+                            @foreach ($tags as $tag)
+                                <option value="{{ $tag->id }}"
+                                    @if(in_array($tag->id, $tag_ids)) selected @endif>
+                                    {{ $tag->title }}
+                                </option>
                             @endforeach
-                        </select>
+                        </select>                        
                     </div>     
 
                     <div class="text-right mt-5">

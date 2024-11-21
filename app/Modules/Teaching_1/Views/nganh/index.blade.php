@@ -76,6 +76,10 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    $.ajaxSetup({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
+    });
+
     $('.dltBtn').click(function(e) {
         var form = $(this).closest('form');
         var dataID = $(this).data('id');
@@ -91,6 +95,36 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 form.submit();
+            }
+        });
+    });
+
+    $("[name='toggle']").change(function() {
+        var mode = $(this).prop('checked') ? 'true' : 'false'; // Lấy trạng thái checkbox
+        var id = $(this).val(); // Lấy ID của ngành
+        $.ajax({
+            url: "{{ route('admin.nganh.status') }}", // Đường dẫn đến route cập nhật trạng thái
+            type: "post",
+            data: {
+                _token: '{{ csrf_token() }}', // Token CSRF
+                mode: mode,
+                id: id,
+            },
+            success: function(response) {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: response.msg,
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+            },
+            error: function(xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Có lỗi xảy ra!',
+                    text: xhr.responseText,
+                });
             }
         });
     });
