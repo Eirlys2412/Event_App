@@ -16,32 +16,33 @@
     <div class="intro-y col-span-12 lg:col-span-12">
         <!-- BEGIN: Form Layout -->
         <form method="post" action="{{ route('admin.donvi.store') }}">
-            @csrf
-            <div class="intro-y box p-5">
-                <div>
-                    <label for="title" class="form-label">Tên Đơn vị</label>
-                    <input id="title" name="title" type="text" class="form-control" placeholder="Nhập tên đơn vị" required>
-                </div>
+    @csrf
+    <div class="intro-y box p-5">
+        <div>
+            <label for="title" class="form-label">Tên Đơn vị</label>
+            <input id="title" name="title" type="text" class="form-control" placeholder="Nhập tên đơn vị" required>
+        </div>
 
-                <!-- Đơn vị Cha -->
-                <div class="mt-3">
-    <label for="parent_id" class="form-label">Đơn vị Cha</label>
-    <select id="parent_id" name="parent_id" class="form-control" placeholder="Chọn đơn vị cha">
-        <option value="">Không có</option> <!-- Tùy chọn không có đơn vị cha -->
-        @foreach($donviList as $parent)
-            <option value="{{ $parent->id }}">{{ $parent->title }}</option>
-        @endforeach
-    </select>
-</div>
+        <!-- Đơn vị Cha -->
+        <div class="mt-3">
+            <label for="parent_id" class="form-label">Đơn vị Cha</label>
+            <select id="parent_id" name="parent_id" class="form-control" placeholder="Chọn đơn vị cha">
+                <option value="">Không có</option> <!-- Tùy chọn không có đơn vị cha -->
+                @foreach($donviList as $parent)
+                    <option value="{{ $parent->id }}">{{ $parent->title }}</option>
+                @endforeach
+            </select>
+        </div>
 
+        <div class="text-right mt-5">
+            <button type="submit" class="btn btn-primary w-24">Lưu</button>
+        </div>
+    </div>
+</form>
 
-                <div class="text-right mt-5">
-                    <button type="submit" class="btn btn-primary w-24">Lưu</button>
-                </div>
-            </div>
-        </form>
     </div>
 </div>
+
 @endsection
 
 @section('scripts')
