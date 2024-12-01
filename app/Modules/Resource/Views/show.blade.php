@@ -7,94 +7,67 @@
         <h3 class="text-xl font-semibold mb-2">{{ $resource->title }}</h3>
 
         <div class="mb-4">
-            
-            @if($resource->link_code )
+            @if($resource->link_code)
                 @if($resource->type_code == 'image')
                     <img src="{{ $resource->url }}" alt="{{ $resource->title }}"
-                    style="width: 100%; height: 500px; object-fit: cover;" />
+                        style="width: 100%; height: 500px; object-fit: cover;" />
                 @endif
                 @if ($resource->type_code == 'document')
                     <a href="{{$resource->url }}" class="text-blue-500 underline">Tải tài liệu</a>
                 @endif
                 @if ($resource->type_code == 'video' && $resource->link_code=='youtube')
                     <iframe style="width: 100%; height: 500px;" src="{{ str_replace('watch?v=', 'embed/', $resource->url) }}"
-                    frameborder="0" allowfullscreen></iframe>
+                        frameborder="0" allowfullscreen></iframe>
                 @endif
-
-
             @else
-
                 @switch(true)
-                    @case(strpos( $resource->file_type, 'image/') === 0)
-
+                    @case(strpos($resource->file_type, 'image/') === 0)
                         <img src="{{ $resource->url }}" alt="{{ $resource->title }}"
                             style="width: 100%; height: 500px; object-fit: cover;" />
                     @break
-
                     @case(strpos($resource->file_type, 'video/') === 0)
                         <video controls style="width: 100%; height: 500px;">
                             <source src="{{ $resource->url }}" type="{{ $resource->file_type }}">
                             Trình duyệt của bạn không hỗ trợ thẻ video.
                         </video>
                     @break
-
                     @case(strpos($resource->file_type, 'audio/') === 0)
                         <audio controls style="width: 100%;">
                             <source src="{{ $resource->url }}" type="{{ $resource->file_type }}">
                             Trình duyệt của bạn không hỗ trợ thẻ audio.
                         </audio>
                     @break
-
                     @case($resource->file_type === 'application/pdf')
                         <embed src="{{ $resource->url }}" type="application/pdf"
                             style="width: 100%; height: 500px;" />
                     @break
-
-                    @case(in_array($resource->file_type, [
-                            'application/msword',
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                        ]))
-                        <img src="{{ asset('backend/assets/icons/icon1.png') }}" alt="{{ $resource->title }}"
-                            style="width: 100%; height: 500px; object-fit: cover;" />
-                    @break
-
-                    @case(in_array($resource->file_type, [
-                            'application/vnd.ms-powerpoint',
-                            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                        ]))
-                        <img src="{{ asset('backend/assets/icons/icon1.png') }}" alt="{{ $resource->title }}"
-                            style="width: 100%; height: 500px; object-fit: cover;" />
-                    @break
-
-                    @case(in_array($resource->file_type, [
-                            'application/vnd.ms-excel',
-                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                        ]))
-                        <img src="{{ asset('backend/assets/icons/icon1.png') }}" alt="{{ $resource->title }}"
-                            style="width: 100%; height: 500px; object-fit: cover;" />
-                    @break
-
                     @default
                         <img src="{{ asset('backend/assets/icons/icon1.png') }}" alt="{{ $resource->title }}"
                             style="width: 100%; height: 500px; object-fit: cover;" />
                 @endswitch
             @endif
-
-
-            
         </div>
-
-
 
         <div class="mb-4">
             <p class="font-medium">File type: <span class="font-normal">{{ $resource->file_type }}</span></p>
             <p class="font-medium">File size: <span class="font-normal">{{ $resource->file_size }} bytes</span></p>
-            <p class="font-medium"> Tags:
+            <p class="font-medium">Tags:
                 <span class="font-normal">
-                    @foreach ($tag_ids as $item)
-                        {{ \App\Models\Tag::find($item->tag_id)->title }}{{ !$loop->last ? ', ' : '' }}
-                    @endforeach
+                    @php
+                        $tags = \App\Models\Tag::whereIn('id', $tag_ids)->pluck('title');
+                    @endphp
+                    {{ $tags->implode(', ') }}
                 </span>
+            </p>
+
+            <p class="font-medium">Description:</p>
+            <div class="font-normal">
+                {!! nl2br(strip_tags($resource->description)) !!}
+            </div>
+
+            <p class="font-medium">URL:</p>
+            <p class="font-normal">
+                <a href="{{ $resource->url }}" class="text-blue-500 underline">{{ $resource->url }}</a>
             </p>
         </div>
 
@@ -120,7 +93,6 @@
             </a>
         </div>
     </div>
-
 @endsection
 
 @section('scripts')

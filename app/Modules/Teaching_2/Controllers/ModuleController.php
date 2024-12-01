@@ -63,9 +63,11 @@ class ModuleController extends Controller
     $requestData = $request->all();
 
     // Xử lý tệp hình ảnh
-    $fileName = time() . '_' . $request->file('photo')->getClientOriginalName();
-    $path = $request->file('photo')->storeAs('module', $fileName, 'public');
-    $requestData['photo'] = '/storage/' . $path; // Cập nhật đường dẫn tệp tin trong dữ liệu
+    // $fileName = time() . '_' . $request->file('photo')->getClientOriginalName();
+    // $path = $request->file('photo')->storeAs('module', $fileName, 'public');
+    // $requestData['photo'] = '/storage/' . $path; // Cập nhật đường dẫn tệp tin trong dữ liệu
+    $helpController = new \App\Http\Controllers\FilesController();
+    $requestData['photo'] = $helpController->store($request->file('photo'));
 
     // Lưu dữ liệu vào cơ sở dữ liệu
     Module::create($requestData);

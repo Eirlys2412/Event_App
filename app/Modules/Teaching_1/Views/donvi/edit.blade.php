@@ -32,13 +32,19 @@
 
                 <div class="mt-3">
                     <label for="parent_id" class="form-label">Đơn vị Cha</label>
-                    <select id="parent_id" name="parent_id" class="form-control" placeholder="Chọn đơn vị cha">
-                        <option value="">Không có</option> <!-- Tùy chọn không có đơn vị cha -->
+                    <select id="parent_id" name="parent_id" class="form-control">
+                        <option value="">Không có</option>
                         @foreach($donviList as $parent)
-                            <option value="{{ $parent->id }}">{{ $parent->title }}</option>
+                            <option value="{{ $parent->id }}" {{ old('parent_id', $donvi->parent_id) == $parent->id ? 'selected' : '' }}>
+                                {{ $parent->title }}
+                            </option>
                         @endforeach
                     </select>
+                    @error('parent_id')
+                        <div class="text-danger mt-1">{{ $message }}</div>
+                    @enderror
                 </div>
+
 
 
                 <div class="text-right mt-5">
