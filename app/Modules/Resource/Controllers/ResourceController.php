@@ -73,8 +73,8 @@ class ResourceController extends Controller
             'tag_ids' => 'nullable|array',
         ]);
 
-        $resourceType = ResourceType::first();
-        $linkTypes = ResourceLinkType::first();
+        $resourceType = ResourceType::where('code', $request->type_code)->first();
+        $linkTypes = ResourceLinkType::where('code', $request->link_code)->first();
         if (!$resourceType) {
             return redirect()->back()->with('error', 'Không tìm thấy loại tài nguyên.');
         }
