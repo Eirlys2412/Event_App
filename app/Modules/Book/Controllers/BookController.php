@@ -80,9 +80,18 @@ class BookController extends Controller
             $resourceIds[] = Resource::createResource($request, $file, 'Book')->id;
         }
 
+        $slug = Str::slug($request->title);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (Book::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
         $bookData = [
             'title' => $request->title,
-            'slug' => Str::slug($request->title),
+            'slug' => $slug,
             'photo' => $photoPath,
             'summary' => $request->summary,
             'content' => $request->content,

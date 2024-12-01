@@ -41,7 +41,7 @@
                                 {{ ucfirst($major->status) }}
                             </span>
                         </td>
-                        <td>{{ $major->created_at->format('d/m/Y') }}</td>
+                        <td>{{ $major->created_at }}</td>
                         <td>
                             <a href="{{ route('admin.major.edit', $major->id) }}" class="btn btn-warning">Sửa</a>
                             <form action="{{ route('admin.major.destroy', $major->id) }}" method="POST" style="display:inline;">
