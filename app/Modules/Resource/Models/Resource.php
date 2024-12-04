@@ -27,6 +27,16 @@ class Resource extends Model
     public static function createResource($request, $file = null, $moduleName = null)
     {
         $title = $request->title ?? 'Resource Default Title';
+        if ($file) {
+            $existingResource = Resource::where('file_name', $file->getClientOriginalName())
+                ->where('file_size', $file->getSize())
+                ->where('code', $moduleName)
+                ->first();
+    
+            if ($existingResource) {
+                return $existingResource; // Trả về resource đã tồn tại
+            }
+        }
         $data = [
             'title' => $title,
             'code' => $moduleName,
@@ -156,27 +166,28 @@ class Resource extends Model
     }
 
     // Tạo slug
-    public static function generateSlug($title, $model = null)
+    public static function generateSlug($title, $model = null, $existingSlugs = [])
     {
-        // Tạo slug từ tiêu đề (title)
+
         $slug = Str::slug($title);
+        $originalSlug = $slug;
+        $counter = 1;
 
-        // Nếu là cập nhật (edit), chỉ cần kiểm tra ngoại lệ cho bản ghi hiện tại
-        if ($model) {
-            $count = self::where('slug', $slug)
-                ->where('id', '!=', $model->id)
-                ->count();
-        } else {
-            $count = self::where('slug', $slug)->count();
-        }
+        // Lấy danh sách slug trùng lặp từ cơ sở dữ liệu
+        $existingSlugsFromDb = Resource::pluck('slug')->toArray();
 
-        // Nếu slug đã tồn tại, thêm thời gian vào cuối slug để đảm bảo tính duy nhất
-        if ($count > 0) {
-            $slug = $slug . '-' . time();
+        // Kết hợp danh sách đã có và từ cơ sở dữ liệu
+        $existingSlugs = array_merge($existingSlugs, $existingSlugsFromDb);
+
+        while (in_array($slug, $existingSlugs)) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
         }
 
         return $slug;
     }
+
+
 
     // Lấy ID YouTube từ URL.
     private static function getYouTubeID($url)
