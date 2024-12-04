@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Modules\Teaching_2\Models;
+
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use App\Modules\Teaching_2\Models\Module;
+use App\Modules\Teaching_2\Models\ChuongTrinhDaoTao;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+
+class ProgramDetails extends Model
+{
+    use HasFactory;
+
+    protected $table = 'program_details';
+
+    protected $fillable = [
+        'hocphan_id',
+        'chuongtrinh_id',
+        'hocky',
+        'loai',
+        'hocphantienquyet',
+        'hocphansongsong',
+    ];
+
+    // protected $casts = [
+    //     'hocphantienquyet' => 'array', // Tự động chuyển JSON thành mảng PHP
+    //     'hocphansongsong' => 'array', // Tự động chuyển JSON thành mảng PHP
+    // ];
+    public function hocphan()
+    {
+        return $this->belongsTo(Module::class, 'hocphan_id');
+    }
+    
+    public function chuongtrinh()
+    {
+        return $this->belongsTo(ChuongTrinhDaoTao::class, 'chuongtrinh_id');
+    }
+
+}

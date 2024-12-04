@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Teaching_2\Controllers\ChuongTrinhDaoTaoController;
+use App\Modules\Teaching_2\Controllers\ProgramDetailsController;
 use Illuminate\Support\Facades\Route;
 use App\Modules\Teaching_2\Controllers\ModuleController;
 // Define routes here
@@ -32,6 +33,11 @@ Route::group(['prefix' => 'admin/', 'as' => 'admin.'], function() {
 
     // Tìm kiếm chương trình đào tạo
     Route::get('chuong_trinh_dao_tao/search', [ChuongTrinhDaoTaoController::class, 'search'])->name('chuong_trinh_dao_tao.search');
+     
+    //Chi tiết chương trình đào tạo
+    Route::resource('program_details', ProgramDetailsController::class);
+    Route::get('program_details/search', [ProgramDetailsController::class, 'search'])->name('program_details.search');
+
 });
 
 
