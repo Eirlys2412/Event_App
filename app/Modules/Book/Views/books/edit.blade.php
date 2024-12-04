@@ -56,7 +56,7 @@
             </div>
 
             <div class="mt-3">
-                <label for="document" class="form-label">Tệp phương tiện (tùy chọn)</label>
+                <label for="document" class="form-label">Tệp phương tiện</label>
                 <input type="file" name="document[]" class="form-control" multiple>
                 @if ($resources && count($resources) > 0)
                     <div class="mt-3">
@@ -66,6 +66,11 @@
                                 <li>
                                     <a href="{{ asset($resource->url) }}" target="_blank">
                                         {{ $resource->file_name }}
+                                    </a>
+                                    <a href="javascript:;" class="btn btn-danger btn-sm dltBtn"
+                                        data-url="{{ route('admin.books.removeResource', ['bookId' => $book->id, 'resourceId' => $resource->id]) }}"
+                                        data-name="{{ $resource->file_name }}">
+                                        Xóa
                                     </a>
                                 </li>
                             @endforeach
@@ -104,6 +109,7 @@
 @endsection
 
 @section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         var select = new TomSelect('#select-junk', {
             maxItems: null,
@@ -122,5 +128,45 @@
         @if (count($tag_ids) == 0)
             select.clear();
         @endif
+
+        $('.dltBtn').click(function(e) {
+            var url = $(this).data('url');
+            var fileName = $(this).data('name');
+            var resourceItem = $(this).closest('li'); // Lưu trữ phần tử 'li' chứa nút xóa
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Bạn có chắc muốn xóa không?',
+                text: "Bạn không thể lấy lại dữ liệu sau khi xóa: " + fileName,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Vâng, tôi muốn xóa!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Gửi yêu cầu AJAX để xóa tài nguyên
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            _method: 'DELETE'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Đã xóa!', 'Tệp đã được xóa thành công.', 'success');
+                                resourceItem.remove(); // Loại bỏ phần tử li khỏi giao diện
+                            } else {
+                                Swal.fire('Lỗi!', 'Đã có lỗi xảy ra khi xóa tệp.', 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Lỗi!', 'Đã có lỗi khi gửi yêu cầu.', 'error');
+                        }
+                    });
+                }
+            });
+        });
     </script>
 @endsection

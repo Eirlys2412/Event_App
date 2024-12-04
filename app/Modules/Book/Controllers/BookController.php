@@ -148,6 +148,7 @@ class BookController extends Controller
             'book_type_id' => 'required|exists:book_types,id',
         ]);
 
+        // Update photo if uploaded
         if ($request->hasFile('photo')) {
             if ($book->photo) {
                 Storage::disk('public')->delete($book->photo);
@@ -157,17 +158,32 @@ class BookController extends Controller
             $book->photo = $filesController->store($request->file('photo'), 'uploads/books');
         }
 
+        // Handle existing and new resources
         $existingResources = json_decode($book->resources, true) ?? [];
         $existingResourceIds = $existingResources['resource_ids'] ?? [];
         $newResourceIds = [];
 
         if ($request->hasFile('document')) {
             foreach ($request->file('document') as $file) {
-                $resource = Resource::createResource($request, $file, 'Book');
-                $newResourceIds[] = $resource->id;
+                // Check if file already exists in resources
+                $existingResource = Resource::where('file_name', $file->getClientOriginalName())->first();
+                if ($existingResource) {
+                    // Skip if already linked
+                    if (!in_array($existingResource->id, $existingResourceIds)) {
+                        $newResourceIds[] = $existingResource->id;
+                    }
+                } else {
+                    // Add new resource
+                    $resource = Resource::createResource($request, $file, 'Book');
+                    $newResourceIds[] = $resource->id;
+                }
             }
         }
 
+        // Merge new and existing resource IDs
+        $finalResourceIds = array_unique(array_merge($existingResourceIds, $newResourceIds));
+
+        // Update book details
         $book->update([
             'title' => $request->title,
             'slug' => Str::slug($request->title),
@@ -177,19 +193,30 @@ class BookController extends Controller
             'book_type_id' => $request->book_type_id,
         ]);
 
-        $finalResourceIds = array_merge($existingResourceIds, $newResourceIds);
-
+        // Save updated resources
         $book->resources = json_encode([
             'book_id' => $book->id,
             'resource_ids' => $finalResourceIds,
         ]);
         $book->save();
 
+        // Update tags
         if ($request->has('tag_ids')) {
             (new \App\Http\Controllers\TagController())->update_book_tag($book->id, $request->tag_ids);
         }
 
         return redirect()->route('admin.books.index')->with('success', 'Cập nhật sách thành công.');
+    }
+
+    public function removeResource(Request $request, $bookId, $resourceId)
+    {
+        $resource = Resource::findOrFail($resourceId);
+        if (file_exists(public_path($resource->url))) {
+            unlink(public_path($resource->url));
+        }
+        $resource->delete();
+
+        return response()->json(['success' => true]);
     }
 
     public function destroy($id)

@@ -123,6 +123,40 @@ class TagController extends Controller
         DB::select($sql);
          $this->store_resource_tag($resource_id,$tag_ids);
     }
+    public function store_book_tag($book_id,$tag_ids)
+    {
+        if(!$tag_ids || count($tag_ids) == 0)
+            return;
+        foreach($tag_ids as $tag_id)
+        {
+            $tag = Tag::find($tag_id);
+            if(!$tag)
+            {
+                $datatag['title'] = $tag_id;
+                $slug = Str::slug( $datatag['title'] );
+                $slug_count = Tag::where('slug',$slug)->count();
+                if($slug_count > 0)
+                {
+                    $slug .= time().'-'.$slug;
+                }
+                $datatag['slug'] = $slug;
+                
+                $tag = Tag::create($datatag);
+                sleep(1);
+            }
+            $data['tag_id'] = $tag->id;
+            $data['book_id'] = $book_id;
+            \App\Modules\Book\Models\TagBook::create($data);
+            $tag->hit += 1;
+            $tag->save();
+        }
+    }
+    public function update_book_tag($book_id,$tag_ids)
+    {
+        $sql = "delete from tag_books where book_id = ".$book_id;
+        DB::select($sql);
+         $this->store_book_tag($book_id,$tag_ids);
+    }
 
     public function index()
     {
