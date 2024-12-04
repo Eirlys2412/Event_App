@@ -15,14 +15,38 @@ use App\Modules\Teaching_2\Models\ChuongTrinhDaoTao;
 class ProgramDetailsController extends Controller
 {
     //
-    // Display the list of user pages
+    protected $pagesize;
+    public function __construct( )
+    {
+        $this->pagesize = env('NUMBER_PER_PAGE','20');
+        $this->middleware('auth');
+        
+    }
     public function index()
     {
-        $active_menu = 'program_details_list';
-        $program_details = ProgramDetails::paginate(10); // Thay đổi all() thành paginate()
-        // dd($program_details); // Kiểm tra loại đối tượng
-        return view('Teaching_2::program_details.index', compact('active_menu','program_details'));
+        $func = "program_details_list";
+        if(!$this->check_function($func))
+        {
+            return redirect()->route('unauthorized');
+        }
+
+        $active_menu="program_details_list";
+        $breadcrumb = '
+        <li class="breadcrumb-item"><a href="#">/</a></li>
+        <li class="breadcrumb-item active" aria-current="page"> Danh sách chi tiết chương trình </li>';
+        $program_details = ProgramDetails::orderBy('id','DESC')->paginate($this->pagesize);
+        // categories
+        return view('Teaching_2::program_details.index',compact('program_details','breadcrumb','active_menu'));
+
     }
+    // // Display the list of user pages
+    // public function index()
+    // {
+    //     $active_menu = 'program_details_list';
+    //     $program_details = ProgramDetails::paginate(10); // Thay đổi all() thành paginate()
+    //     // dd($program_details); // Kiểm tra loại đối tượng
+    //     return view('Teaching_2::program_details.index', compact('active_menu','program_details'));
+    // }
 
     // Show the form for creating a new user page
     public function create()
@@ -123,18 +147,44 @@ class ProgramDetailsController extends Controller
         $program_details->delete();
         return redirect()->route('admin.program_details.index')->with('success', 'Program Details deleted successfully.');
     }
-    // Tìm kiếm 
     public function search(Request $request)
     {
-        $active_menu = 'program_details_list';
-        $hocPhan = Module::all(); // Lấy tất cả đơn vị để chọn
-        $chuongTrinhdaotao = ChuongTrinhDaoTao::all(); // Lấy tất cả người dùng để chọn
-        $search = $request->input('datasearch');
+        $func = "program_details_list";
+        if(!$this->check_function($func))
+        {
+            return redirect()->route('unauthorized');
+        }
+        if($request->datasearch)
+        {
+            $active_menu="program_details_list";
+            $searchdata =$request->datasearch;
+            $program_details = ProgramDetails::with(['hocPhan', 'chuongTrinhdaotao'])
+            ->where('id', 'LIKE', "%{$searchdata}%")
+            ->paginate($this->pagesize)->withQueryString();
+            $breadcrumb = '
+            <li class="breadcrumb-item"><a href="#">/</a></li>
+            <li class="breadcrumb-item  " aria-current="page"><a href="'.route('admin.blog.index').'">Bài viết</a></li>
+            <li class="breadcrumb-item active" aria-current="page"> tìm kiếm </li>';
+            return view('Teaching_2::program_details.index',compact('program_details','breadcrumb','searchdata','active_menu'));
+        }
+        else
+        {
+            return redirect()->route('admin.program_details.index')->with('success','Không có thông tin tìm kiếm!');
+        }
 
-        $program_details = ProgramDetails::with(['hocPhan', 'chuongTrinhdaotao'])
-            ->where('id', 'LIKE', "%{$search}%")
-            ->paginate(10);
-
-        return view('Teaching_2::program_details.index', compact('program_details', 'hocPhan', 'chuongTrinhdaotao','active_menu', 'search'));
     }
+    // Tìm kiếm 
+    // public function search(Request $request)
+    // {
+    //     $active_menu = 'program_details_list';
+    //     $hocPhan = Module::all(); // Lấy tất cả đơn vị để chọn
+    //     $chuongTrinhdaotao = ChuongTrinhDaoTao::all(); // Lấy tất cả người dùng để chọn
+    //     $search = $request->input('datasearch');
+
+    //     $program_details = ProgramDetails::with(['hocPhan', 'chuongTrinhdaotao'])
+    //         ->where('id', 'LIKE', "%{$search}%")
+    //         ->paginate(10);
+
+    //     return view('Teaching_2::program_details.index', compact('program_details', 'hocPhan', 'chuongTrinhdaotao','active_menu', 'search'));
+    // }
 }
