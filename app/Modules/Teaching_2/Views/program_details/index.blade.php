@@ -14,12 +14,9 @@
             
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
                 <div class="w-56 relative text-slate-500">
-                    <form action="{{ route('admin.program_details.search') }}" method="get">
-                        <input type="text" 
-                               name="datasearch" 
-                               class="ipsearch form-control w-56 box pr-10" 
-                               placeholder="Search..."
-                               value="{{ isset($search) ? $search : '' }}">
+                    <form action="{{route('admin.program_details.search')}}" method = "get">
+                        @csrf
+                        <input type="text" name="datasearch" class="ipsearch form-control w-56 box pr-10" placeholder="Search...">
                         <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0" data-lucide="search"></i> 
                     </form>
                 </div>
@@ -45,7 +42,7 @@
                 <td>
                     <a target="_blank" href="" class="font-medium whitespace-nowrap">{{ $item->hocPhan->title ?? 'N/A' }}</a> 
                 </td>
-                <td class="text-left">{{ $item->chuongTrinh->title ?? 'N/A' }}</td> 
+                <td class="text-left">{{ $item->chuongTrinhdaotao->title ?? 'N/A' }}</td> 
                 <td class="text-left">{{ $item->loai ?? 'N/A' }}</td> 
                 <td class="text-left">{{ $item->hocky ?? 'N/A' }}</td> 
                 <td class="table-report__action w-56">

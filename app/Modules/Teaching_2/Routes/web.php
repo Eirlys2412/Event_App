@@ -36,7 +36,7 @@ Route::group(['prefix' => 'admin/', 'as' => 'admin.'], function() {
      
     //Chi tiết chương trình đào tạo
     Route::resource('program_details', ProgramDetailsController::class);
-    Route::get('program_details/search', [ProgramDetailsController::class, 'search'])->name('program_details.search');
+    Route::get('program_details_search', [ProgramDetailsController::class, 'search'])->name('program_details.search');
 
 });
 

@@ -29,12 +29,12 @@ class ProgramDetails extends Model
     //     'hocphantienquyet' => 'array', // Tự động chuyển JSON thành mảng PHP
     //     'hocphansongsong' => 'array', // Tự động chuyển JSON thành mảng PHP
     // ];
-    public function hocphan()
+    public function hocPhan()
     {
         return $this->belongsTo(Module::class, 'hocphan_id');
     }
     
-    public function chuongtrinh()
+    public function chuongTrinhdaotao()
     {
         return $this->belongsTo(ChuongTrinhDaoTao::class, 'chuongtrinh_id');
     }
