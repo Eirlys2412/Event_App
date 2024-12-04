@@ -320,9 +320,9 @@
         </ul>
     </li>
        <!-- eventtype -->
-<li>
+<!-- <li>
     <a href="javascript:;" class="side-menu {{($active_menu=='event_list'|| $active_menu=='event_add')?'side-menu--active':''}}">
-        <div class="side-menu__icon"> <i data-lucide="calendar"></i> </div> <!-- Thay đổi icon ở đây -->
+        <div class="side-menu__icon"> <i data-lucide="calendar"></i> </div> 
         <div class="side-menu__title">
             Sự kiện
             <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
@@ -342,7 +342,33 @@
             </a>
         </li>
     </ul>
-</li>
+</li>  -->
+
+    <!-- event_type -->
+    <li>
+        <a href="javascript:;" class="side-menu side-menu{{($active_menu=='eventtype_list' || $active_menu=='eventtype_add' || $active_menu=='eventtype_edit') ? '--active' : ''}}">
+            <div class="side-menu__icon"> <i data-lucide="calendar"></i> </div>
+            <div class="side-menu__title">
+                Loại sự kiện
+                <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+            </div>
+        </a>
+        <ul class="{{($active_menu == 'eventtype_list' || $active_menu == 'eventtype_add' || $active_menu == 'eventtype_edit') ? 'side-menu__sub-open' : ''}}">
+            <li>
+                <a href="{{ route('admin.event_type.index') }}" class="side-menu {{ $active_menu == 'eventtype_list' ? 'side-menu--active' : '' }}">
+                    <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                    <div class="side-menu__title">Danh sách loại sự kiện</div>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.event_type.create') }}" class="side-menu {{ $active_menu == 'eventtype_add' ? 'side-menu--active' : '' }}">
+                    <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                    <div class="side-menu__title">Thêm loại sự kiện</div>
+                </a>
+            </li>
+        </ul>
+    </li>
+
 <li>
     <a href="javascript:;" class="side-menu {{($active_menu=='major_list'|| $active_menu=='major_add')?'side-menu--active':''}}">
         <div class="side-menu__icon"> 
