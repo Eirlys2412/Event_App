@@ -1,0 +1,1 @@
+<h1>Welcome to the Event module</h1>
