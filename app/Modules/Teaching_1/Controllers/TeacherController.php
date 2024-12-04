@@ -94,4 +94,20 @@ class TeacherController extends Controller
         $teacher->delete();
         return redirect()->route('admin.teacher.index')->with('success', 'Giảng viên đã được xóa thành công.');
     }
+
+    // Tìm kiếm giảng viên theo mã giảng viên
+    public function search(Request $request)
+    {
+        $active_menu = 'teacher_list';
+        $chuyen_nganh = ChuyenNganh::all();
+        $search = $request->input('datasearch');
+
+        $teachers = Teacher::with(['donVi', 'user', 'chuyenNganhs'])
+            ->where('mgv', 'LIKE', "%{$search}%")
+            ->paginate(10);
+
+        return view('Teaching_1::teacher.index', compact('teachers', 'chuyen_nganh', 'active_menu', 'search'));
+    }
 }
+
+

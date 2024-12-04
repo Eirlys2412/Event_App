@@ -4,16 +4,17 @@
  
  
     <h2 class="intro-y text-lg font-medium mt-10">
-        Danh sách giảng viên
+        Danh sách chi tiết chương trình
     </h2>
     <div class="grid grid-cols-12 gap-6 mt-5">
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
-            <a href="{{route('admin.teacher.create')}}" class="btn btn-primary shadow-md mr-2">Thêm giảng viên</a>
+            <a href="{{route('admin.program_details.create')}}" class="btn btn-primary shadow-md mr-2">Thêm chi tiết chương trình</a>
+
+            <div class="hidden md:block mx-auto text-slate-500">Hiển thị trang {{$program_details->currentPage()}} trong {{$program_details->lastPage()}} trang</div>
             
-            <div class="hidden md:block mx-auto text-slate-500">Hiển thị trang {{$teachers->currentPage()}} trong {{$teachers->lastPage()}} trang</div>
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
                 <div class="w-56 relative text-slate-500">
-                    <form action="{{ route('admin.teacher.search') }}" method="get">
+                    <form action="{{ route('admin.program_details.search') }}" method="get">
                         <input type="text" 
                                name="datasearch" 
                                class="ipsearch form-control w-56 box pr-10" 
@@ -29,29 +30,30 @@
     <table class="table table-report -mt-2">
         <thead>
             <tr>
-                <th class="whitespace-nowrap">MGV</th>
-                <th class="whitespace-nowrap">TÊN</th>
-                <th class="whitespace-nowrap">ĐƠN VỊ</th>
-                <th class="text-center whitespace-nowrap">CHUYÊN NGÀNH</th>
-                {{-- <th class="text-center whitespace-nowrap">TRẠNG THÁI</th> --}}
+                <th class="whitespace-nowrap">Học phần</th>
+                <th class="whitespace-nowrap">Chương trình đào tạo</th>
+                <th class="whitespace-nowrap">Loại học phần</th>
+                <th class="whitespace-nowrap">Học kỳ</th>
+                {{-- <th class="text-center whitespace-nowrap">CHUYÊN NGÀNH</th> --}}
+                <th class="text-center whitespace-nowrap">TRẠNG THÁI</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach($teachers as $item)
+            @foreach($program_details as $item)
             <tr class="intro-x">
                 <td>
-                    <a target="_blank" href="" class="font-medium whitespace-nowrap">{{ $item->mgv }}</a> 
+                    <a target="_blank" href="" class="font-medium whitespace-nowrap">{{ $item->hocPhan->title ?? 'N/A' }}</a> 
                 </td>
-                <td class="text-left">{{ $item->user->username ?? 'N/A' }}</td> <!-- Lấy tên người dùng -->
-                <td class="text-left">{{ $item->donVi->title ?? 'N/A' }}</td> <!-- Lấy tên đơn vị -->
-                <td class="text-left">{{ $item->chuyenNganhs->title ?? 'N/A' }}</td> <!-- Lấy tên chuyên ngành -->
+                <td class="text-left">{{ $item->chuongTrinh->title ?? 'N/A' }}</td> 
+                <td class="text-left">{{ $item->loai ?? 'N/A' }}</td> 
+                <td class="text-left">{{ $item->hocky ?? 'N/A' }}</td> 
                 <td class="table-report__action w-56">
                     <div class="flex justify-center items-center">
-                        <a href="{{ route('admin.teacher.edit', $item->id) }}" class="flex items-center mr-3"> 
+                        <a href="{{ route('admin.program_details.edit', $item->id) }}" class="flex items-center mr-3"> 
                             <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit 
                         </a>
-                        <form action="{{ route('admin.teacher.destroy', $item->id) }}" method="post">
+                        <form action="{{ route('admin.program_details.destroy', $item->id) }}" method="post">
                             @csrf
                             @method('delete')
                             <a class="flex items-center text-danger dltBtn" data-id="{{ $item->id }}" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal"> 
@@ -62,6 +64,7 @@
                 </td>
             </tr>
             @endforeach
+            
         </tbody>
     </table>
 </div>
@@ -71,7 +74,7 @@
         <!-- BEGIN: Pagination -->
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center">
             <nav class="w-full sm:w-auto sm:mr-auto">
-                {{ $teachers->links('vendor.pagination.tailwind') }}
+                {{ $program_details->links('vendor.pagination.tailwind') }}
             </nav>
         </div>
 <!-- END: Pagination -->
@@ -87,6 +90,7 @@
     });
     $('.dltBtn').click(function(e)
     {
+        console.log("Delete button clicked");
         var form=$(this).closest('form');
         var dataID = $(this).data('id');
         e.preventDefault();

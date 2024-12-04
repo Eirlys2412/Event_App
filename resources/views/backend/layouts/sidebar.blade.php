@@ -470,29 +470,53 @@
         </li>
     </ul>
 </li>
- <!-- teacher -->
- <li>
-    <a href="javascript:;" class="side-menu {{($active_menu=='teacher_list'|| $active_menu=='teacher_add')?'side-menu--active':''}}">
-        <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
-        <div class="side-menu__title">
-            Giảng Viên
-            <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
-        </div>
-    </a>
-    <ul class="{{($active_menu=='teacher_list'|| $active_menu=='teacher_add')?'side-menu__sub-open':''}}">
-        <li>
-            <a href="{{route('admin.teacher.index')}}" class="side-menu {{$active_menu=='teacher_list'?'side-menu--active':''}}">
-                <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
-                <div class="side-menu__title">Danh sách Giảng viên</div>
+         <!-- teacher -->
+         <li>
+            <a href="javascript:;" class="side-menu {{($active_menu=='teacher_list'|| $active_menu=='teacher_add')?'side-menu--active':''}}">
+                <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
+                <div class="side-menu__title">
+                    Giảng Viên
+                    <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+                </div>
             </a>
+            <ul class="{{($active_menu=='teacher_list'|| $active_menu=='teacher_add')?'side-menu__sub-open':''}}">
+                <li>
+                    <a href="{{route('admin.teacher.index')}}" class="side-menu {{$active_menu=='teacher_list'?'side-menu--active':''}}">
+                        <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                        <div class="side-menu__title">Danh sách Giảng viên</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{route('admin.teacher.create')}}" class="side-menu {{$active_menu=='teacher_add'?'side-menu--active':''}}">
+                        <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                        <div class="side-menu__title">Thêm giảng viên</div>
+                    </a>
+                </li>
+            </ul>
         </li>
-        <li>
-            <a href="{{route('admin.teacher.create')}}" class="side-menu {{$active_menu=='teacher_add'?'side-menu--active':''}}">
-                <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
-                <div class="side-menu__title">Thêm giảng viên</div>
+         <!-- Chi tiết chương trình -->
+         <li>
+            <a href="javascript:;" class="side-menu {{($active_menu=='program_details_list'|| $active_menu=='program_details_add')?'side-menu--active':''}}">
+                <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
+                <div class="side-menu__title">
+                    Chi tiết chương trình
+                    <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+                </div>
             </a>
+            <ul class="{{($active_menu=='teacher_list'|| $active_menu=='program_details_add')?'side-menu__sub-open':''}}">
+                <li>
+                    <a href="{{route('admin.program_details.index')}}" class="side-menu {{$active_menu=='program_details_list'?'side-menu--active':''}}">
+                        <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                        <div class="side-menu__title">Danh sách chi tiết chương trình</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{route('admin.program_details.create')}}" class="side-menu {{$active_menu=='program_details_add'?'side-menu--active':''}}">
+                        <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                        <div class="side-menu__title">Thêm chi tiết chương trình</div>
+                    </a>
+                </li>
+            </ul>
         </li>
-    </ul>
-</li>
     </ul>
     </nav>

@@ -28,6 +28,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::get('nganh/search', [NganhController::class, 'nganhSearch'])->name('nganh.search');
     Route::post('nganh/status', [NganhController::class, 'nganhStatus'])->name('nganh.status');
     // Route cho giảng viên
+    Route::get('teacher/search', [TeacherController::class, 'search'])->name('teacher.search');
     Route::resource('teacher', TeacherController::class);
     
     // Route cho don vi
