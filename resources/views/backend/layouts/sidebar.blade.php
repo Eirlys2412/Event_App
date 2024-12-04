@@ -115,6 +115,42 @@
                 </li>
             </ul>
         </li>
+        {{-- tuluancauhoi --}}
+        <li>
+            <a href="javascript:;" class="side-menu {{ ($active_menu == 'tuluancauhoi_list' || $active_menu == 'admin.tuluancauhoi.index' || $active_menu == 'admin.tuluancauhoi.create') ? '--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="align-center"></i> </div>
+                <div class="side-menu__title">
+                    Câu hỏi
+                    <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+                </div>
+            </a>
+            <ul class="{{ ($active_menu == 'admin.tuluancauhoi.index' || $active_menu == 'admin.tuluancauhoi.create') ? 'side-menu__sub-open' : '' }}">
+                <li>
+                    <a href="{{ route('admin.tuluancauhoi.index') }}" class="side-menu {{ $active_menu == 'admin.tuluancauhoi.index' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="compass"></i> </div>
+                        <div class="side-menu__title">Danh sách Câu hỏi</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tuluancauhoi.create') }}" class="side-menu {{ $active_menu == 'admin.tuluancauhoi.create' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                        <div class="side-menu__title">Thêm Câu hỏi</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tuluancauhoi-types.index') }}" class="side-menu {{ $active_menu == 'admin.tuluancauhoi-types.index' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                        <div class="side-menu__title">Loại câu hỏi</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tuluancauhoi-link-types.index') }}" class="side-menu {{ $active_menu == 'admin.tuluancauhoi-link-types.index' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="link-2"></i> </div>
+                        <div class="side-menu__title">Loại liên kết câu hỏi</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
         <li>
             <a href="javascript:;" class="side-menu  class="side-menu {{($active_menu =='ugroup_add'|| $active_menu=='ugroup_list' || $active_menu =='ctm_add'|| $active_menu=='ctm_list'  )?'side-menu--active':''}}">
                 <div class="side-menu__icon"> <i data-lucide="user"></i> </div>
