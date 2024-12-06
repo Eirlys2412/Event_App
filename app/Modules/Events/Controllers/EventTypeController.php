@@ -21,7 +21,7 @@ class EventTypeController extends Controller
 
     public function index()
     {
-        $func = "etype_list";
+        $func = "eventtype_list";
         if (!$this->check_function($func)) {
             return redirect()->route('unauthorized');
         }
@@ -33,12 +33,12 @@ class EventTypeController extends Controller
         
         $EventTypes = EventType::orderBy('id', 'DESC')->paginate($this->pagesize);
 
-        return view('Event::event_type.index', compact('active_menu', 'breadcrumb', 'EventTypes'));
+        return view('Events::event_type.index', compact('active_menu', 'breadcrumb', 'EventTypes'));
     }
 
     public function search(Request $request)
     {
-        $func = "etype_list";
+        $func = "eventtype_list";
         if (!$this->check_function($func)) {
             return redirect()->route('unauthorized');
         }
@@ -54,7 +54,7 @@ class EventTypeController extends Controller
             <li class="breadcrumb-item"><a href="' . route('admin.event_type.index') . '">Danh sách loại sự kiện</a></li>
             <li class="breadcrumb-item active" aria-current="page">Tìm kiếm</li>';
 
-            return view('Event::event_type.search', compact('EventTypes', 'active_menu', 'breadcrumb', 'searchdata'));
+            return view('Events::event_type.search', compact('EventTypes', 'active_menu', 'breadcrumb', 'searchdata'));
         } else {
             return redirect()->route('admin.event_type.index')->with('nothing');
         }
@@ -62,7 +62,7 @@ class EventTypeController extends Controller
 
     public function create()
     {
-        $func = 'etype_add';
+        $func = 'eventtype_add';
         if (!$this->check_function($func)) {
             return redirect()->route('unauthorized');
         }
@@ -73,12 +73,12 @@ class EventTypeController extends Controller
         <li class="breadcrumb-item"><a href="' . route('admin.event_type.index') . '">Danh sách loại sự kiện</a></li>
         <li class="breadcrumb-item active" aria-current="page">Tạo loại sự kiện</li>';
 
-        return view('Event::event_type.create', compact('breadcrumb', 'active_menu'));
+        return view('Events::event_type.create', compact('breadcrumb', 'active_menu'));
     }
 
     public function store(Request $request)
     {
-        $func = "etype_add";
+        $func = "eventtype_add";
         if (!$this->check_function($func)) {
             return redirect()->route('unauthorized');
         }
@@ -108,7 +108,7 @@ class EventTypeController extends Controller
 
     public function edit(string $id)
     {
-        $func = "etype_edit";
+        $func = "eventtype_edit";
         if (!$this->check_function($func)) {
             return redirect()->route('unauthorized');
         }
@@ -121,7 +121,7 @@ class EventTypeController extends Controller
             <li class="breadcrumb-item"><a href="' . route('admin.event_type.index') . '">Danh sách loại sự kiện</a></li>
             <li class="breadcrumb-item active" aria-current="page">Điều chỉnh loại sự kiện</li>';
 
-            return view('Event::event_type.edit', compact('breadcrumb', 'EventTypes', 'active_menu'));
+            return view('Events::event_type.edit', compact('breadcrumb', 'EventTypes', 'active_menu'));
         } else {
             return back()->with('error', 'Không tìm thấy dữ liệu');
         }
@@ -129,7 +129,7 @@ class EventTypeController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $func = "etype_edit";
+        $func = "eventtype_edit";
         if (!$this->check_function($func)) {
             return redirect()->route('unauthorized');
         }
@@ -157,7 +157,7 @@ class EventTypeController extends Controller
 
     public function destroy(string $id)
     {
-        $func = "etype_delete";
+        $func = "eventtype_delete";
         if (!$this->check_function($func)) {
             return redirect()->route('unauthorized');
         }
