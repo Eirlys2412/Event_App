@@ -26,68 +26,92 @@
                     <label for="hoc_phan" class="form-label">Học phần</label>
                     <select name="hocphan_id" id="hoc_phan" class="form-select">
                         @foreach($hocPhan as $hoc_phan)
-                            <option value="{{ $hoc_phan->id }}" {{ $hoc_phan->id == $program_details->hocphan_id ? 'selected' : '' }}>{{ $hoc_phan->title }}</option>
+                            <option value="{{ $hoc_phan->id }}" {{ $hoc_phan->id == $program_details->hocphan_id ? 'selected' : '' }}>
+                                {{ $hoc_phan->title }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
-
+        
                 <div class="mt-3">
                     <label for="ctdt" class="form-label">Chương trình đào tạo</label>
                     <select name="chuongtrinh_id" id="ctdt" class="form-select">
                         @foreach($chuongTrinhdaotao as $ctdt)
-                            <option value="{{ $ctdt->id }}" {{ $ctdt->id == $program_details->chuongtrinh_id ? 'selected' : '' }}>{{ $ctdt->title }}</option>
+                            <option value="{{ $ctdt->id }}" {{ $ctdt->id == $program_details->chuongtrinh_id ? 'selected' : '' }}>
+                                {{ $ctdt->title }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
-
-    
+        
                 <div class="mt-3">
                     <label for="hoc_ky" class="form-label">Học kỳ</label>
                     <select id="hoc_ky" name="hocky" class="form-control">
                         <option value="">Chọn học kỳ</option>
                         @for ($i = 1; $i <= 10; $i++)
-                            <option value="{{ $i }}" 
-                                {{ old('hocky', $program_details->hocky ?? '') == $i ? 'selected' : '' }}>
+                            <option value="{{ $i }}" {{ old('hocky', $program_details->hocky ?? '') == $i ? 'selected' : '' }}>
                                 {{ $i }}
                             </option>
                         @endfor
                     </select>
                 </div>
-                
-
+        
                 <div class="mt-3">
                     <label for="loai_hoc_phan" class="form-label">Loại</label>
                     <select id="loai_hoc_phan" name="loai" class="form-control">
                         <option value="">Chọn loại học phần</option>
-                        <option value="Bắt buộc" 
-                            {{ old('loai', $program_details->loai ?? '') == 'Bắt buộc' ? 'selected' : '' }}>
+                        <option value="Bắt buộc" {{ old('loai', $program_details->loai ?? '') == 'Bắt buộc' ? 'selected' : '' }}>
                             Bắt buộc
                         </option>
-                        <option value="Tự chọn" 
-                            {{ old('loai', $program_details->loai ?? '') == 'Tự chọn' ? 'selected' : '' }}>
+                        <option value="Tự chọn" {{ old('loai', $program_details->loai ?? '') == 'Tự chọn' ? 'selected' : '' }}>
                             Tự chọn
                         </option>
                     </select>
                 </div>
-                
-
+        
+                <!-- Học Phần Tiên Quyết -->
+                <div class="mt-3">
+                    <label for="hocphantienquyet" class="form-label">Học phần tiên quyết</label>
+                    <select name="hocphantienquyet[]" id="hocphantienquyet" class="form-select" multiple>
+                        @foreach($hocPhan as $hoc_phan)
+                            <option value="{{ $hoc_phan->id }}" {{ in_array($hoc_phan->id, old('hocphantienquyet', (array) $program_details->hocphantienquyet ?? [])) ? 'selected' : '' }}>
+                                {{ $hoc_phan->title }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+        
+                <!-- Học Phần Song Song -->
+                <div class="mt-3">
+                    <label for="hocphansongsong" class="form-label">Học phần song song</label>
+                    <select name="hocphansongsong[]" id="hocphansongsong" class="form-select" multiple>
+                        @foreach($hocPhan as $hoc_phan)
+                            <option value="{{ $hoc_phan->id }}" {{ in_array($hoc_phan->id, old('hocphansongsong', (array) $program_details->hocphansongsong ?? [])) ? 'selected' : '' }}>
+                                {{ $hoc_phan->title }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+        
+                <!-- Hiển thị lỗi nếu có -->
                 <div class="mt-3">
                     @if($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                     @endif
                 </div>
-
+        
                 <div class="text-right mt-5">
                     <button type="submit" class="btn btn-primary w-24">Cập nhật</button>
                 </div>
             </div>
         </form>
+        
     </div>
 </div>
 
