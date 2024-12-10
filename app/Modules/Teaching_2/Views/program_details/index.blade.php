@@ -31,6 +31,8 @@
                 <th class="whitespace-nowrap">Chương trình đào tạo</th>
                 <th class="whitespace-nowrap">Loại học phần</th>
                 <th class="whitespace-nowrap">Học kỳ</th>
+                <th class="whitespace-nowrap">Học phần tiên quyết</th>
+                <th class="whitespace-nowrap">Học phần song song</th>
                 {{-- <th class="text-center whitespace-nowrap">CHUYÊN NGÀNH</th> --}}
                 <th class="text-center whitespace-nowrap">TRẠNG THÁI</th>
                 <th></th>
@@ -38,29 +40,60 @@
         </thead>
         <tbody>
             @foreach($program_details as $item)
-            <tr class="intro-x">
-                <td>
-                    <a target="_blank" href="" class="font-medium whitespace-nowrap">{{ $item->hocPhan->title ?? 'N/A' }}</a> 
-                </td>
-                <td class="text-left">{{ $item->chuongTrinhdaotao->title ?? 'N/A' }}</td> 
-                <td class="text-left">{{ $item->loai ?? 'N/A' }}</td> 
-                <td class="text-left">{{ $item->hocky ?? 'N/A' }}</td> 
-                <td class="table-report__action w-56">
-                    <div class="flex justify-center items-center">
-                        <a href="{{ route('admin.program_details.edit', $item->id) }}" class="flex items-center mr-3"> 
-                            <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit 
-                        </a>
-                        <form action="{{ route('admin.program_details.destroy', $item->id) }}" method="post">
-                            @csrf
-                            @method('delete')
-                            <a class="flex items-center text-danger dltBtn" data-id="{{ $item->id }}" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal"> 
-                                <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete 
-                            </a>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-            @endforeach
+<tr class="intro-x">
+    <td>
+        <a target="_blank" href="" class="font-medium whitespace-nowrap">{{ $item->hocPhan->title ?? 'N/A' }}</a>
+    </td>
+    <td class="text-left">{{ $item->chuongTrinhdaotao->title ?? 'N/A' }}</td>
+    <td class="text-left">{{ $item->loai ?? 'N/A' }}</td>
+    <td class="text-left">{{ $item->hocky ?? 'N/A' }}</td>
+
+    <!-- Hiển thị học phần tiên quyết -->
+    <td class="text-left">
+        @php
+            $hocphantienquyet = json_decode($item->hocphantienquyet, true);
+        @endphp
+        @if($hocphantienquyet && isset($hocphantienquyet['next']))
+            {{ implode(', ', array_map(function($id) use ($hocPhanList) {
+                return $hocPhanList[$id] ?? 'N/A';
+            }, $hocphantienquyet['next'])) }}
+        @else
+            N/A
+        @endif
+    </td>
+
+    <!-- Hiển thị học phần song song -->
+    <td class="text-left">
+        @php
+            $hocphansongsong = json_decode($item->hocphansongsong, true);
+        @endphp
+        @if($hocphansongsong && isset($hocphansongsong['id']))
+            {{ implode(', ', array_map(function($id) use ($hocPhanList) {
+                return $hocPhanList[$id] ?? 'N/A';
+            }, $hocphansongsong['id'])) }}
+        @else
+            N/A
+        @endif
+    </td>
+
+    <!-- Hành động -->
+    <td class="table-report__action w-56">
+        <div class="flex justify-center items-center">
+            <a href="{{ route('admin.program_details.edit', $item->id) }}" class="flex items-center mr-3"> 
+                <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit 
+            </a>
+            <form action="{{ route('admin.program_details.destroy', $item->id) }}" method="post">
+                @csrf
+                @method('delete')
+                <a class="flex items-center text-danger dltBtn" data-id="{{ $item->id }}" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal"> 
+                    <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete 
+                </a>
+            </form>
+        </div>
+    </td>
+</tr>
+@endforeach
+
             
         </tbody>
     </table>

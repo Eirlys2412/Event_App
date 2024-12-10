@@ -5,7 +5,7 @@ namespace App\Modules\Teaching_2\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Modules\Teaching_2\Models\Module;
+use App\Modules\Teaching_2\Models\HocPhan;
 use App\Modules\Teaching_2\Models\ChuongTrinhDaoTao;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -31,7 +31,7 @@ class ProgramDetails extends Model
     // ];
     public function hocPhan()
     {
-        return $this->belongsTo(Module::class, 'hocphan_id');
+        return $this->belongsTo(HocPhan::class, 'hocphan_id');
     }
     
     public function chuongTrinhdaotao()
