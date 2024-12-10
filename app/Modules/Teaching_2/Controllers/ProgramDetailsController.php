@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log; // Thêm dòng này
 use App\Modules\Teaching_2\Models\ProgramDetails;
-use App\Modules\Teaching_2\Models\Module;
+use App\Modules\Teaching_2\Models\HocPhan;
 use App\Modules\Teaching_2\Models\ChuongTrinhDaoTao;
 
 
@@ -23,27 +23,32 @@ class ProgramDetailsController extends Controller
         
     }
     public function index()
-    {
-        $func = "program_details_list";
-        if(!$this->check_function($func))
-        {
-            return redirect()->route('unauthorized');
-        }
+{
+    $func = "program_details_list";
+    if (!$this->check_function($func)) {
+        return redirect()->route('unauthorized');
+    }
 
-        $active_menu="program_details_list";
-        $breadcrumb = '
+    $active_menu = "program_details_list";
+    $breadcrumb = '
         <li class="breadcrumb-item"><a href="#">/</a></li>
         <li class="breadcrumb-item active" aria-current="page"> Danh sách chi tiết chương trình </li>';
-        $program_details = ProgramDetails::orderBy('id','DESC')->paginate($this->pagesize);
-        // categories
-        return view('Teaching_2::program_details.index',compact('program_details','breadcrumb','active_menu'));
 
-    }
+    // Lấy danh sách chi tiết chương trình đào tạo
+    $program_details = ProgramDetails::orderBy('id', 'DESC')->paginate($this->pagesize);
+
+    // Lấy danh sách học phần [id => title]
+    $hocPhanList = HocPhan::pluck('title', 'id')->toArray();
+
+    // Truyền dữ liệu vào view
+    return view('Teaching_2::program_details.index', compact('program_details', 'breadcrumb', 'active_menu', 'hocPhanList'));
+}
+
 
     // Show the form for creating a new user page
     public function create()
     {   $active_menu = 'program_details_add';
-        $hocPhan = Module::all(); // Lấy tất cả đơn vị để chọn
+        $hocPhan = HocPhan::all(); // Lấy tất cả đơn vị để chọn
         $chuongTrinhdaotao = ChuongTrinhDaoTao::all(); // Lấy tất cả người dùng để chọn
         return view('Teaching_2::program_details.create', compact('active_menu','hocPhan','chuongTrinhdaotao'));
     }
@@ -52,14 +57,14 @@ class ProgramDetailsController extends Controller
 {
     // Validate dữ liệu từ request
     $validatedData = $request->validate([
-        'hocphan_id' => 'required|exists:modules,id', // Phải tồn tại trong bảng modules (id)
+        'hocphan_id' => 'required|exists:hoc_phans,id', // Phải tồn tại trong bảng modules (id)
         'chuongtrinh_id' => 'required|exists:chuong_trinh_dao_tao,id', // Phải tồn tại trong bảng chuong_trinh_dao_tao (id)
         'hocky' => 'required|integer|min:1', // Bắt buộc, số nguyên, không nhỏ hơn 1
         'loai' => 'required|string|max:50|in:Bắt buộc,Tự chọn', // Bắt buộc, chuỗi, giá trị là "Bắt buộc" hoặc "Tự chọn"
         'hocphantienquyet' => 'nullable|array', // Nếu có giá trị, phải là mảng
-        'hocphantienquyet.*' => 'integer|exists:modules,id', // Các phần tử phải là số nguyên và tồn tại trong bảng modules
+        'hocphantienquyet.*' => 'integer|exists:hoc_phans,id', // Các phần tử phải là số nguyên và tồn tại trong bảng modules
         'hocphansongsong' => 'nullable|array', // Nếu có giá trị, phải là mảng
-        'hocphansongsong.*' => 'integer|exists:modules,id', // Các phần tử phải là số nguyên và tồn tại trong bảng modules
+        'hocphansongsong.*' => 'integer|exists:hoc_phans,id', // Các phần tử phải là số nguyên và tồn tại trong bảng modules
     ]);
 
     // Dữ liệu học phần tiên quyết
@@ -113,7 +118,7 @@ class ProgramDetailsController extends Controller
     {
         $active_menu = 'program_details_edit'; 
         $program_details = ProgramDetails::findOrFail($program_details); // Tìm bản ghi theo ID
-        $hocPhan = Module::all(); // Lấy tất cả đơn vị để chọn
+        $hocPhan = HocPhan::all(); // Lấy tất cả đơn vị để chọn
         $chuongTrinhdaotao = ChuongTrinhDaoTao::all(); // Lấy tất cả người dùng để chọn
 
         // Chuyển đổi dữ liệu học phần tiên quyết và học phần song song thành mảng nếu cần
