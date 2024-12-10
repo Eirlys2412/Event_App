@@ -463,22 +463,22 @@
               </ul>
         </li>
         <li>
-            <a href="javascript:;.html" class="side-menu side-menu{{( $active_menu=='module_list'|| $active_menu=='blog_add'||$active_menu=='blogcat_list'|| $active_menu=='blogcat_add' )?'--active':''}}">
+            <a href="javascript:;.html" class="side-menu side-menu{{( $active_menu=='hocphan_list'|| $active_menu=='blog_add'||$active_menu=='blogcat_list'|| $active_menu=='blogcat_add' )?'--active':''}}">
                 <div class="side-menu__icon"> <i data-lucide="book"></i> </div>
                 <div class="side-menu__title">
                     Học phần
                     <div class="side-menu__sub-icon transform"> <i data-lucide="book"></i> </div>
                 </div>
             </a>
-            <ul class="{{ ($active_menu=='module_list'|| $active_menu=='blog_add'||$active_menu=='blogcat_list'|| $active_menu=='blogcat_add')?'side-menu__sub-open':''}}">
+            <ul class="{{ ($active_menu=='hocphan_list'|| $active_menu=='blog_add'||$active_menu=='blogcat_list'|| $active_menu=='blogcat_add')?'side-menu__sub-open':''}}">
                 <li>
-                    <a href="{{ route('admin.module.index') }}" class="side-menu {{ $active_menu == 'module_list' ? 'side-menu--active' : '' }}">
+                    <a href="{{ route('admin.hocphan.index') }}" class="side-menu {{ $active_menu == 'hocphan_list' ? 'side-menu--active' : '' }}">
                         <div class="side-menu__icon"> <i data-lucide="graduation-cap"></i></div>
                         <div class="side-menu__title">Danh sách học phần</div>
                     </a>
                 </li>
                 <li>
-                    <a href="{{route('admin.module.create')}}" class="side-menu {{$active_menu=='blog_add'?'side-menu--active':''}}">
+                    <a href="{{route('admin.hocphan.create')}}" class="side-menu {{ $active_menu == 'hocphan_list' ? 'side-menu--active' : '' }}">
                         <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
                         <div class="side-menu__title"> Thêm học phần</div>
                     </a>

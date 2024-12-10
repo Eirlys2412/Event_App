@@ -3,13 +3,13 @@
 use App\Modules\Teaching_2\Controllers\ChuongTrinhDaoTaoController;
 use App\Modules\Teaching_2\Controllers\ProgramDetailsController;
 use Illuminate\Support\Facades\Route;
-use App\Modules\Teaching_2\Controllers\ModuleController;
+use App\Modules\Teaching_2\Controllers\HocPhanController;
 // Define routes here
 Route::group(['prefix' => 'admin/', 'as' => 'admin.'], function() {
     // Route::resource('recommend', RecommendController::class);
-    Route::resource('module', ModuleController::class);
+    Route::resource('hocphan', HocPhanController::class);
     // Route::get('recommend', [RecommendController::class, 'index'])->name('recommend.index');
-    Route::get('module_search', [ModuleController::class, 'moduleSearch'])->name('module.search');
+    Route::get('hocphan_search', [HocPhanController::class, 'moduleSearch'])->name('hocphan.search');
     // Hiển thị danh sách chương trình đào tạo
     Route::get('chuong_trinh_dao_tao', [ChuongTrinhDaoTaoController::class, 'index'])->name('chuong_trinh_dao_tao.index');
 
