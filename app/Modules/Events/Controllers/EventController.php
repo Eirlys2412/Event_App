@@ -24,15 +24,22 @@ class EventController extends Controller
 
     // Danh sách các sự kiện
     public function index()
-    {
-        $eventList = Event::latest()->paginate($this->pagesize);
-        $active_menu = "event_list";
-        $breadcrumb = '
-            <li class="breadcrumb-item"><a href="#">/</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Danh sách Sự kiện</li>';
+{
+    $eventList = Event::with('eventType')->paginate($this->pagesize); // Chỉ lấy eventType
 
-        return view('Events::event.index', compact('eventList', 'breadcrumb', 'active_menu'));
+    foreach ($eventList as $event) {
+        $resourceIds = json_decode($event->resources, true)['resource_ids'] ?? [];
+        $resourceUrls = Resource::whereIn('id', $resourceIds)->pluck('url')->toArray();
+        $event->setAttribute('resource_urls', $resourceUrls);
     }
+
+    $breadcrumb = '
+        <li class="breadcrumb-item"><a href="#">/</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Danh sách sự kiện</li>';
+    $active_menu = "event_list";
+
+    return view('Events::event.index', compact('eventList', 'breadcrumb', 'active_menu'));
+}
 
     // Tạo mới sự kiện
     public function create()
