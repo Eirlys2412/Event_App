@@ -13,16 +13,18 @@ return new class extends Migration
     {
         Schema::create('event', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('slug')->unique();
-            $table->text('summary')->nullable();
-            $table->text('description')->nullable();
-            $table->text('resources')->nullable();
-            $table->dateTime('timestart');
-            $table->dateTime('timeend');
-            $table->foreignId('event_type_id')->constrained('event_type')->onDelete('cascade');
-            $table->json('tags')->nullable();
-            $table->timestamps();
+            $table->string('title'); // Tiêu đề sự kiện
+            $table->string('slug')->unique(); // Slug duy nhất
+            $table->text('summary')->nullable(); // Tóm tắt
+            $table->longText('description')->nullable(); // Mô tả chi tiết
+            $table->json('resources')->nullable(); // Tài nguyên dưới dạng JSON
+            $table->dateTime('timestart'); // Thời gian bắt đầu
+            $table->dateTime('timeend'); // Thời gian kết thúc
+            $table->foreignId('event_type_id') // Loại sự kiện
+                ->constrained('event_type') // Bảng `event_types`
+                ->onDelete('cascade'); // Xóa sự kiện khi xóa loại sự kiện
+            $table->json('tags')->nullable(); // Thẻ dưới dạng JSON
+            $table->timestamps(); // Thêm cột created_at và updated_at
         });
     }
 
