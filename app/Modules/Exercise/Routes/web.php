@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Modules\Exercise\Controllers\TuluancauhoiController;
 use App\Modules\Exercise\Controllers\TuluancauhoiTypeController;
 use App\Modules\Exercise\Controllers\TuluancauhoiLinkTypeController;
+use App\Modules\Exercise\Controllers\TracNghiemCauHoiController;
 
 // Định nghĩa route cho module câu hỏi
 Route::prefix('admin/tuluancauhoi')->name('admin.tuluancauhoi.')->group(function () {
@@ -38,4 +39,9 @@ Route::group(['prefix' => 'admin/', 'as' => 'admin.'], function () {
         'update' => 'tuluancauhoi-link-types.update',
         'destroy' => 'tuluancauhoi-link-types.destroy',
     ]); 
+
+    Route::resource('tracnghiemcauhoi', TracNghiemCauHoiController::class);
+    // Route::get('hocphan_search', [App\Modules\Exercise\Controllers\::class, 'moduleSearch'])->name('hocphan.search');
+    Route::delete('/admin/tracnghiemcauhoi/{tracnghiemcauhoiId}/resource/{resourceId}', [TracNghiemCauHoiController::class, 'removeResource'])->name('tracnghiemcauhoi.removeResource');
 });
+

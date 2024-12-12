@@ -117,7 +117,7 @@
         </li>
         {{-- tuluancauhoi --}}
         <li>
-            <a href="javascript:;" class="side-menu {{ ($active_menu == 'tuluancauhoi_list' || $active_menu == 'admin.tuluancauhoi.index' || $active_menu == 'admin.tuluancauhoi.create') ? '--active' : '' }}">
+            <a href="javascript:;" class="side-menu {{ ($active_menu == 'tracnghiemcauhoi_list' || $active_menu == 'tuluancauhoi_list' || $active_menu == 'admin.tuluancauhoi.index' || $active_menu == 'admin.tuluancauhoi.create') ? '--active' : '' }}">
                 <div class="side-menu__icon"> <i data-lucide="align-center"></i> </div>
                 <div class="side-menu__title">
                     Câu hỏi
@@ -147,6 +147,15 @@
                     <a href="{{ route('admin.tuluancauhoi-link-types.index') }}" class="side-menu {{ $active_menu == 'admin.tuluancauhoi-link-types.index' ? 'side-menu--active' : '' }}">
                         <div class="side-menu__icon"> <i data-lucide="link-2"></i> </div>
                         <div class="side-menu__title">Loại liên kết câu hỏi</div>
+                    </a>
+                </li>
+
+
+
+                <li>
+                    <a href="{{ route('admin.tracnghiemcauhoi.index') }}" class="side-menu {{ $active_menu == 'admin.tracnghiemcauhoi.index' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="compass"></i> </div>
+                        <div class="side-menu__title">Câu hỏi trắc nghiệm</div>
                     </a>
                 </li>
             </ul>
@@ -320,31 +329,7 @@
         </ul>
     </li>
 
-    <!-- Event -->
-<li>
-    <a href="javascript:;" class="side-menu {{($active_menu=='event_list' || $active_menu=='event_add')?'side-menu--active':''}}">
-        <div class="side-menu__icon"> <i data-lucide="calendar"></i> </div>
-        <div class="side-menu__title">
-            Sự kiện
-            <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
-        </div>
-    </a>
-    <ul class="{{($active_menu=='event_list' || $active_menu=='event_add')?'side-menu__sub-open':''}}">
-        <li>
-            <a href="{{route('admin.event.index')}}" class="side-menu {{$active_menu=='event_list'?'side-menu--active':''}}">
-                <div class="side-menu__icon"> <i data-lucide="layers"></i> </div>
-                <div class="side-menu__title">Danh sách sự kiện</div>
-            </a>
-        </li>
-        <li>
-            <a href="{{route('admin.event.create')}}" class="side-menu {{$active_menu=='event_add'?'side-menu--active':''}}">
-                <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
-                <div class="side-menu__title">Thêm sự kiện</div>
-            </a>
-        </li>
-    </ul>
-</li>
-
+    
     <!-- event_type -->
     <li>
         <a href="javascript:;" class="side-menu side-menu{{($active_menu=='eventtype_list' || $active_menu=='eventtype_add' || $active_menu=='eventtype_edit') ? '--active' : ''}}">

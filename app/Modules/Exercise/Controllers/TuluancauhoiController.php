@@ -5,7 +5,7 @@ namespace App\Modules\Exercise\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Modules\Exercise\Models\Tuluancauhoi;
-use App\Modules\Teaching_2\Models\Module; 
+use App\Modules\Teaching_2\Models\HocPhan; 
 use App\Modules\Teaching_2\Models\HinhThucThi;
 use Illuminate\Support\Facades\Auth; 
 
@@ -27,25 +27,25 @@ class TuluancauhoiController extends Controller
         $breadcrumb = $this->generateBreadcrumb('Danh sách Câu hỏi');
     
         // Sử dụng 'module' và 'user'
-        $tuluancauhois = Tuluancauhoi::with(['user', 'module'])->orderBy('id', 'DESC')->paginate($this->pagesize);
+        $tuluancauhois = Tuluancauhoi::with(['user', 'hocphan'])->orderBy('id', 'DESC')->paginate($this->pagesize);
     
         return view('Exercise::tuluancauhoi.index', compact('tuluancauhois', 'breadcrumb', 'active_menu'));
     }
 
     public function create()
     {
-        $modules = Module::all(); // Lấy tất cả các module
+        $hocphans = HocPhan::all(); // Lấy tất cả các module
         $breadcrumb = $this->generateBreadcrumb('Thêm Câu hỏi');
         $active_menu = "tuluancauhoi_add";
 
-        return view('Exercise::tuluancauhoi.create', compact('breadcrumb', 'active_menu', 'modules'));
+        return view('Exercise::tuluancauhoi.create', compact('breadcrumb', 'active_menu', 'hocphans'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'content' => 'required',
-            'hocphan_id' => 'required|exists:modules,id',
+            'hocphan_id' => 'required|exists:hoc_phans,id',
         ]);
     
         $tuluancauhoi = new Tuluancauhoi();
@@ -60,18 +60,18 @@ class TuluancauhoiController extends Controller
     public function edit($id)
     {
         $tuluancauhoi = Tuluancauhoi::findOrFail($id);
-        $modules = Module::all();
+        $hocphans = HocPhan::all();
         $breadcrumb = $this->generateBreadcrumb('Chỉnh sửa Câu hỏi');
         $active_menu = "tuluancauhoi_edit";
 
-        return view('Exercise::tuluancauhoi.edit', compact('tuluancauhoi', 'breadcrumb', 'active_menu', 'modules'));
+        return view('Exercise::tuluancauhoi.edit', compact('tuluancauhoi', 'breadcrumb', 'active_menu', 'hocphans'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'content' => 'required',
-            'hocphan_id' => 'required|exists:modules,id', // Chắc chắn rằng hocphan_id là chính xác
+            'hocphan_id' => 'required|exists:hoc_phans,id', // Chắc chắn rằng hocphan_id là chính xác
         ]);
 
         $tuluancauhoi = Tuluancauhoi::findOrFail($id);

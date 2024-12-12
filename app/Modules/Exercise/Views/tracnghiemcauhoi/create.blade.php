@@ -12,53 +12,62 @@
  
     <div class="intro-y flex items-center mt-8">
         <h2 class="text-lg font-medium mr-auto">
-            Sửa học phần
+            Thêm câu hỏi trắc nghiệm
         </h2>
     </div>
     <div class="grid grid-cols-12 gap-12 mt-5">
         <div class="intro-y col-span-12 lg:col-span-12">
             <!-- BEGIN: Form Layout -->
-            <form method="post" action="{{route('admin.module.update', $module->id)}}" enctype="multipart/form-data">
+            <form method="post" action="{{route('admin.tracnghiemcauhoi.store')}}" enctype="multipart/form-data">
                 @csrf
-                @method('PUT')
                 <div class="intro-y box p-5">
-                    <div class="mt-3">
-                        <label for="regular-form-1" class="form-label">Tiêu đề</label>
-                        <input value="{{$module->title}}" name="title" type="text" class="form-control" placeholder="tiêu đề">
-                    </div>
-                    <div class="mt-3">
-                        <label for="photo" class="form-label">Photo</label>
-                        <input type="file" id="photo" name="photo" />
-                        @if($module->photo)
-                            <div class="mt-2">
-                                <img class="tooltip rounded-full" src="{{asset('storage/recommend/'.$module->photo)}}" alt="Hình ảnh hiện tại" class="img-thumbnail" style="max-width: 150px;">
-                            </div>
-                        @endif
-                    </div>
-                    <div class="mt-3">
-                        <label for="regular-form-1" class="form-label">Mã học phần</label>
-                        <input value="{{$module->code}}" name="code" type="text" class="form-control" placeholder="mã học phần">
-                    </div>
-                    <div class="mt-3">
+                    {{-- <div class="mt-3">
                         <label for="" class="form-label">Nội dung</label>
-                        <textarea class="editor" name="content" id="editor2">{{ old('content', $module->content) }}</textarea>
+                        <textarea class="editor" name="content" id="editor2">{{ old('content') }}</textarea>
+                    </div> --}}
+                    <div class="mt-3">
+                        <label for="content" class="form-label">Nội dung</label>
+                        <input type="file" id="content" name="content" />
                     </div>
                     <div class="mt-3">
-                        <label for="" class="form-label">Tóm tắt</label>
-                        <textarea class="form-control" id="editor1" name="summary">{{ old('summary', $module->summary) }}</textarea>
-                    </div>
-                    <div class="mt-3">
-                        <label for="regular-form-1" class="form-label">Tín chỉ</label>
-                        <input value="{{$module->tinchi}}" name="tinchi" type="text" class="form-control" placeholder="tín chỉ">
-                    </div>
-                    <div class="mt-3">
-                        <label for="regular-form-1" class="form-label">Hình thức thi</label>
-                        <select name="hinhthucthi" class="form-select mt-2">
-                            @foreach($hinhthucthi as $data)
-                                <option value="{{$data->title}}">{{ $data->title }}</option>
+                        <label for="regular-form-1" class="form-label">Học Phần</label>
+                        <select name="hocphan_id" class="form-select mt-2">
+                            @foreach($hocphan as $data)
+                                <option value="{{$data->id}}">{{ $data->title }}</option>
                             @endforeach
                         </select>
                     </div>
+                    <div class="mt-3">
+                        <label for="regular-form-1" class="form-label">Loại trắc nghiệm</label>
+                        <select name="loai_id" class="form-select mt-2">
+                            @foreach($tracnghiemloai as $data)
+                                <option value="{{$data->id}}">{{ $data->title }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mt-3">
+                        <label for="regular-form-1" class="form-label">Người tạo</label>
+                        <select name="user_id" class="form-select mt-2">
+                            @foreach($user as $data)
+                                <option value="{{$data->id}}">{{ $data->username }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mt-3">
+                        <label for="post-form-4" class="form-label">Tags</label>
+                        <select id="select-junk" name="tag_ids[]" multiple placeholder=" ..." autocomplete="off">
+                          @foreach ($tags as $tag )
+                          <option value="{{$tag->id}}" >{{$tag->title}}</option>
+                          @endforeach
+                        </select>
+                    </div>  
+                    <div class="mt-3">
+                        <label for="document" class="form-label">Tài Liệu</label>
+                        <input type="file" name="document[]" id="document" class="form-control" multiple required>
+                        @error('document')
+                            <div class="text-red-600">{{ $message }}</div>
+                        @enderror
+                    </div>    
                     <div class="text-right mt-5">
                         <button type="submit" class="btn btn-primary w-24">Lưu</button>
                     </div>

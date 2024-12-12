@@ -31,7 +31,7 @@
                         <input type="file" id="photo" name="photo" />
                         @if($hocphan->photo)
                             <div class="mt-2">
-                                <img class="tooltip rounded-full" src="{{asset('storage/recommend/'.$hocphan->photo)}}" alt="Hình ảnh hiện tại" class="img-thumbnail" style="max-width: 150px;">
+                                <img class="tooltip rounded-full" src="{{asset('storage/'.$hocphan->photo)}}" alt="Hình ảnh hiện tại" class="img-thumbnail" style="max-width: 150px;">
                             </div>
                         @endif
                     </div>

@@ -101,14 +101,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-            
-            
             HinhThucThiSeeder::class,
             ResourceSeeder::class,
             DonviSeeder::class,
             ChuyennganhSeeder::class,
             NganhSeeder::class,
             EventTypeSeeder::class,
+            LoaiTracNghiemSeeder::class,
         ]);
     }
 }

@@ -19,7 +19,7 @@ class CreateProgramDetailsTable extends Migration
             // Thêm khóa ngoại đến bảng modules
             $table->unsignedBigInteger('hocphan_id'); // Mã học phần
             $table->foreign('hocphan_id') // Tạo khóa ngoại
-                  ->references('id')->on('modules') // Liên kết với cột id trong bảng modules
+                  ->references('id')->on('hoc_phans') // Liên kết với cột id trong bảng modules
                   ->onDelete('cascade') // Xóa chi tiết nếu module bị xóa
                   ->onUpdate('cascade'); // Cập nhật khóa ngoại khi module thay đổi
 
