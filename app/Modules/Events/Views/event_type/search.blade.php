@@ -24,27 +24,33 @@
             <table class="table table-report -mt-2">
                 <thead>
                     <tr>
-                        <th class="whitespace-nowrap">MÃ LOẠI SỰ KIỆN</th>
-                        <th class="whitespace-nowrap">TÊN LOẠI SỰ KIỆN</th>
-                        <th class="text-center whitespace-nowrap">TRẠNG THÁI</th>
-                        <th></th>
+                        <th class="whitespace-nowrap">ID</th>
+                        <th class="whitespace-nowrap">Tiêu đề</th>
+                        <!-- <th class="whitespace-nowrap">Slug</th> -->
+                        <th class="whitespace-nowrap">Loại địa điểm</th>
+                        <th class="whitespace-nowrap">Tên địa điểm tổ chức</th>
+                        <th class="text-center whitespace-nowrap">Trạng thái</th>
+                        <th class="text-center whitespace-nowrap">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($EventTypes as $eventType)
-                    <tr class="intro-x">
-                        <td>{{ $eventType->id }}</td>
-                        <td>{{ $eventType->title }}</td>
-                        <td class="text-center">
-                            <input type="checkbox" 
-                                data-toggle="switchbutton" 
-                                data-onlabel="active"
-                                data-offlabel="inactive"
-                                {{ $eventType->status == "active" ? "checked" : "" }}
-                                data-size="sm"
-                                name="toggle"
-                                value="{{ $eventType->id }}"
-                                data-style="ios">
+                        <tr class="intro-x">
+                            <td>{{ $eventType->id }}</td>
+                            <td>{{ $eventType->title }}</td>
+                            <!-- <td>{{ $eventType->slug }}</td> -->
+                            <td>{{ $eventType->location_type }}</td>
+                            <td>{{ $eventType->location_address }}</td>
+                            <td class="text-center">
+                                <input type="checkbox" 
+                                       data-toggle="switchbutton" 
+                                       data-onlabel="active"
+                                       data-offlabel="inactive"
+                                       {{ $eventType->status == 'active' ? 'checked' : '' }}
+                                       data-size="sm"
+                                       name="toggle"
+                                       value="{{ $eventType->id }}"
+                                       data-style="ios">
                         </td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
