@@ -62,7 +62,6 @@ class ResourceController extends Controller
 
     public function store(Request $request)
     {
-        //dd($request->all());
         $request->validate([
             'title' => 'required|string|max:255',
             'link_code' => 'nullable|exists:resource_link_types,code',
@@ -74,16 +73,24 @@ class ResourceController extends Controller
         ]);
 
         $resourceType = ResourceType::where('code', $request->type_code)->first();
-        $linkTypes = ResourceLinkType::where('code', $request->link_code)->first();
+
         if (!$resourceType) {
             return redirect()->back()->with('error', 'Không tìm thấy loại tài nguyên.');
         }
-        if (!$linkTypes) {
-            return redirect()->back()->with('error', 'Không tìm thấy loại link.');
-        }
+
         $data = $request->only(['title', 'url', 'description']);
         $data['type_code'] = $resourceType->code;
-        $data['link_code'] = $linkTypes->code;
+
+        // Xử lý loại liên kết tài nguyên dựa trên loại nhập liệu
+        if ($request->hasFile('file')) {
+            $data['link_code'] = null; 
+        } else {
+            $linkType = ResourceLinkType::where('code', $request->link_code)->first();
+            if (!$linkType) {
+                return redirect()->back()->with('error', 'Không tìm thấy loại liên kết.');
+            }
+            $data['link_code'] = $linkType->code;
+        }
 
         $resource = Resource::createResource((object) $data, $request->file('file'), 'Resource');
 

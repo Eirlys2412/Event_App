@@ -48,10 +48,10 @@ class BookController extends Controller
         <li class="breadcrumb-item active" aria-current="page">Tạo sách</li>';
         $active_menu = "book_add";
         $tags = Tag::where('status', 'active')->orderBy('title', 'ASC')->get();
-        $typeCodes = ResourceType::distinct()->pluck('code');
+        //$typeCodes = ResourceType::distinct()->pluck('code');
         $bookTypes = BookType::all();
 
-        return view('Book::books.create', compact('breadcrumb', 'active_menu', 'typeCodes', 'tags', 'bookTypes'));
+        return view('Book::books.create', compact('breadcrumb', 'active_menu',  'tags', 'bookTypes'));
     }
 
     public function store(Request $request)
