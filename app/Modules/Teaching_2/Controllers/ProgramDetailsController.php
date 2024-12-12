@@ -157,7 +157,6 @@ class ProgramDetailsController extends Controller
 
 
     // Update a program_details
-    // Update a program_details
 public function update(Request $request, $id)
 {
     try {
@@ -189,7 +188,7 @@ public function update(Request $request, $id)
         $hocphansongsong = null;
         if (!empty($validatedData['hocphansongsong'])) {
             $hocphansongsong = json_encode([
-                'id' => $validatedData,
+                'id' => $validatedData['hocphan_id'],
                 'parallel' => $validatedData['hocphansongsong'], // Học phần chính và song song
             ], JSON_UNESCAPED_UNICODE);
         }
