@@ -46,8 +46,8 @@
                 <!-- Tài nguyên (File) -->
                 <div class="mt-3">
                     <label for="resources" class="form-label">Tài nguyên (File)</label>
-                    <input id="resources" name="resources[]" type="file" class="form-control @error('resources') is-invalid @enderror" multiple>
-                    @error('resources')
+                    <input id="resources" name="documents[]" type="file" class="form-control @error('documents') is-invalid @enderror" multiple>
+                    @error('documents')
                         <div class="text-red-500 text-sm">{{ $message }}</div>
                     @enderror
                 </div>
