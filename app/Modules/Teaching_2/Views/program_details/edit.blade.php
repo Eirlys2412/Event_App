@@ -69,29 +69,33 @@
                     </select>
                 </div>
         
-                <!-- Học Phần Tiên Quyết -->
+                <!-- Học phần tiên quyết -->
                 <div class="mt-3">
                     <label for="hocphantienquyet" class="form-label">Học phần tiên quyết</label>
                     <select name="hocphantienquyet[]" id="hocphantienquyet" class="form-select" multiple>
                         @foreach($hocPhan as $hoc_phan)
-                            <option value="{{ $hoc_phan->id }}" {{ in_array($hoc_phan->id, old('hocphantienquyet', (array) $program_details->hocphantienquyet ?? [])) ? 'selected' : '' }}>
+                            <option value="{{ $hoc_phan->id }}" 
+                                {{ in_array($hoc_phan->id, $hocphantienquyet_ids) ? 'selected' : '' }}>
                                 {{ $hoc_phan->title }}
                             </option>
                         @endforeach
                     </select>
                 </div>
-        
-                <!-- Học Phần Song Song -->
+
+                <!-- Học phần song song -->
                 <div class="mt-3">
                     <label for="hocphansongsong" class="form-label">Học phần song song</label>
                     <select name="hocphansongsong[]" id="hocphansongsong" class="form-select" multiple>
                         @foreach($hocPhan as $hoc_phan)
-                            <option value="{{ $hoc_phan->id }}" {{ in_array($hoc_phan->id, old('hocphansongsong', (array) $program_details->hocphansongsong ?? [])) ? 'selected' : '' }}>
+                            <option value="{{ $hoc_phan->id }}" 
+                                {{ in_array($hoc_phan->id, $hocphansongsong_ids) ? 'selected' : '' }}>
                                 {{ $hoc_phan->title }}
                             </option>
                         @endforeach
                     </select>
                 </div>
+
+
         
                 <!-- Hiển thị lỗi nếu có -->
                 <div class="mt-3">
@@ -120,6 +124,38 @@
 @section('scripts')
 
 <script>
+     // Khởi tạo cho học phần tiên quyết
+     var selectTienQuyet = new TomSelect('#hocphantienquyet', {
+        maxItems: null,
+        allowEmptyOption: true,
+        plugins: ['remove_button'],
+        sortField: {
+            field: "text",
+            direction: "asc"
+        },
+        onItemAdd: function() {
+            this.setTextboxValue('');
+            this.refreshOptions();
+        },
+        create: true
+    });
+
+    // Khởi tạo cho học phần song song
+    var selectSongSong = new TomSelect('#hocphansongsong', {
+        maxItems: null,
+        allowEmptyOption: true,
+        plugins: ['remove_button'],
+        sortField: {
+            field: "text",
+            direction: "asc"
+        },
+        onItemAdd: function() {
+            this.setTextboxValue('');
+            this.refreshOptions();
+        },
+        create: true
+    });
+    
 </script>
 
 @endsection
