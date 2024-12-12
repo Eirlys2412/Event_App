@@ -19,8 +19,8 @@
                 <label for="hocphan_id" class="form-label">Học phần</label>
                 <select name="hocphan_id" id="hocphan_id" class="form-select" required>
                     <option value="">Chọn học phần</option>
-                    @foreach($modules as $module)
-                        <option value="{{ $module->id }}" {{ $tuluancauhoi->hocphan_id == $module->id ? 'selected' : '' }}>{{ $module->title }}</option>
+                    @foreach($hocphans as $hocphan)
+                        <option value="{{ $hocphan->id }}" {{ $tuluancauhoi->hocphan_id == $hocphan->id ? 'selected' : '' }}>{{ $module->title }}</option>
                     @endforeach
                 </select>
                 @error('hocphan_id')

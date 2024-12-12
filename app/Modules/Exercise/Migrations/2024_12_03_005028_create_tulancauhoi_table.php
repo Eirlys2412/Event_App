@@ -23,7 +23,7 @@ class CreateTulancauhoiTable extends Migration
             $table->timestamps(); // Tạo cột created_at và updated_at
 
             // Ràng buộc khóa ngoại
-            $table->foreign('hocphan_id')->references('id')->on('modules')->onDelete('cascade');
+            $table->foreign('hocphan_id')->references('id')->on('hoc_phans')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }

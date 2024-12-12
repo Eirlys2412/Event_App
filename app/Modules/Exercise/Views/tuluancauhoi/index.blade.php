@@ -28,7 +28,7 @@
                 <tr class="intro-x">
                     <td>{{ $item->id }}</td>
                     <td>{{ $item->content }}</td>
-                    <td>{{ optional($item->module)->title }}</td>
+                    <td>{{ optional($item->hocphan)->title }}</td>
                     <td>{{ optional($item->user)->name }}</td>
                     <td class="table-report__action w-56">
                         <div class="flex justify-center items-center">

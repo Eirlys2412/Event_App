@@ -5,7 +5,7 @@ namespace App\Modules\Exercise\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User; // Import model User
-use App\Modules\Teaching_2\Models\Module; // Import model Module
+use App\Modules\Teaching_2\Models\HocPhan; // Import model Module
 
 class Tuluancauhoi extends Model
 {
@@ -36,8 +36,8 @@ class Tuluancauhoi extends Model
     }
 
     // Định nghĩa quan hệ với model Module
-    public function module()
+    public function hocphan()
     {
-        return $this->belongsTo(Module::class, 'hocphan_id'); // Khóa ngoại là hocphan_id
+        return $this->belongsTo(HocPhan::class, 'hocphan_id'); // Khóa ngoại là hocphan_id
     }
 }
