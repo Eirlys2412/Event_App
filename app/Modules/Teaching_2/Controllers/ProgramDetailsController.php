@@ -49,7 +49,8 @@ class ProgramDetailsController extends Controller
     public function create()
     {   $active_menu = 'program_details_add';
         $hocPhan = HocPhan::all(); // Lấy tất cả đơn vị để chọn
-        $chuongTrinhdaotao = ChuongTrinhDaoTao::all(); // Lấy tất cả người dùng để chọn
+        // Lấy các chương trình đào tạo chỉ có status là 'active'
+        $chuongTrinhdaotao = ChuongTrinhDaoTao::where('status', 'active')->get();
         return view('Teaching_2::program_details.create', compact('active_menu','hocPhan','chuongTrinhdaotao'));
     }
     
