@@ -590,5 +590,30 @@
                 </li>
             </ul>
         </li>
+         <!-- phân công -->
+<li>
+    <a href="javascript:;" class="side-menu {{($active_menu=='phancong_list'|| $active_menu=='phancong_add')?'side-menu--active':''}}">
+        <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
+        <div class="side-menu__title">
+            Phân công
+            <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+        </div>
+    </a>
+    <ul class="{{($active_menu=='phancong_list'|| $active_menu=='phancong_add')?'side-menu__sub-open':''}}">
+        <li>
+            <a href="{{ route('phancong.index') }}" class="side-menu {{ $active_menu == 'phancong_list' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                <div class="side-menu__title">Danh sách phân công</div>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('phancong.create') }}" class="side-menu {{ $active_menu == 'phancong_add' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                <div class="side-menu__title">Thêm phân công</div>
+            </a>
+        </li>
+    </ul>
+</li>
+
     </ul>
     </nav>
