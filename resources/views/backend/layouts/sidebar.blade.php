@@ -126,36 +126,15 @@
             </a>
             <ul class="{{ ($active_menu == 'admin.tuluancauhoi.index' || $active_menu == 'admin.tuluancauhoi.create') ? 'side-menu__sub-open' : '' }}">
                 <li>
-                    <a href="{{ route('admin.tuluancauhoi.index') }}" class="side-menu {{ $active_menu == 'admin.tuluancauhoi.index' ? 'side-menu--active' : '' }}">
-                        <div class="side-menu__icon"> <i data-lucide="compass"></i> </div>
-                        <div class="side-menu__title">Danh sách Câu hỏi</div>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.tuluancauhoi.create') }}" class="side-menu {{ $active_menu == 'admin.tuluancauhoi.create' ? 'side-menu--active' : '' }}">
-                        <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
-                        <div class="side-menu__title">Thêm Câu hỏi</div>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.tuluancauhoi-types.index') }}" class="side-menu {{ $active_menu == 'admin.tuluancauhoi-types.index' ? 'side-menu--active' : '' }}">
-                        <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
-                        <div class="side-menu__title">Loại câu hỏi</div>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.tuluancauhoi-link-types.index') }}" class="side-menu {{ $active_menu == 'admin.tuluancauhoi-link-types.index' ? 'side-menu--active' : '' }}">
-                        <div class="side-menu__icon"> <i data-lucide="link-2"></i> </div>
-                        <div class="side-menu__title">Loại liên kết câu hỏi</div>
-                    </a>
-                </li>
-
-
-
-                <li>
                     <a href="{{ route('admin.tracnghiemcauhoi.index') }}" class="side-menu {{ $active_menu == 'admin.tracnghiemcauhoi.index' ? 'side-menu--active' : '' }}">
                         <div class="side-menu__icon"> <i data-lucide="compass"></i> </div>
                         <div class="side-menu__title">Câu hỏi trắc nghiệm</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tuluancauhoi.index') }}" class="side-menu {{ $active_menu == 'admin.tuluancauhoi.index' ? 'side-menu--active' : '' }}">
+                        <div class="side-menu__icon"> <i data-lucide="compass"></i> </div>
+                        <div class="side-menu__title">Câu hỏi tự luận</div>
                     </a>
                 </li>
             </ul>
