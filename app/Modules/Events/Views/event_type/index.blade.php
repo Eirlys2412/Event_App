@@ -29,7 +29,7 @@
                     <tr>
                         <th class="whitespace-nowrap">ID</th>
                         <th class="whitespace-nowrap">Tiêu đề</th>
-                        <th class="whitespace-nowrap">Slug</th>
+                        <!-- <th class="whitespace-nowrap">Slug</th> -->
                         <th class="whitespace-nowrap">Loại địa điểm</th>
                         <th class="whitespace-nowrap">Tên địa điểm tổ chức</th>
                         <th class="text-center whitespace-nowrap">Trạng thái</th>
@@ -41,7 +41,7 @@
                         <tr class="intro-x">
                             <td>{{ $eventType->id }}</td>
                             <td>{{ $eventType->title }}</td>
-                            <td>{{ $eventType->slug }}</td>
+                            <!-- <td>{{ $eventType->slug }}</td> -->
                             <td>{{ $eventType->location_type }}</td>
                             <td>{{ $eventType->location_address }}</td>
                             <td class="text-center">
