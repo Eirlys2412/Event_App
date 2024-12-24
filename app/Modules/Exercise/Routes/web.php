@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Modules\Exercise\Controllers\TracNghiemCauHoiController;
 use App\Modules\Exercise\Controllers\TuLuanCauHoiController;
 use App\Modules\Exercise\Controllers\BoDeTracNghiemController;
+use App\Modules\Exercise\Controllers\BoDeTuLuanController;
 
 // Định nghĩa route cho module câu hỏi
 Route::prefix('admin/tuluancauhoi')->name('admin.tuluancauhoi.')->group(function () {
@@ -27,5 +28,7 @@ Route::group(['prefix' => 'admin/', 'as' => 'admin.'], function () {
     
     // Bộ đề trắc nghiệm
     Route::resource('bode_tracnghiem', BoDeTracNghiemController::class);
+    // Bộ đề tu luan
+    Route::resource('bode_tuluans', BoDeTuLuanController::class);
 });
 
