@@ -4,130 +4,189 @@ namespace App\Modules\Exercise\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Modules\Exercise\Models\Tuluancauhoi;
-use App\Modules\Teaching_2\Models\HocPhan; 
-use App\Modules\Teaching_2\Models\HinhThucThi;
+
+use App\Modules\Teaching_2\Models\HocPhan;
+use App\Modules\Exercise\Models\TuLuanCauHoi;
+use App\Models\User; // Import model User
+use Illuminate\Support\Facades\DB;
+use App\Modules\Resource\Models\Resource;
+
 use Illuminate\Support\Facades\Auth; 
 
-class TuluancauhoiController extends Controller
+class TuLuanCauHoiController extends Controller
 {
+    //
     protected $pagesize;
-
-    public function __construct()
+    public function __construct( )
     {
-        $this->pagesize = env('NUMBER_PER_PAGE', 20);
+        $this->pagesize = env('NUMBER_PER_PAGE','20');
         $this->middleware('auth');
-    }
-
-    public function index()
-    {
-        $this->authorizeFunction("tuluancauhoi_list");
         
-        $active_menu = "tuluancauhoi_list";
-        $breadcrumb = $this->generateBreadcrumb('Danh sách Câu hỏi');
-    
-        // Sử dụng 'module' và 'user'
-        $tuluancauhois = Tuluancauhoi::with(['user', 'hocphan'])->orderBy('id', 'DESC')->paginate($this->pagesize);
-    
-        return view('Exercise::tuluancauhoi.index', compact('tuluancauhois', 'breadcrumb', 'active_menu'));
+    }
+    public function index(){
+        $func = "tuluancauhoi_list";
+        if(!$this->check_function($func))
+        {
+            return redirect()->route('unauthorized');
+        }
+        $active_menu="tuluancauhoi_list";
+        $breadcrumb = '
+        <li class="breadcrumb-item"><a href="#">/</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Danh sách câu hỏi tự luận</li>';  
+
+        $tuluancauhoi = TuLuanCauHoi::with(['user','hocphan'])->orderBy('id', 'DESC')->paginate($this->pagesize);
+        return view('Exercise::tuluancauhoi.index', compact('tuluancauhoi','breadcrumb', 'active_menu'));
+
     }
 
     public function create()
     {
-        $hocphans = HocPhan::all(); // Lấy tất cả các module
-        $breadcrumb = $this->generateBreadcrumb('Thêm Câu hỏi');
-        $active_menu = "tuluancauhoi_add";
+        $hocphan = HocPhan::all();
+        $user = User::all();
+        $tags = \App\Models\Tag::where('status','active')->orderBy('title','ASC')->get();
 
-        return view('Exercise::tuluancauhoi.create', compact('breadcrumb', 'active_menu', 'hocphans'));
+        $breadcrumb = '
+        <li class="breadcrumb-item"><a href="#">/</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Thêm câu hỏi tự luận</li>';
+        $active_menu = "tuluancauhoi_add";
+        return view('Exercise::tuluancauhoi.create', compact('tags','hocphan','user','breadcrumb', 'active_menu'));
     }
 
     public function store(Request $request)
     {
+        // Xác thực dữ liệu nhập vào
         $request->validate([
-            'content' => 'required',
-            'hocphan_id' => 'required|exists:hoc_phans,id',
-        ]);
-    
-        $tuluancauhoi = new Tuluancauhoi();
-        $tuluancauhoi->content = $request->input('content');
-        $tuluancauhoi->hocphan_id = $request->input('hocphan_id');
-        $tuluancauhoi->user_id = Auth::id(); // Lấy ID của người dùng đang đăng nhập
-        $tuluancauhoi->save();
-    
-        return redirect()->route('admin.tuluancauhoi.index')->with('success', 'Câu hỏi đã được thêm thành công.');
-    }
-
-    public function edit($id)
-    {
-        $tuluancauhoi = Tuluancauhoi::findOrFail($id);
-        $hocphans = HocPhan::all();
-        $breadcrumb = $this->generateBreadcrumb('Chỉnh sửa Câu hỏi');
-        $active_menu = "tuluancauhoi_edit";
-
-        return view('Exercise::tuluancauhoi.edit', compact('tuluancauhoi', 'breadcrumb', 'active_menu', 'hocphans'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'content' => 'required',
-            'hocphan_id' => 'required|exists:hoc_phans,id', // Chắc chắn rằng hocphan_id là chính xác
+            'content' => 'required|string',
+            'hocphan_id' => 'required|integer', // Thay đổi thành integer nếu hocphan_id là số
+            'tags' => 'nullable|string|max:255', // Cho phép null
+            'user_id' => 'required|integer', // Thay đổi thành integer nếu user_id là số
+            'document.*' => 'file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:204800',
         ]);
 
-        $tuluancauhoi = Tuluancauhoi::findOrFail($id);
-        $tuluancauhoi->content = $request->input('content');
-        $tuluancauhoi->hocphan_id = $request->input('hocphan_id');
+        $tag_ids = $request->tag_ids;
+        // Lấy tất cả dữ liệu từ yêu cầu
+        $requestData = $request->all();
+
+        // $helpController = new \App\Http\Controllers\FilesController();
+        // $requestData['content'] = $helpController->store($request->file('content'));
+
+        // Lưu dữ liệu vào cơ sở dữ liệu
+        $tuluancauhoi = TuLuanCauHoi::create($requestData);
+
+        $tagservice = new \App\Http\Controllers\TagController();
+        $tagservice->store_tuluancauhoi_tag($tuluancauhoi->id,$tag_ids);
+
+        $resourceIds = [];
+        foreach ($request->file('document') as $file) {
+            $resourceIds[] = Resource::createResource($request, $file, 'CauHoiTuLuan')->id;
+        }
+
+        $tuluancauhoi->resources = json_encode([
+            'tuluan_id' => $tuluancauhoi->id,
+            'resource_ids' => $resourceIds,
+        ]);
         $tuluancauhoi->save();
 
-        return redirect()->route('admin.tuluancauhoi.index')->with('success', 'Câu hỏi đã được cập nhật thành công.');
-    }
-
-    public function destroy(string $id)
-    {
-        $this->authorizeFunction("tuluancauhoi_delete");
-    
-        // Tìm câu hỏi theo ID
-        $tuluancauhoi = Tuluancauhoi::findOrFail($id);
-        $tuluancauhoi->delete(); // Xóa câu hỏi
-    
-        return redirect()->route('admin.tuluancauhoi.index')->with('success', 'Xóa câu hỏi thành công!');
-    }
-
-    public function search(Request $request)
-    {
-        $this->authorizeFunction("tuluancauhoi_list");
-
-        $searchdata = $request->input('datasearch');
-
-        if (!empty($searchdata)) {
-            $active_menu = "tuluancauhoi_list";
-            $tuluancauhois = Tuluancauhoi::where('content', 'LIKE', '%' . $searchdata . '%')->paginate($this->pagesize)->withQueryString();
-
-            $breadcrumb = $this->generateBreadcrumb('Tìm kiếm');
-
-            return view('Exercise::tuluancauhoi.search', compact('tuluancauhois', 'breadcrumb', 'searchdata', 'active_menu'));
-        } else {
-            return redirect()->route('admin.tuluancauhoi.index')->with('success', 'Không có thông tin tìm kiếm!');
+        if($tuluancauhoi){
+            return redirect()->route('admin.tuluancauhoi.index')->with('thongbao', 'Tạo câu hỏi thành công.');
         }
+        else
+        {
+            return back()->with('error','Có lỗi xãy ra!');
+        }    
     }
 
-    protected function authorizeFunction($func)
+    public function destroy($id)
     {
-        if (!$this->check_function($func)) {
-            return redirect()->route('unauthorized');
-        }
+        $tuluancauhoi = TuLuanCauHoi::findOrFail($id);
+        $tuluancauhoi->delete();
+        return redirect()->route('admin.tuluancauhoi.index')->with('thongbao', 'Xóa học phần thành công.');
     }
 
-    public function show(string $id)
-    {
-        $tuluancauhoi = Tuluancauhoi::findOrFail($id);
-        return view('Exercise::tuluancauhoi.show', compact('tuluancauhoi'));
-    }
+    public function edit($id){
+        $tuluancauhoi = TuLuanCauHoi::findOrFail($id);
+        $hocphan = HocPhan::all();
+        $user = User::all();
 
-    protected function generateBreadcrumb($title)
-    {
-        return '
+        $tags  = \App\Models\Tag::where('status','active')->orderBy('title','ASC')->get();
+        $tag_ids =DB::select("select tag_id from tag_tuluancauhois where tuluancauhoi_id = ".$tuluancauhoi->id)  ;
+
+        $resourceIds = json_decode($tuluancauhoi->resources, true)['resource_ids'] ?? [];
+        $resources = Resource::whereIn('id', $resourceIds)->get();
+
+        $breadcrumb = '
         <li class="breadcrumb-item"><a href="#">/</a></li>
-        <li class="breadcrumb-item active" aria-current="page">' . $title . '</li>';
+        <li class="breadcrumb-item active" aria-current="page">Sửa câu hỏi tự luận</li>';
+        $active_menu = "tuluancauhoi_edit";
+        return view('Exercise::tuluancauhoi.edit', compact('resources','tag_ids','tags','tuluancauhoi','hocphan','user','breadcrumb', 'active_menu'));
+    }
+
+    public function removeResource(Request $request, $tuluancauhoiId, $resourceId)
+    {
+        $resource = Resource::findOrFail($resourceId);
+        if (file_exists(public_path($resource->url))) {
+            unlink(public_path($resource->url));
+        }
+        $resource->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function update(Request $request, $id){
+        $tuluancauhoi = TuLuanCauHoi::find($id);
+
+       // Xác thực dữ liệu nhập vào
+       $request->validate([
+        'content' => 'required|string',
+        'hocphan_id' => 'required|integer', // Thay đổi thành integer nếu hocphan_id là số
+        'tags' => 'nullable|string|max:255', // Cho phép null
+        'user_id' => 'required|integer', // Thay đổi thành integer nếu user_id là số
+        'document.*' => 'file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:204800',
+        ]);
+
+        // Lấy dữ liệu từ yêu cầu
+        $requestData = $request->all();
+
+        // Tìm câu h��i cần sửa
+        $existingResources = json_decode($tuluancauhoi->resources, true) ?? [];
+        $existingResourceIds = $existingResources['resource_ids'] ?? [];
+        $newResourceIds = [];
+        if ($request->hasFile('document')) {
+            foreach ($request->file('document') as $file) {
+                // Check if file already exists in resources
+                $existingResource = Resource::where('file_name', $file->getClientOriginalName())->first();
+                if ($existingResource) {
+                    // Skip if already linked
+                    if (!in_array($existingResource->id, $existingResourceIds)) {
+                        $newResourceIds[] = $existingResource->id;
+                    }
+                } else {
+                    // Add new resource
+                    $resource = Resource::createResource($request, $file, 'CauHoiTuLuan');
+                    $newResourceIds[] = $resource->id;
+                }
+            }
+        }
+
+        $finalResourceIds = array_unique(array_merge($existingResourceIds, $newResourceIds));
+
+        // $helpController = new \App\Http\Controllers\FilesController();
+        // $requestData['content'] = $helpController->store($request->file('content'));
+
+        // Cập nhật dữ liệu vào cơ sở dữ liệu
+        $tuluancauhoi->update($requestData);
+
+        $tagservice = new \App\Http\Controllers\TagController();
+        $tag_ids = $request->tag_ids;
+        $tagservice->update_tuluancauhoi_tag($tuluancauhoi->id,$tag_ids);
+
+        // Save updated resources
+        $tuluancauhoi->resources = json_encode([
+            'tuluan_id' => $tuluancauhoi->id,
+            'resource_ids' => $finalResourceIds,
+        ]);
+        $tuluancauhoi->save();
+
+        return redirect()->route('admin.tuluancauhoi.index')->with('thongbao', 'Sửa câu h��i trắc nghiệm thành công.');
     }
 }

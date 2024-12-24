@@ -21,14 +21,11 @@
             <form method="post" action="{{route('admin.tracnghiemcauhoi.store')}}" enctype="multipart/form-data">
                 @csrf
                 <div class="intro-y box p-5">
-                    {{-- <div class="mt-3">
+                    <div class="mt-3">
                         <label for="" class="form-label">Nội dung</label>
                         <textarea class="editor" name="content" id="editor2">{{ old('content') }}</textarea>
-                    </div> --}}
-                    <div class="mt-3">
-                        <label for="content" class="form-label">Nội dung</label>
-                        <input type="file" id="content" name="content" />
                     </div>
+
                     <div class="mt-3">
                         <label for="regular-form-1" class="form-label">Học Phần</label>
                         <select name="hocphan_id" class="form-select mt-2">

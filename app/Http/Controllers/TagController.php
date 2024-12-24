@@ -118,11 +118,47 @@ class TagController extends Controller
         }
     }
 
+     // làm về trắc nghiệm câu hỏi
+     public function store_tuluancauhoi_tag($tuluancauhoi_id,$tag_ids){
+        if(!$tag_ids || count($tag_ids) == 0)
+            return;
+        foreach($tag_ids as $tag_id)
+        {
+            $tag = Tag::find($tag_id);
+            if(!$tag)
+            {
+                $datatag['title'] = $tag_id;
+                $slug = Str::slug( $datatag['title'] );
+                $slug_count = Tag::where('slug',$slug)->count();
+                if($slug_count > 0)
+                {
+                    $slug .= time().'-'.$slug;
+                }
+                $datatag['slug'] = $slug;
+                
+                $tag = Tag::create($datatag);
+                sleep(1);
+            }
+            $data['tag_id'] = $tag->id;
+            $data['tuluancauhoi_id'] = $tuluancauhoi_id;
+            \App\Modules\Exercise\Models\TagTuLuanCauHoi::create($data);
+            $tag->hit += 1;
+            $tag->save();
+        }
+    }
+
     public function update_tracnghiemcauhoi_tag($tracnghiemcauhoi_id,$tag_ids)
     {
         $sql = "delete from tag_tracnghiemcauhois where tracnghiemcauhoi_id = ".$tracnghiemcauhoi_id;
         DB::select($sql);
          $this->store_tracnghiemcauhoi_tag($tracnghiemcauhoi_id,$tag_ids);
+    }
+    
+    public function update_tuluancauhoi_tag($tuluancauhoi_id,$tag_ids)
+    {
+        $sql = "delete from tag_tuluancauhois where tuluancauhoi_id = ".$tuluancauhoi_id;
+        DB::select($sql);
+         $this->store_tuluancauhoi_tag($tuluancauhoi_id,$tag_ids);
     }
 
     // làm về bộ đề trắc nghiệm câu hỏi
