@@ -49,7 +49,8 @@ class ProgramDetailsController extends Controller
     public function create()
     {   $active_menu = 'program_details_add';
         $hocPhan = HocPhan::all(); // Lấy tất cả đơn vị để chọn
-        $chuongTrinhdaotao = ChuongTrinhDaoTao::all(); // Lấy tất cả người dùng để chọn
+        // Lấy các chương trình đào tạo chỉ có status là 'active'
+        $chuongTrinhdaotao = ChuongTrinhDaoTao::where('status', 'active')->get();
         return view('Teaching_2::program_details.create', compact('active_menu','hocPhan','chuongTrinhdaotao'));
     }
     
@@ -83,7 +84,8 @@ class ProgramDetailsController extends Controller
     $hocphansongsong = null;
     if (!empty($validatedData['hocphansongsong'])) {
         $hocphansongsong = json_encode([
-            'id' => array_merge([$hocphanId], $validatedData['hocphansongsong']), // Học phần chính và song song
+            'id' => $hocphanId,
+            'parallel' => $validatedData['hocphansongsong'], // Học phần chính và song song
         ], JSON_UNESCAPED_UNICODE);
     }
 
@@ -115,20 +117,46 @@ class ProgramDetailsController extends Controller
 
     // Show the form for editing an existing program_details
     public function edit($program_details)
-    {
-        $active_menu = 'program_details_edit'; 
-        $program_details = ProgramDetails::findOrFail($program_details); // Tìm bản ghi theo ID
-        $hocPhan = HocPhan::all(); // Lấy tất cả đơn vị để chọn
-        $chuongTrinhdaotao = ChuongTrinhDaoTao::all(); // Lấy tất cả người dùng để chọn
+{
+    $active_menu = 'program_details_edit'; 
+    
+    // Lấy bản ghi từ database
+    $program_details = ProgramDetails::findOrFail($program_details); 
+    
+    // Lấy danh sách học phần và chương trình đào tạo
+    $hocPhan = HocPhan::all(); 
+    $chuongTrinhdaotao = ChuongTrinhDaoTao::all(); 
 
-        // Chuyển đổi dữ liệu học phần tiên quyết và học phần song song thành mảng nếu cần
-        $hocphantienquyet = json_decode($program_details->hocphantienquyet, true) ?? [];
-        $hocphansongsong = json_decode($program_details->hocphansongsong, true) ?? [];
-
-        return view('Teaching_2::program_details.edit', compact('program_details', 'hocPhan', 'chuongTrinhdaotao', 'active_menu', 'hocphantienquyet', 'hocphansongsong'));
+    // Giải mã JSON và trích xuất ID cho học phần tiên quyết
+    $hocphantienquyet_ids = [];
+    if ($program_details->hocphantienquyet) {
+        $decoded = json_decode($program_details->hocphantienquyet, true);
+        if (isset($decoded['next'])) {
+            $hocphantienquyet_ids = $decoded['next']; // Lấy danh sách ID từ "next"
+        }
     }
 
-    // Update a program_details
+    // Giải mã JSON và trích xuất ID cho học phần song song
+    $hocphansongsong_ids = [];
+    if ($program_details->hocphansongsong) {
+        $decoded = json_decode($program_details->hocphansongsong, true);
+        if (isset($decoded['parallel'])) {
+            $hocphansongsong_ids = $decoded['parallel']; // Lấy danh sách ID từ "id"
+        }
+    }
+
+    // Truyền dữ liệu vào View
+    return view('Teaching_2::program_details.edit', compact(
+        'program_details', 
+        'hocPhan', 
+        'chuongTrinhdaotao', 
+        'active_menu', 
+        'hocphantienquyet_ids', 
+        'hocphansongsong_ids'
+    ));
+}
+
+
     // Update a program_details
 public function update(Request $request, $id)
 {
@@ -161,7 +189,8 @@ public function update(Request $request, $id)
         $hocphansongsong = null;
         if (!empty($validatedData['hocphansongsong'])) {
             $hocphansongsong = json_encode([
-                'id' => array_merge([$validatedData['hocphan_id']], $validatedData['hocphansongsong']), // Học phần chính và song song
+                'id' => $validatedData['hocphan_id'],
+                'parallel' => $validatedData['hocphansongsong'], // Học phần chính và song song
             ], JSON_UNESCAPED_UNICODE);
         }
 

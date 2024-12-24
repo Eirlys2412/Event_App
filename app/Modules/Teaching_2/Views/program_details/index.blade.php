@@ -67,10 +67,10 @@
         @php
             $hocphansongsong = json_decode($item->hocphansongsong, true);
         @endphp
-        @if($hocphansongsong && isset($hocphansongsong['id']))
+        @if($hocphansongsong && isset($hocphansongsong['parallel']))
             {{ implode(', ', array_map(function($id) use ($hocPhanList) {
                 return $hocPhanList[$id] ?? 'N/A';
-            }, $hocphansongsong['id'])) }}
+            }, $hocphansongsong['parallel'])) }}
         @else
             N/A
         @endif
@@ -193,7 +193,6 @@
         });
   
 });  
-    
 </script>
- 
+
 @endsection
