@@ -197,6 +197,42 @@ class TagController extends Controller
          $this->store_bodetracnghiem_tag($bodetracnghiem_id,$tag_ids);
     }
 
+    // làm về bộ đề tự luận câu hỏi
+    public function store_bodetuluan_tag($bodetuluan_id,$tag_ids){
+        if(!$tag_ids || count($tag_ids) == 0)
+            return;
+        foreach($tag_ids as $tag_id)
+        {
+            $tag = Tag::find($tag_id);
+            if(!$tag)
+            {
+                $datatag['title'] = $tag_id;
+                $slug = Str::slug( $datatag['title'] );
+                $slug_count = Tag::where('slug',$slug)->count();
+                if($slug_count > 0)
+                {
+                    $slug .= time().'-'.$slug;
+                }
+                $datatag['slug'] = $slug;
+                
+                $tag = Tag::create($datatag);
+                sleep(1);
+            }
+            $data['tag_id'] = $tag->id;
+            $data['bodetuluan_id'] = $bodetuluan_id;
+            \App\Modules\Exercise\Models\TagBoDeTuLuan::create($data);
+            $tag->hit += 1;
+            $tag->save();
+        }
+    }
+
+    public function update_bodetuluan_tag($bodetuluan_id,$tag_ids)
+    {
+        $sql = "delete from tag_tracnghiemcauhois where bodetuluan_id = ".$bodetuluan_id;
+        DB::select($sql);
+         $this->store_bodetuluan_tag($bodetuluan_id,$tag_ids);
+    }
+
     public function store_resource_tag($resource_id,$tag_ids)
     {
         if(!$tag_ids || count($tag_ids) == 0)
