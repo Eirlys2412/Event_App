@@ -54,11 +54,7 @@
                     @foreach($tracnghiemcauhoi as $item)
                     <tr class="intro-x">
                         <td>
-                            <p class="font-medium whitespace-nowrap">
-                                <a href="{{$item->content}}" target="_blank" class="text-blue-500 hover:underline">
-                                    Tải file
-                                </a>
-                            </p>
+                            <p target="_blank" href="" class="font-medium whitespace-nowrap">{{ strip_tags($item->content) }}</p> 
                         </td>
                         <td>
                             <p target="_blank" href="" class="font-medium whitespace-nowrap">{{ optional($item->hocphan)->title }}</p> 

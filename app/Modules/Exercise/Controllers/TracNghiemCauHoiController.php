@@ -57,7 +57,7 @@ class TracNghiemCauHoiController extends Controller
     {
         // Xác thực dữ liệu nhập vào
         $request->validate([
-            'content' => 'required|file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:10240',
+            'content' => 'required|string',
             'hocphan_id' => 'required|integer', // Thay đổi thành integer nếu hocphan_id là số
             'tags' => 'nullable|string|max:255', // Cho phép null
             // 'resource' => 'nullable|string|max:255', // Cho phép null
@@ -69,9 +69,6 @@ class TracNghiemCauHoiController extends Controller
         $tag_ids = $request->tag_ids;
         // Lấy tất cả dữ liệu từ yêu cầu
         $requestData = $request->all();
-
-        $helpController = new \App\Http\Controllers\FilesController();
-        $requestData['content'] = $helpController->store($request->file('content'));
 
         // Lưu dữ liệu vào cơ sở dữ liệu
         $tracnghiemcauhoi = TracNghiemCauhoi::create($requestData);
@@ -132,7 +129,7 @@ class TracNghiemCauHoiController extends Controller
 
         // Xác thực dữ liệu nhập vào
         $request->validate([
-            'content' => 'required|file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:10240',
+            'content' => 'required|string',
             'hocphan_id' => 'required|integer', // Thay đ��i thành integer nếu hocphan_id là số
             'tags' => 'nullable|string|max:255', // Cho phép null
             'resource' => 'nullable|string|max:255', // Cho phép null
@@ -166,9 +163,6 @@ class TracNghiemCauHoiController extends Controller
         }
 
         $finalResourceIds = array_unique(array_merge($existingResourceIds, $newResourceIds));
-
-        $helpController = new \App\Http\Controllers\FilesController();
-        $requestData['content'] = $helpController->store($request->file('content'));
 
         // Cập nhật dữ liệu vào cơ sở dữ liệu
         $tracnghiemcauhoi->update($requestData);
