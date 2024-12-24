@@ -148,6 +148,7 @@
 @endsection
 
 @section ('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     var select = new TomSelect('#select-junk', {
         maxItems: null,
@@ -155,7 +156,49 @@
         plugins: ['remove_button'],
         sortField: { field: "text", direction: "asc" },
     });
+    @if (count($tag_ids) == 0)
+            select.clear();
+    @endif
 
+    $('.dltBtn').click(function(e) {
+            var url = $(this).data('url');
+            var fileName = $(this).data('name');
+            var resourceItem = $(this).closest('li'); // Lưu trữ phần tử 'li' chứa nút xóa
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Bạn có chắc muốn xóa không?',
+                text: "Bạn không thể lấy lại dữ liệu sau khi xóa: " + fileName,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Vâng, tôi muốn xóa!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Gửi yêu cầu AJAX để xóa tài nguyên
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            _method: 'DELETE'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Đã xóa!', 'Tệp đã được xóa thành công.', 'success');
+                                resourceItem.remove(); // Loại bỏ phần tử li khỏi giao diện
+                            } else {
+                                Swal.fire('Lỗi!', 'Đã có lỗi xảy ra khi xóa tệp.', 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Lỗi!', 'Đã có lỗi khi gửi yêu cầu.', 'error');
+                        }
+                    });
+                }
+            });
+        });
     // Xử lý thêm đáp án mới
     document.getElementById('add-answer').addEventListener('click', function () {
         const tableBody = document.querySelector('#answers-table tbody');
@@ -185,7 +228,53 @@
         }
     });
 </script>
-
+<script>
+    Dropzone.autoDiscover = false;
+       
+       // Dropzone class:
+     
+           Dropzone.instances[0].options.multiple = false;
+           Dropzone.instances[0].options.autoQueue= true;
+           Dropzone.instances[0].options.maxFilesize =  1; // MB
+           Dropzone.instances[0].options.maxFiles =1;
+           Dropzone.instances[0].options.dictDefaultMessage = 'Drop images anywhere to upload (6 images Max)';
+           Dropzone.instances[0].options.acceptedFiles= "image/jpeg,image/png,image/gif";
+           Dropzone.instances[0].options.previewTemplate =  '<div class=" d-flex flex-column  position-relative">'
+                                           +' <img    data-dz-thumbnail >'
+                                           
+                                       +' </div>';
+           // Dropzone.instances[0].options.previewTemplate =  '<li><figure><img data-dz-thumbnail /><i title="Remove Image" class="icon-trash" data-dz-remove ></i></figure></li>';      
+           Dropzone.instances[0].options.addRemoveLinks =  true;
+           Dropzone.instances[0].options.headers= {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')};
+   
+           Dropzone.instances[0].on("addedfile", function (file ) {
+           // Example: Handle success event
+           console.log('File addedfile successfully!' );
+           });
+           Dropzone.instances[0].on("success", function (file, response) {
+           // Example: Handle success event
+           // file.previewElement.innerHTML = "";
+           if(response.status == "true")
+           $('#photo').val(response.link);
+           console.log('File success successfully!' +response.link);
+           });
+           Dropzone.instances[0].on("removedfile", function (file ) {
+           $('#photo').val('');
+           console.log('File removed successfully!'  );
+           });
+           Dropzone.instances[0].on("error", function (file, message) {
+           // Example: Handle success event
+           file.previewElement.innerHTML = "";
+           console.log(file);
+   
+           console.log('error !' +message);
+           });
+           console.log(Dropzone.instances[0].options   );
+   
+           // console.log(Dropzone.optionsForElement);
+   
+   </script>
+<script src="{{asset('js/js/ckeditor.js')}}"></script>
 <script>
     ClassicEditor.create(document.querySelector('#editor2'), {
         ckfinder: {

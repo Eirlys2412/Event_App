@@ -4,7 +4,7 @@ namespace App\Modules\Exercise\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Modules\Exercise\Models\TracNghiemLoai; 
+use App\Modules\Exercise\Models\TuLuanDapan; 
 use App\Modules\Teaching_2\Models\HocPhan; // Import model Module
 use App\Models\User; // Import model User
 
@@ -29,4 +29,8 @@ class TuLuanCauHoi extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    public function answers()
+{
+    return $this->hasMany(TuLuanDapan::class, 'tu_luan_id');
+}
 }
