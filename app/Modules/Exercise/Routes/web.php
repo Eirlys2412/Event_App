@@ -5,6 +5,7 @@ use App\Modules\Exercise\Controllers\TuluancauhoiController;
 use App\Modules\Exercise\Controllers\TuluancauhoiTypeController;
 use App\Modules\Exercise\Controllers\TuluancauhoiLinkTypeController;
 use App\Modules\Exercise\Controllers\TracNghiemCauHoiController;
+use App\Modules\Exercise\Controllers\BoDeTracNghiemController;
 
 // Định nghĩa route cho module câu hỏi
 Route::prefix('admin/tuluancauhoi')->name('admin.tuluancauhoi.')->group(function () {
@@ -43,5 +44,10 @@ Route::group(['prefix' => 'admin/', 'as' => 'admin.'], function () {
     Route::resource('tracnghiemcauhoi', TracNghiemCauHoiController::class);
     // Route::get('hocphan_search', [App\Modules\Exercise\Controllers\::class, 'moduleSearch'])->name('hocphan.search');
     Route::delete('/admin/tracnghiemcauhoi/{tracnghiemcauhoiId}/resource/{resourceId}', [TracNghiemCauHoiController::class, 'removeResource'])->name('tracnghiemcauhoi.removeResource');
+    
+    // Bộ đề trắc nghiệm
+    Route::resource('bode_tracnghiem', BoDeTracNghiemController::class);
+
+
 });
 
