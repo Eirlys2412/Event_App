@@ -41,3 +41,14 @@ Route::group(['prefix' => 'admin/', 'as' => 'admin.'], function() {
 });
 
 
+use App\Modules\Teaching_2\Controllers\PhanCongController;
+
+Route::prefix('phancong')->name('phancong.')->group(function () {
+    Route::get('/', [PhanCongController::class, 'index'])->name('index');
+    Route::get('create', [PhanCongController::class, 'create'])->name('create');
+    Route::post('store', [PhanCongController::class, 'store'])->name('store');
+    Route::get('{id}', [PhanCongController::class, 'show'])->name('show');
+    Route::get('{id}/edit', [PhanCongController::class, 'edit'])->name('edit');
+    Route::put('{id}', [PhanCongController::class, 'update'])->name('update');
+    Route::delete('{id}', [PhanCongController::class, 'destroy'])->name('destroy');  
+});

@@ -18,14 +18,7 @@
             @enderror
         </div>
 
-        {{-- Slug --}}
-        <div class="form-group">
-            <label for="slug">Slug Loại Sự Kiện</label>
-            <input type="text" name="slug" class="form-control" value="{{ old('slug', $EventTypes->slug) }}" required>
-            @error('slug')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
+        <!--  -->
 
         {{-- Loại địa điểm --}}
         <div class="form-group">
