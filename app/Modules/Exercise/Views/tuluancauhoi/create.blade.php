@@ -12,7 +12,7 @@
  
     <div class="intro-y flex items-center mt-8">
         <h2 class="text-lg font-medium mr-auto">
-            Thêm câu hỏi trắc nghiệm
+            Thêm câu hỏi Tự luận 
         </h2>
     </div>
     <div class="grid grid-cols-12 gap-12 mt-5">
@@ -55,7 +55,40 @@
                         @error('document')
                             <div class="text-red-600">{{ $message }}</div>
                         @enderror
-                    </div>    
+                    </div> 
+
+                    <!-- Danh sách đáp án -->
+                    <div class="mt-3">
+                        <label for="answers" class="form-label">Danh sách đáp án</label>
+                        <table class="table table-bordered" id="answers-table">
+                            <thead>
+                                <tr>
+                                    <th>Đáp án</th>
+                                    <th>Resource</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" name="answers[0][content]" class="form-control" placeholder="Nhập đáp án">
+                                    </td>
+                                    <td>
+                                        {{-- <select name="answers[0][is_correct]" class="form-select">
+                                            <option value="1">Đúng</option>
+                                            <option value="0">Sai</option>
+                                        </select> --}}
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger btn-sm remove-answer">Xóa</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-primary btn-sm mt-2" id="add-answer">Thêm đáp án</button>
+                                               
+                    </div>
+
                     <div class="text-right mt-5">
                         <button type="submit" class="btn btn-primary w-24">Lưu</button>
                     </div>
@@ -85,6 +118,31 @@
         
     });
     select.clear();
+
+    // Xử lý thêm đáp án mới
+    document.getElementById('add-answer').addEventListener('click', function () {
+    const tableBody = document.querySelector('#answers-table tbody');
+    const rowCount = tableBody.rows.length; // Lấy số dòng hiện tại
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td>
+            <input type="text" name="answers[${rowCount}][content]" class="form-control" placeholder="Nhập đáp án">
+        </td>
+        <td>
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm remove-answer">Xóa</button>
+        </td>
+    `;
+    tableBody.appendChild(newRow);
+});
+
+// Xử lý xóa đáp án
+document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('remove-answer')) {
+        e.target.closest('tr').remove();
+    }
+});
 </script>
 
 <script>
