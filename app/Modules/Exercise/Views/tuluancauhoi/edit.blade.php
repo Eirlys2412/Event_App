@@ -1,9 +1,7 @@
 @extends('backend.layouts.master')
+
 @section ('scriptop')
-
 <meta name="csrf-token" content="{{ csrf_token() }}">
- 
-
 <script src="{{asset('js/js/tom-select.complete.min.js')}}"></script>
 <link rel="stylesheet" href="{{ asset('/js/css/tom-select.min.css') }}">
 @endsection
@@ -24,7 +22,7 @@
                 <div class="intro-y box p-5">
                     <div class="mt-3">
                         <label for="" class="form-label">Nội dung</label>
-                        <textarea class="editor" name="content" id="editor2">{{ old('content') }}</textarea>
+                        <textarea class="editor" name="content" id="editor2">{{ old('content',$tuluancauhoi->content) }}</textarea>
                     </div>
                     <div class="mt-3">
                         <label for="regular-form-1" class="form-label">Học Phần</label>
@@ -85,6 +83,46 @@
                             <p class="mt-2 text-gray-600">Chưa có tệp nào được chọn.</p>
                         @endif
                     </div> 
+
+                    <!-- Danh sách đáp án -->
+                <div class="mt-3">
+                    <label for="answers" class="form-label">Danh sách đáp án</label>
+                    <table class="table table-bordered" id="answers-table">
+                        <thead>
+                            <tr>
+                                <th>Đáp án</th>
+                                <th>Resource</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if($tuluancauhoi->answers && count($tuluancauhoi->answers) > 0)
+                                @foreach($tuluancauhoi->answers as $index => $answer)
+                                    <tr>
+                                        <td>
+                                            <input type="text" name="answers[{{ $index }}][content]" class="form-control" value="{{ $answer->content }}" placeholder="Nhập đáp án">
+                                        </td>
+                                        <td>
+                                            <select name="answers[{{ $index }}][is_correct]" class="form-select">
+                                                
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm remove-answer">Xóa</button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="3">Chưa có đáp án nào được thêm vào.</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                        
+                    </table>
+                    <button type="button" class="btn btn-primary btn-sm mt-2" id="add-answer">Thêm đáp án</button>
+                </div>
+
                     <div class="text-right mt-5">
                         <button type="submit" class="btn btn-primary w-24">Lưu</button>
                     </div>
@@ -155,6 +193,32 @@
                 }
             });
         });
+
+        // Xử lý thêm đáp án mới
+        document.getElementById('add-answer').addEventListener('click', function () {
+            const tableBody = document.querySelector('#answers-table tbody');
+            const rowCount = tableBody.rows.length; // Lấy số dòng hiện tại
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>
+                    <input type="text" name="answers[${rowCount}][content]" class="form-control" placeholder="Nhập đáp án">
+                </td>
+                <td>
+                    
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm remove-answer">Xóa</button>
+                </td>
+            `;
+            tableBody.appendChild(newRow);
+});
+
+// Xử lý xóa đáp án
+document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('remove-answer')) {
+        e.target.closest('tr').remove();
+    }
+});
     </script>
 
 <script>
