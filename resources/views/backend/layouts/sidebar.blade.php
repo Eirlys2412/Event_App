@@ -593,30 +593,6 @@
             </li>
         </ul>
     </li>
-    <!-- Bộ đề tự luận -->
-    <li>
-        <a href="javascript:;" class="side-menu {{($active_menu=='bode_tuluans_list'|| $active_menu=='bode_tuluans_add')?'side-menu--active':''}}">
-            <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
-            <div class="side-menu__title">
-                Bộ đề tự luận
-                <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
-            </div>
-        </a>
-        <ul class="{{($active_menu=='teacher_list'|| $active_menu=='bode_tuluans_add')?'side-menu__sub-open':''}}">
-            <li>
-                <a href="{{route('admin.bode_tuluans.index')}}" class="side-menu {{$active_menu=='bode_tuluans_list'?'side-menu--active':''}}">
-                    <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
-                    <div class="side-menu__title">Danh sách bộ đề tự luận</div>
-                </a>
-            </li>
-            <li>
-                <a href="{{route('admin.bode_tuluans.create')}}" class="side-menu {{$active_menu=='bode_tuluans_add'?'side-menu--active':''}}">
-                    <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
-                    <div class="side-menu__title">Thêm bộ đề tự luận</div>
-                </a>
-            </li>
-        </ul>
-    </li>
          <!-- phân công -->
 <li>
     <a href="javascript:;" class="side-menu {{($active_menu=='phancong_list'|| $active_menu=='phancong_add')?'side-menu--active':''}}">
@@ -641,5 +617,43 @@
         </li>
     </ul>
 </li>
+    <!-- Thời khóa biểu -->
+    <li>
+        <a href="javascript:;" class="side-menu {{($active_menu=='thoikhoabieu_list'|| $active_menu=='bode_tracnghiem_add')?'side-menu--active':''}}">
+            <div class="side-menu__icon"><i data-lucide="calendar"></i>
+            </div>
+            <div class="side-menu__title">
+                Thời khóa biểu
+                <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+            </div>
+        </a>
+        <ul class="{{($active_menu==''|| $active_menu=='')?'side-menu__sub-open':''}}">
+            <li>
+                <a href="{{route('admin.thoikhoabieu.index')}}" class="side-menu {{$active_menu=='bode_tracnghiem_list'?'side-menu--active':''}}">
+                    <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                    <div class="side-menu__title">Danh sách thời khóa biểu</div>
+                </a>
+            </li>
+        </ul>
+    </li>
+    <!-- Attendance: Sự tham dự -->
+    <li>
+        <a href="javascript:;" class="side-menu {{($active_menu=='attendance_list'|| $active_menu=='bode_tracnghiem_add')?'side-menu--active':''}}">
+            <div class="side-menu__icon"> <i data-lucide="check-square"></i> <!-- Biểu tượng phù hợp cho điểm danh -->
+            </div>
+            <div class="side-menu__title">
+                Điểm danh theo thời khóa biểu
+                <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+            </div>
+        </a>
+        <ul class="{{($active_menu==''|| $active_menu=='')?'side-menu__sub-open':''}}">
+            <li>
+                <a href="{{route('admin.diemdanh.index')}}" class="side-menu {{$active_menu=='attendance_list'?'side-menu--active':''}}">
+                    <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                    <div class="side-menu__title">Danh sách điểm danh</div>
+                </a>
+            </li>
+        </ul>
+    </li>
     </ul>
-    </nav>
+</nav>
