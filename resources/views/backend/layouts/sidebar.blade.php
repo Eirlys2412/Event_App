@@ -656,6 +656,103 @@
         </li>
     </ul>
 </li>
+<!-- Nhóm phân công -->
+<li>
+    <a href="javascript:;" class="side-menu {{ ($active_menu == 'phanconggroup_list' || $active_menu == 'phanconggroup_add') ? 'side-menu--active' : '' }}">
+        <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
+        <div class="side-menu__title">
+            Nhóm phân công
+            <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+        </div>
+    </a>
+    <ul class="{{ ($active_menu == 'phanconggroup_list' || $active_menu == 'phanconggroup_add') ? 'side-menu__sub-open' : '' }}">
+        <li>
+            <a href="{{ route('phanconggroup.index') }}" class="side-menu {{ $active_menu == 'phanconggroup_list' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                <div class="side-menu__title">Danh sách Nhóm phân công</div>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('phanconggroup.create') }}" class="side-menu {{ $active_menu == 'phanconggroup_add' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                <div class="side-menu__title">Thêm nhóm phân công</div>
+            </a>
+        </li>
+    </ul>
+</li>
+<!-- Loại chứng chỉ -->
+<li>
+    <a href="javascript:;" class="side-menu {{ ($active_menu == 'loai_chungchi_list' || $active_menu == 'loai_chungchi_add') ? 'side-menu--active' : '' }}">
+        <div class="side-menu__icon"> <i data-lucide="award"></i> </div>
+        <div class="side-menu__title">
+            Loại chứng chỉ
+            <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+        </div>
+    </a>
+    <ul class="{{ ($active_menu == 'loai_chungchi_list' || $active_menu == 'loai_chungchi_add') ? 'side-menu__sub-open' : '' }}">
+        <li>
+            <a href="{{ route('loai_chungchi.index') }}" class="side-menu {{ $active_menu == 'loai_chungchi_list' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                <div class="side-menu__title">Danh sách Loại chứng chỉ</div>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('loai_chungchi.create') }}" class="side-menu {{ $active_menu == 'loai_chungchi_add' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                <div class="side-menu__title">Thêm loại chứng chỉ</div>
+            </a>
+        </li>
+    </ul>
+</li>
+
+        <!-- Điểm danh -->
+        <li>
+    <a href="javascript:;" class="side-menu {{ ($active_menu == 'diemdanh_list' || $active_menu == 'diemdanh_add') ? 'side-menu--active' : '' }}">
+        <div class="side-menu__icon"> <i data-lucide="check-circle"></i> </div>
+        <div class="side-menu__title">
+            Điểm danh
+            <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+        </div>
+    </a>
+    <ul class="{{ ($active_menu == 'diemdanh_list' || $active_menu == 'diemdanh_add') ? 'side-menu__sub-open' : '' }}">
+        <li>
+            <a href="{{ route('diemdanh.index') }}" class="side-menu {{ $active_menu == 'diemdanh_list' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                <div class="side-menu__title">Danh sách điểm danh</div>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('diemdanh.create') }}" class="side-menu {{ $active_menu == 'diemdanh_add' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                <div class="side-menu__title">Thêm điểm danh</div>
+            </a>
+        </li>
+    </ul>
+</li>
+<!-- Enrollment -->
+<li>
+    <a href="javascript:;" class="side-menu {{ ($active_menu == 'enrollment_list' || $active_menu == 'enrollment_add') ? 'side-menu--active' : '' }}">
+        <div class="side-menu__icon"> <i data-lucide="book-open"></i> </div>
+        <div class="side-menu__title">
+            Enrollment
+            <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+        </div>
+    </a>
+    <ul class="{{ ($active_menu == 'enrollment_list' || $active_menu == 'enrollment_add') ? 'side-menu__sub-open' : '' }}">
+        <li>
+            <a href="{{ route('enrollment.index') }}" class="side-menu {{ $active_menu == 'enrollment_list' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                <div class="side-menu__title">Danh sách Enrollment</div>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('enrollment.create') }}" class="side-menu {{ $active_menu == 'enrollment_add' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                <div class="side-menu__title">Thêm Enrollment</div>
+            </a>
+        </li>
+    </ul>
+</li>
     <!-- Thời khóa biểu -->
     <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='thoikhoabieu_list'|| $active_menu=='bode_tracnghiem_add')?'side-menu--active':''}}">

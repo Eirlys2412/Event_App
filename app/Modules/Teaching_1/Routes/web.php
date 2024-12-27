@@ -5,6 +5,7 @@ use App\Modules\Teaching_1\Controllers\NganhController;
 use App\Modules\Teaching_1\Controllers\TeacherController;
 use App\Modules\Teaching_1\Controllers\DonviController;
 use App\Modules\Teaching_1\Controllers\StudentController;
+use App\Modules\Teaching_1\Controllers\DiemdanhController;
 
 
 // Nhóm route cho quản lý ngành
@@ -43,3 +44,20 @@ Route::middleware('auth')->group(function () {
     Route::put('students/{id}', [StudentController::class, 'update'])->name('student.update');
     Route::delete('students/{id}', [StudentController::class, 'destroy'])->name('student.destroy');
 });
+// Route hiển thị danh sách điểm danh
+Route::get('diemdanh', [DiemdanhController::class, 'index'])->name('diemdanh.index');
+
+// Route tạo mới điểm danh
+Route::get('diemdanh/create', [DiemdanhController::class, 'create'])->name('diemdanh.create');
+
+// Route lưu điểm danh mới
+Route::post('diemdanh', [DiemdanhController::class, 'store'])->name('diemdanh.store');
+
+// Route sửa điểm danh
+Route::get('diemdanh/{diemdanh}/edit', [DiemdanhController::class, 'edit'])->name('diemdanh.edit');
+
+// Route cập nhật điểm danh
+// Route::put('diemdanh/{diemdanh_id}', action: [DiemdanhController::class, 'update'])->name('diemdanh.update');
+// Route xóa điểm danh
+Route::put('diemdanh/{diemdanh_id}', [DiemdanhController::class, 'update'])->name('diemdanh.update');
+Route::delete('diemdanh/{diemdanh}', [DiemdanhController::class, 'destroy'])->name('diemdanh.destroy');
