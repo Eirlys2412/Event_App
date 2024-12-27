@@ -330,6 +330,21 @@
                 <div class="side-menu__title">Thêm sự kiện</div>
             </a>
         </li>
+
+        
+        <!-- Thêm mục Event Group -->
+        <li>
+            <a href="{{ route('admin.event_group.index') }}" class="side-menu {{$active_menu=='event_group_list' ? 'side-menu--active' : ''}}">
+                <div class="side-menu__icon"> <i data-lucide="layers"></i> </div>
+                <div class="side-menu__title">Danh sách nhóm sự kiện</div>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('admin.event_group.create') }}" class="side-menu {{$active_menu=='event_group_add' ? 'side-menu--active' : ''}}">
+                <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                <div class="side-menu__title">Thêm nhóm sự kiện</div>
+            </a>
+        </li>
     </ul>
 </li>
     
