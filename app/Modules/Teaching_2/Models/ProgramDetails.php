@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Modules\Teaching_2\Models\HocPhan;
 use App\Modules\Teaching_2\Models\ChuongTrinhDaoTao;
+use App\Modules\Teaching_2\Models\Hocky;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
@@ -19,7 +20,7 @@ class ProgramDetails extends Model
     protected $fillable = [
         'hocphan_id',
         'chuongtrinh_id',
-        'hocky',
+        'hoc_ky_id',
         'loai',
         'hocphantienquyet',
         'hocphansongsong',
@@ -39,4 +40,8 @@ class ProgramDetails extends Model
         return $this->belongsTo(ChuongTrinhDaoTao::class, 'chuongtrinh_id');
     }
 
+    public function hocKy()
+    {
+        return $this->belongsTo(Hocky::class, 'hoc_ky_id');
+    }
 }

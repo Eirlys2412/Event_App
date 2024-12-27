@@ -11,7 +11,7 @@
  
 <div class="intro-y flex items-center mt-8">
     <h2 class="text-lg font-medium mr-auto">
-        Điều chỉnh thông tin Giảng Viên
+        Điều chỉnh chi tiết chương trình
     </h2>
 </div>
 <div class="grid grid-cols-12 gap-12 mt-5">
@@ -46,13 +46,13 @@
         
                 <div class="mt-3">
                     <label for="hoc_ky" class="form-label">Học kỳ</label>
-                    <select id="hoc_ky" name="hocky" class="form-control">
+                    <select id="hoc_ky" name="hoc_ky_id" class="form-control">
                         <option value="">Chọn học kỳ</option>
-                        @for ($i = 1; $i <= 10; $i++)
-                            <option value="{{ $i }}" {{ old('hocky', $program_details->hocky ?? '') == $i ? 'selected' : '' }}>
-                                {{ $i }}
+                        @foreach($hocKy as $hoc_ky)
+                            <option value="{{ $hoc_ky->id }}" {{  $hoc_ky->id == $program_details->hoc_ky_id ? 'selected' : ''}}>
+                                {{ $hoc_ky->so_hoc_ky }}
                             </option>
-                        @endfor
+                        @endforeach
                     </select>
                 </div>
         

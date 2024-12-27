@@ -46,7 +46,7 @@
     </td>
     <td class="text-left">{{ $item->chuongTrinhdaotao->title ?? 'N/A' }}</td>
     <td class="text-left">{{ $item->loai ?? 'N/A' }}</td>
-    <td class="text-left">{{ $item->hocky ?? 'N/A' }}</td>
+    <td class="text-left">{{ $item->hocKy->so_hoc_ky ?? 'N/A' }}</td>
 
     <!-- Hiển thị học phần tiên quyết -->
     <td class="text-left">

@@ -30,7 +30,13 @@ class CreateProgramDetailsTable extends Migration
                   ->onDelete('cascade') // Xóa chi tiết nếu chương trình bị xóa
                   ->onUpdate('cascade'); // Cập nhật khóa ngoại khi chương trình thay đổi
 
-            $table->integer('hocky'); // Học kỳ
+            // Thêm khóa ngoại đến bảng hoc_ky
+            $table->unsignedBigInteger('hoc_ky_id'); // Mã học kỳ
+            $table->foreign('hoc_ky_id') // Tạo khóa ngoại
+                  ->references('id')->on('hoc_ky') // Liên kết với cột id trong bảng hoc_ky
+                  ->onDelete('cascade') // Xóa chi tiết nếu học kỳ bị xóa
+                  ->onUpdate('cascade'); // Cập nhật khóa ngoại khi học kỳ thay đổi
+
             $table->string('loai', 50); // Loại (bắt buộc, tự chọn)
             $table->json('hocphantienquyet')->nullable(); // Danh sách học phần tiên quyết (JSON)
             $table->json('hocphansongsong')->nullable(); // Danh sách học phần song song (JSON)
@@ -48,6 +54,7 @@ class CreateProgramDetailsTable extends Migration
         Schema::table('program_details', function (Blueprint $table) {
             $table->dropForeign(['hocphan_id']); // Xóa khóa ngoại hocphan_id
             $table->dropForeign(['chuongtrinh_id']); // Xóa khóa ngoại chuongtrinh_id
+            $table->dropForeign(['hoc_ky_id']); // Xóa khóa ngoại hoc_ky_id
         });
         Schema::dropIfExists('program_details');
     }
