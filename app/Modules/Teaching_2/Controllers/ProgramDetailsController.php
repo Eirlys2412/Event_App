@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log; // Thêm dòng này
 use App\Modules\Teaching_2\Models\ProgramDetails;
 use App\Modules\Teaching_2\Models\HocPhan;
 use App\Modules\Teaching_2\Models\ChuongTrinhDaoTao;
-
+use App\Modules\Teaching_2\Models\Hocky;
 
 class ProgramDetailsController extends Controller
 {
@@ -49,9 +49,10 @@ class ProgramDetailsController extends Controller
     public function create()
     {   $active_menu = 'program_details_add';
         $hocPhan = HocPhan::all(); // Lấy tất cả đơn vị để chọn
+        $hocKy = Hocky::all(); // Lấy tất cả đơn vị để chọn
         // Lấy các chương trình đào tạo chỉ có status là 'active'
         $chuongTrinhdaotao = ChuongTrinhDaoTao::where('status', 'active')->get();
-        return view('Teaching_2::program_details.create', compact('active_menu','hocPhan','chuongTrinhdaotao'));
+        return view('Teaching_2::program_details.create', compact('active_menu','hocPhan','chuongTrinhdaotao','hocKy'));
     }
     
     public function store(Request $request)
@@ -60,7 +61,7 @@ class ProgramDetailsController extends Controller
     $validatedData = $request->validate([
         'hocphan_id' => 'required|exists:hoc_phans,id', // Phải tồn tại trong bảng modules (id)
         'chuongtrinh_id' => 'required|exists:chuong_trinh_dao_tao,id', // Phải tồn tại trong bảng chuong_trinh_dao_tao (id)
-        'hocky' => 'required|integer|min:1', // Bắt buộc, số nguyên, không nhỏ hơn 1
+        'hoc_ky_id' =>  'required|exists:hoc_ky,id',// Bắt buộc, số nguyên, không nhỏ hơn 1
         'loai' => 'required|string|max:50|in:Bắt buộc,Tự chọn', // Bắt buộc, chuỗi, giá trị là "Bắt buộc" hoặc "Tự chọn"
         'hocphantienquyet' => 'nullable|array', // Nếu có giá trị, phải là mảng
         'hocphantienquyet.*' => 'integer|exists:hoc_phans,id', // Các phần tử phải là số nguyên và tồn tại trong bảng modules
@@ -93,7 +94,7 @@ class ProgramDetailsController extends Controller
     $programDetailsData = [
         'hocphan_id' => $hocphanId,
         'chuongtrinh_id' => $validatedData['chuongtrinh_id'],
-        'hocky' => $validatedData['hocky'],
+        'hoc_ky_id' => $validatedData['hoc_ky_id'],
         'loai' => $validatedData['loai'],
         'hocphantienquyet' => $hocphantienquyet,
         'hocphansongsong' => $hocphansongsong,
@@ -125,6 +126,7 @@ class ProgramDetailsController extends Controller
     
     // Lấy danh sách học phần và chương trình đào tạo
     $hocPhan = HocPhan::all(); 
+    $hocKy = Hocky::all(); 
     $chuongTrinhdaotao = ChuongTrinhDaoTao::all(); 
 
     // Giải mã JSON và trích xuất ID cho học phần tiên quyết
@@ -149,6 +151,7 @@ class ProgramDetailsController extends Controller
     return view('Teaching_2::program_details.edit', compact(
         'program_details', 
         'hocPhan', 
+        'hocKy', 
         'chuongTrinhdaotao', 
         'active_menu', 
         'hocphantienquyet_ids', 
@@ -168,7 +171,7 @@ public function update(Request $request, $id)
         $validatedData = $request->validate([
             'hocphan_id' => 'required|exists:modules,id',
             'chuongtrinh_id' => 'required|exists:chuong_trinh_dao_tao,id',
-            'hocky' => 'required|integer|min:1',
+            'hoc_ky_id' =>  'required|exists:hoc_ky,id',// Bắt buộc, số nguyên, không nhỏ hơn 1
             'loai' => 'required|string|max:50|in:Bắt buộc,Tự chọn',
             'hocphantienquyet' => 'nullable|array',
             'hocphantienquyet.*' => 'integer|exists:modules,id',
@@ -198,7 +201,7 @@ public function update(Request $request, $id)
         $program_details->update([
             'hocphan_id' => $validatedData['hocphan_id'],
             'chuongtrinh_id' => $validatedData['chuongtrinh_id'],
-            'hocky' => $validatedData['hocky'],
+            'hoc_ky_id' => $validatedData['hoc_ky_id'],
             'loai' => $validatedData['loai'],
             'hocphantienquyet' => $hocphantienquyet,
             'hocphansongsong' => $hocphansongsong,

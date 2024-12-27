@@ -51,11 +51,16 @@
                 <!-- Chọn Học Kỳ -->
                 <div class="mt-3">
                     <label for="hoc_ky" class="form-label">Học kỳ</label>
-                    <select id="hoc_ky" name="hocky" class="form-control">
+                    <select id="hoc_ky" name="hoc_ky_id" class="form-control">
                         <option value="">Chọn học kỳ</option>
-                        @for ($i = 1; $i <= 10; $i++)
+                        {{-- @for ($i = 1; $i <= 10; $i++)
                             <option value="{{ $i }}" {{ old('hocky') == $i ? 'selected' : '' }}>{{ $i }}</option>
-                        @endfor
+                        @endfor --}}
+                        @foreach($hocKy as $hoc_ky)
+                            <option value="{{ $hoc_ky->id }}" {{ old('hoc_ky_id') == $hoc_ky->id ? 'selected' : '' }}>
+                                {{ $hoc_ky->so_hoc_ky }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
         
