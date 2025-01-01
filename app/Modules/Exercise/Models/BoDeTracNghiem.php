@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Modules\Teaching_2\Models\HocPhan; // Import model Module
 use App\Modules\Exercise\Models\TracNghiemCauhoi;
+use App\Modules\Teaching_3\Models\EnrollResult;
 use App\Models\User; // Import model User
 
 class BodeTracNghiem extends Model
@@ -49,5 +50,10 @@ class BodeTracNghiem extends Model
     {
         $questionIds = collect($this->questions)->pluck('id_question'); // Lấy danh sách id_question từ JSON
         return TracNghiemCauhoi::whereIn('id', $questionIds)->get();
+    }
+
+    public function enrollResults()
+    {
+        return $this->morphMany(EnrollResult::class, 'bode');
     }
 }
