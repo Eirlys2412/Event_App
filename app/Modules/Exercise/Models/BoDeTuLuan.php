@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Modules\Teaching_2\Models\HocPhan; // Import model Module
 use App\Modules\Exercise\Models\Tuluancauhoi;
+use App\Modules\Teaching_3\Models\EnrollResult;
 use App\Models\User; // Import model User
 
 class BoDeTuLuan extends Model
@@ -50,5 +51,10 @@ class BoDeTuLuan extends Model
     {
         $questionIds = collect($this->questions)->pluck('id_question'); // Lấy danh sách id_question từ JSON
         return Tuluancauhoi::whereIn('id', $questionIds)->get();
+    }
+
+    public function enrollResults()
+    {
+        return $this->morphMany(EnrollResult::class, 'bode');
     }
 }
