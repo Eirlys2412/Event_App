@@ -753,6 +753,30 @@
         </li>
     </ul>
 </li>
+<!-- Enrollresult -->
+<li>
+    <a href="javascript:;" class="side-menu {{ ($active_menu == 'enroll_results_list' || $active_menu == 'enroll_results_add') ? 'side-menu--active' : '' }}">
+        <div class="side-menu__icon"> <i data-lucide="book-open"></i> </div>
+        <div class="side-menu__title">
+            EnrollResult
+            <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+        </div>
+    </a>
+    <ul class="{{ ($active_menu == 'enroll_results_list' || $active_menu == 'enroll_results_add') ? 'side-menu__sub-open' : '' }}">
+        <li>
+            <a href="{{ route('admin.enroll_results.index') }}" class="side-menu {{ $active_menu == 'enroll_results_list' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                <div class="side-menu__title">Danh sách kết quả khoá học</div>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('admin.enroll_results.create') }}" class="side-menu {{ $active_menu == 'enroll_results_add' ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                <div class="side-menu__title">Thêm danh sách kết quả khoá học</div>
+            </a>
+        </li>
+    </ul>
+</li>
     <!-- Thời khóa biểu -->
     <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='thoikhoabieu_list'|| $active_menu=='bode_tracnghiem_add')?'side-menu--active':''}}">
