@@ -87,7 +87,18 @@ class User extends Authenticatable
        
         return $pro;
     }
-    
+    /**
+     * Cập nhật ảnh đại diện cho người dùng
+     *
+     * @param string $photoPath
+     * @return void
+     */
+    public function updatePhoto($photoPath)
+    {
+        // Cập nhật giá trị 'photo' trong bảng users
+        $this->photo = $photoPath;
+        $this->save();
+    }
     
 }   
 
