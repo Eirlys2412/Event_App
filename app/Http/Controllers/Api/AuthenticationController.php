@@ -7,53 +7,75 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 class AuthenticationController extends Controller
 {
-    public function savenewUser(Request $request)
-    {
-        $this->validate($request,[
-            'full_name'=>'string|required',
-            'description'=>'string|nullable',
-            'phone'=>'string|required',
-            'email'=>'string|required',
-            'password'=>'string|required',
-            'address'=>'string|required',
-        ]);
-        
-        $data = $request->all();
-       
-        $olduser =\App\Models\User::where('phone',$data['phone'])->get();
-        if(count($olduser) > 0)
-            return response()->json([
-                'success' => false,
-                'message' => 'So dien thoai da ton tai',
-            ], 200);
-        $olduser = \App\Models\User::where('email',$data['email'])->get();
-            if(count($olduser) > 0)
-                return response()->json([
-                'success' => false,
-                'message' => 'Email da ton tai',
-            ], 200);
-        $data['photo'] = asset('backend/assets/dist/images/profile-6.jpg');
-        $data['password'] = Hash::make($data['password']);
-        $data['username'] = $data['phone'];
-        $data['role'] = 'customer';
-        $status = \App\Models\User::c_create($data);
-        if(!$status) 
-        {
-           return response()->json([
-                'success' => false,
-                'message' => 'Dang ky that bai',
-            ], 401);
-        }    
+    public function savenewUser(Request $request) 
+{
+    $this->validate($request, [
+        'full_name' => 'string|required',
+        'description' => 'string|nullable',
+        'phone' => 'string|required',
+        'email' => 'string|required|email',
+        'password' => 'string|required',
+        'role' => 'string|required|in:student,teacher',
+    ]);
+
+    $data = $request->all();
+
+    // Kiểm tra số điện thoại đã tồn tại
+    if (\App\Models\User::where('phone', $data['phone'])->exists()) {
         return response()->json([
-                'success' => true,
-                'message' => 'Register out successfully',
-            ], 200);
+            'success' => false,
+            'message' => 'Số điện thoại đã tồn tại',
+        ], 200);
     }
+
+    // Kiểm tra email đã tồn tại
+    if (\App\Models\User::where('email', $data['email'])->exists()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Email đã tồn tại',
+        ], 200);
+    }
+
+    // Gán các giá trị mặc định
+    $data['photo'] = asset('backend/images/profile-6.jpg');
+    $data['password'] = Hash::make($data['password']);
+    $data['username'] = $data['phone'];
+
+    // Tạo user
+    $user = \App\Models\User::create($data);
+
+    if (!$user) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Đăng ký thất bại',
+        ], 401);
+    }
+
+    // Tạo token cho người dùng mới
+    $token =  $user->createToken('appToken')->accessToken;
+    // Trả về token và thông tin người dùng
+    return response()->json([
+        'success' => true,
+        'message' => 'Đăng ký thành công',
+        'user' => [
+            'id' => $user->id,
+            'full_name' => $user->full_name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'photo' => $user->photo,
+        ],
+        'token' => $token, // Token được trả về
+    ], 200);
+}
+
+    
+
     public function store()
     {
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
@@ -85,6 +107,93 @@ class AuthenticationController extends Controller
             ], 401);
         }
     }
+
+
+
+public function createStudent(Request $request)
+{
+    $this->validate($request, [
+        'mssv' => 'string|required|unique:students,mssv',
+        'donvi_id' => 'integer|required|exists:donvi,id',
+        'nganh_id' => 'integer|required|exists:nganh,id',
+        'khoa' => 'string|required',
+        'user_id' => 'integer|required|exists:users,id',
+    ]);
+
+    try {
+        $data = $request->all();
+
+        // Tạo slug từ MSSV
+        $data['slug'] = Str::slug($data['mssv'], '-');
+
+        // Thêm dữ liệu vào bảng students
+        $student = \App\Modules\Teaching_1\Models\Student::create([
+            'mssv' => $data['mssv'],
+            'donvi_id' => $data['donvi_id'],
+            'nganh_id' => $data['nganh_id'],
+            'khoa' => $data['khoa'],
+            'user_id' => $data['user_id'],
+            'slug' => $data['slug'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Student created successfully',
+            'data' => $student,
+        ], 201); // Trả về mã trạng thái 201 khi tạo thành công
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to create student',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+public function createTeacher(Request $request)
+{
+    $this->validate($request, [
+        'mgv' => 'string|required|unique:teacher,mgv', // Mã giảng viên phải là duy nhất
+        'ma_donvi' => 'integer|required|exists:donvi,id', // Mã đơn vị phải tồn tại
+        'user_id' => 'integer|required|exists:users,id', // user_id phải tồn tại
+        'chuyen_nganh' => 'integer|required', // Chuyên ngành là bắt buộc
+        'hoc_ham' => 'string|nullable', // Học hàm (nếu có)
+        'hoc_vi' => 'string|nullable', // Học vị (nếu có)
+        'loai_giangvien' => 'string|required', // Loại giảng viên chỉ chấp nhận full-time hoặc part-time
+    ]);
+
+    try {
+        $data = $request->all();
+
+        // Tạo slug từ mã giảng viên
+        $data['slug'] = Str::slug($data['mgv'], '-');
+
+        // Thêm dữ liệu vào bảng teachers
+        $teacher = \App\Modules\Teaching_1\Models\Teacher::create([
+            'mgv' => $data['mgv'],
+            'ma_donvi' => $data['ma_donvi'],
+            'user_id' => $data['user_id'],
+            'chuyen_nganh' => $data['chuyen_nganh'],
+            'hoc_ham' => $data['hoc_ham'] ?? null,
+            'hoc_vi' => $data['hoc_vi'] ?? null,
+            'loai_giangvien' => $data['loai_giangvien'],
+            'slug' => $data['slug'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Teacher created successfully',
+            'data' => $teacher,
+        ], 201);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to create teacher',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
         /**
      * Destroy an authenticated session.
      *
