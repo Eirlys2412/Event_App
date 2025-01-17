@@ -19,7 +19,7 @@ public function show($userId)
     $student = Student::where('user_id', $userId)->first();
 
     if (!$student) {
-        return response()->json(['message' => 'Student not found'], 404);
+        return response()->json(null, 200); // Trả về null
     }
 
     return response()->json([
