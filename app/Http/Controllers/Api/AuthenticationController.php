@@ -194,6 +194,50 @@ public function createTeacher(Request $request)
     }
 }
 
+public function googleSignIn(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'full_name' => 'required|string',
+        'google_id' => 'required|string',
+        'role' => 'nullable|string|in:student,teacher', // role chỉ nhận 'student' hoặc 'teacher'
+        'budget' => 'nullable|numeric', // nếu cần thiết
+    ]);
+
+    // Kiểm tra nếu user đã tồn tại hoặc tạo mới
+    $user = User::firstOrCreate(
+        ['email' => $request->email],
+        [
+            'full_name' => $request->full_name,
+            'google_id' => $request->google_id,
+            'username' => $request->input('username', null), // username có thể bỏ qua nếu không có
+            'role' => $request->input('role', 'student'), // mặc định là 'student' nếu không có
+            'budget' => $request->input('budget', 0), // mặc định là 0 nếu không có
+            'phone' => $request->input('phone', null), // phone là bắt buộc
+            'password' => bcrypt('default_password'), // Google không yêu cầu mật khẩu
+            'status' => 'active', // mặc định là 'active'
+            'photo' => 'backend/images/profile-6.jpg', // mặc định là 'active'
+            'remember_token' => Str::random(60), // tạo remember_token nếu cần
+        ]
+    );
+
+    // Tạo token cho user
+    $token = $user->createToken('GoogleSignIn')->accessToken;
+
+    return response()->json([
+       'user' => [
+            'id' => $user->id,
+            'full_name' => $user->full_name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'photo' => $user->photo,
+        ],
+        'token' => $token,
+    ]);
+}
+
+
+
         /**
      * Destroy an authenticated session.
      *
