@@ -14,9 +14,10 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('login', [\App\Http\Controllers\Api\AuthenticationController::class, 'store']);
     Route::post('logout', [\App\Http\Controllers\Api\AuthenticationController::class, 'destroy'])->middleware('auth:api');
     Route::post('register', [\App\Http\Controllers\Api\AuthenticationController::class, 'savenewUser']);
+    Route::post('google-sign-in', [\App\Http\Controllers\Api\AuthenticationController::class, 'googleSignIn']);
     Route::post('/password/send-reset-code', [\App\Http\Controllers\Api\PasswordRecoveryController::class, 'sendResetCode']);
     Route::post('/password/reset', [\App\Http\Controllers\Api\PasswordRecoveryController::class, 'resetPassword']);
-
+    
     //UniverInfo
     Route::get('/nganhs', [\App\Http\Controllers\Api\UniverInfoController::class, 'getNganhs']);
     Route::get('/donvi', [\App\Http\Controllers\Api\UniverInfoController::class, 'getDonVis']);
