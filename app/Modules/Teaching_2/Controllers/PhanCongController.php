@@ -62,6 +62,8 @@ class PhanCongController extends Controller
         'ngayphancong' => 'required|date',
         'time_start' => 'nullable|date',
         'time_end' => 'nullable|date',
+        'class_course' => 'required|string|max:255',
+        'max_student' =>  'required|integer|min:0',
     ]);
 
     // Tìm giảng viên dựa trên mã giảng viên (mgv)
@@ -81,6 +83,8 @@ class PhanCongController extends Controller
         'ngayphancong' => $request->ngayphancong,
         'time_start' => $request->time_start,
         'time_end' => $request->time_end,
+        'class_course' => $request->class_course,
+        'max_student' => $request->max_student,
     ]);
 
     return redirect()->route('phancong.index')->with('success', 'Phân công mới đã được tạo!');
@@ -128,6 +132,9 @@ class PhanCongController extends Controller
         'ngayphancong' => 'required|date',
         'time_start' => 'nullable|date',
         'time_end' => 'nullable|date',
+        'class_course' => 'required|string|max:255',
+        'max_student' =>  'required|integer|min:0',
+
     ]);
 
     // Lấy phân công cần cập nhật
@@ -150,6 +157,8 @@ class PhanCongController extends Controller
         'ngayphancong' => $request->ngayphancong,
         'time_start' => $request->time_start,
         'time_end' => $request->time_end,
+        'class_course' => $request->class_course,
+        'max_student' => $request->max_student,
     ]);
 
     // Chuyển hướng về danh sách phân công với thông báo thành công

@@ -18,7 +18,7 @@ class AuthenticationController extends Controller
     $this->validate($request, [
         'full_name' => 'string|required',
         'description' => 'string|nullable',
-        'phone' => 'string|required',
+        // 'phone' => 'string|required',
         'email' => 'string|required|email',
         'password' => 'string|required',
         'role' => 'string|required|in:student,teacher',
@@ -26,13 +26,13 @@ class AuthenticationController extends Controller
 
     $data = $request->all();
 
-    // Kiểm tra số điện thoại đã tồn tại
-    if (\App\Models\User::where('phone', $data['phone'])->exists()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Số điện thoại đã tồn tại',
-        ], 200);
-    }
+    // // Kiểm tra số điện thoại đã tồn tại
+    // if (\App\Models\User::where('phone', $data['phone'])->exists()) {
+    //     return response()->json([
+    //         'success' => false,
+    //         'message' => 'Số điện thoại đã tồn tại',
+    //     ], 200);
+    // }
 
     // Kiểm tra email đã tồn tại
     if (\App\Models\User::where('email', $data['email'])->exists()) {
