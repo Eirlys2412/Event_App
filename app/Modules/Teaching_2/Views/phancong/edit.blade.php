@@ -103,6 +103,24 @@
                         @enderror
                     </div>
 
+                    <!-- Lớp học phần -->
+                    <div class="mb-4">
+                        <label for="class_course" class="form-label">Lớp học phần</label>
+                        <input type="text" name="class_course" id="class_course" class="form-control" value="{{ old('class_course', $phancong->class_course) }}">
+                        @error('class_course')
+                            <div class="text-red-600 mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Số lượng sinh viên tối đa -->
+                    <div class="mb-4">
+                        <label for="max_student" class="form-label">Số lượng sinh viên tối đa</label>
+                        <input type="text" name="max_student" id="max_student" class="form-control" value="{{ old('max_student', $phancong->max_student) }}">
+                        @error('max_student')
+                            <div class="text-red-600 mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     <div class="mb-4 text-center">
                         <button type="submit" class="btn btn-primary">Cập nhật</button>
                         <a href="{{ route('phancong.index') }}" class="btn btn-secondary">Quay lại</a>

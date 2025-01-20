@@ -15,7 +15,7 @@ class PhanCong extends Model
 
     protected $table = 'phancong'; // Tên bảng trong cơ sở dữ liệu
     protected $fillable = [
-        'giangvien_id', 'hocphan_id', 'hocky_id', 'namhoc_id', 'ngayphancong', 'time_start', 'time_end'
+        'giangvien_id', 'hocphan_id', 'hocky_id', 'namhoc_id', 'ngayphancong', 'time_start', 'time_end','class_course','max_student'
     ];
 
     // Define relationships
