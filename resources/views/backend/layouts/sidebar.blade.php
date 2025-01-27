@@ -815,5 +815,44 @@
             </li>
         </ul>
     </li>
+    <!-- enrollcertificates: Chứng nhận -->
+    <li>
+        <a href="javascript:;" class="side-menu {{($active_menu=='enrollcertificates_list'|| $active_menu=='bode_tracnghiem_add')?'side-menu--active':''}}">
+            <div class="side-menu__icon"><i data-lucide="award"></i>                <!-- Biểu tượng phù hợp cho điểm danh -->
+            </div>
+            <div class="side-menu__title">
+                Chứng nhận
+                <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+            </div>
+        </a>
+        <ul class="{{($active_menu==''|| $active_menu=='')?'side-menu__sub-open':''}}">
+            <li>
+                <a href="{{route('admin.enrollcertificates.index')}}" class="side-menu {{$active_menu=='enrollcertificates_list'?'side-menu--active':''}}">
+                    <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                    <div class="side-menu__title">Danh sách chứng nhận</div>
+                </a>
+            </li>
+        </ul>
+    </li>
+    <!-- Learning: Đang học -->
+    <li>
+        <a href="javascript:;" class="side-menu {{($active_menu=='learning_list'|| $active_menu=='bode_tracnghiem_add')?'side-menu--active':''}}">
+            <div class="side-menu__icon"><i data-lucide="clock"></i>
+                <!-- Biểu tượng phù hợp cho điểm danh -->
+            </div>
+            <div class="side-menu__title">
+                Trạng thái học tập
+                <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+            </div>
+        </a>
+        <ul class="{{($active_menu==''|| $active_menu=='')?'side-menu__sub-open':''}}">
+            <li> 
+                <a href="{{route('admin.learning.index')}}" class="side-menu {{$active_menu=='learning_list'?'side-menu--active':''}}">
+                    <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                    <div class="side-menu__title">Danh sách đang học</div>
+                </a>
+            </li>
+        </ul>
+    </li>
     </ul>
 </nav>

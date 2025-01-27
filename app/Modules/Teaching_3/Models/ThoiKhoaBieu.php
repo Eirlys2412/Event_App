@@ -27,8 +27,4 @@ class ThoiKhoaBieu extends Model
         return $this->belongsTo(PhanCong::class, 'phancong_id');
     }
 
-    public function diaDiem()
-    {
-        return $this->belongsTo(DiaDiem::class, 'diadiem_id');
-    }
 }
