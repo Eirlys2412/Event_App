@@ -147,6 +147,42 @@ class TagController extends Controller
         }
     }
 
+     // làm về trắc nghiệm câu hỏi
+     public function store_diadiem_tag($thoikhoabieu_id,$tag_ids){
+        if(!$tag_ids || count($tag_ids) == 0)
+            return;
+        foreach($tag_ids as $tag_id)
+        {
+            $tag = Tag::find($tag_id);
+            if(!$tag)
+            {
+                $datatag['title'] = $tag_id;
+                $slug = Str::slug( $datatag['title'] );
+                $slug_count = Tag::where('slug',$slug)->count();
+                if($slug_count > 0)
+                {
+                    $slug .= time().'-'.$slug;
+                }
+                $datatag['slug'] = $slug;
+                
+                $tag = Tag::create($datatag);
+                sleep(1);
+            }
+            $data['tag_id'] = $tag->id;
+            $data['diadiems_id'] = $thoikhoabieu_id;
+            \App\Models\TagDiadiem::create($data);
+            $tag->hit += 1;
+            $tag->save();
+        }
+    }
+
+    public function update_diadiem_tag($thoikhoabieu_id,$tag_ids)
+    {
+        $sql = "delete from tag_diadiems where diadiems_id = ".$thoikhoabieu_id;
+        DB::select($sql);
+         $this->store_diadiem_tag($thoikhoabieu_id,$tag_ids);
+    }
+
     public function update_tracnghiemcauhoi_tag($tracnghiemcauhoi_id,$tag_ids)
     {
         $sql = "delete from tag_tracnghiemcauhois where tracnghiemcauhoi_id = ".$tracnghiemcauhoi_id;
