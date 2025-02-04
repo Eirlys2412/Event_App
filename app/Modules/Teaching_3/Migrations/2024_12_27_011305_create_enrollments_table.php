@@ -13,7 +13,7 @@ class CreateEnrollmentsTable extends Migration
     {
         Schema::create('enrollments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->constrained('users')->onDelete('cascade');
+            $table->unsignedBigInteger('student_id')->constrained('students')->onDelete('cascade');
             $table->unsignedBigInteger('phancong_id')->constrained('phancong')->onDelete('cascade');
             $table->integer('timespending')->default(0); // Thời gian đã học
             $table->integer('process')->default(0); // % hoàn thành khóa học
