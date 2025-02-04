@@ -40,5 +40,13 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::get('/teacher/{userId}', [\App\Http\Controllers\Api\TeacherController::class, 'show'])->middleware('auth:api');
     Route::put('/teacher/{userId}', [\App\Http\Controllers\Api\TeacherController::class, 'update'])->middleware('auth:api');
     Route::post('teacher', [\App\Http\Controllers\Api\AuthenticationController::class, 'createTeacher'])->middleware('auth:api');
+    
+    //Phan cong
+    Route::get('/phancong', [\App\Http\Controllers\Api\UniverInfoController::class, 'index']);
+
+    //Course
+    Route::get('/courses', [\App\Http\Controllers\Api\CourseController::class, 'getAvailableCourses']);
+    Route::post('/enroll', [\App\Http\Controllers\Api\CourseController::class, 'enrollCourse']);
+
 
   });
