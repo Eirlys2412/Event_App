@@ -13,11 +13,11 @@
                     @method('PUT')
 
                     <div class="mb-4">
-                        <label for="user_id" class="form-label">User</label>
-                        <select name="user_id" id="user_id" class="form-control">
+                        <label for="student_id" class="form-label">User</label>
+                        <select name="student_id" id="student_id" class="form-control">
                             <option value="">-- Chọn User --</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}" {{ $enrollment->user_id == $user->id ? 'selected' : '' }}>{{ $user->code }}</option>
+                            @foreach($students as $student)
+                                <option value="{{ $student->id }}" {{ $enrollment->student_id == $student->id ? 'selected' : '' }}>{{ $student->mssv }}</option>
                             @endforeach
                         </select>
                     </div>

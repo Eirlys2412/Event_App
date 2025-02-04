@@ -12,11 +12,11 @@
                     @csrf
                     
                     <div class="mb-4">
-                        <label for="user_id" class="form-label">User</label>
-                        <select name="user_id" id="user_id" class="form-control">
-                            <option value="">-- Chọn User --</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->code }}</option>
+                        <label for="student_id" class="form-label">Sinh viên</label>
+                        <select name="student_id" id="student_id" class="form-control">
+                            <option value="">-- Chọn sinh viên --</option>
+                            @foreach($students as $student)
+                                <option value="{{ $student->id }}">{{ $student->mssv }}</option>
                             @endforeach
                         </select>
                     </div>

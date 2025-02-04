@@ -15,7 +15,7 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th>User</th>
+                            <th>Sinh viên</th>
                             <th>Phân Công</th>
                             <th>Thời Gian Học</th>
                             <th>Hoàn Thành (%)</th>
@@ -27,7 +27,7 @@
                         @foreach($enrollments as $enrollment)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $enrollment->user->username ?? 'N/A' }}</td>
+                                <td>{{ $enrollment->students->mssv ?? 'N/A' }}</td>
                                 <td>
                                     @if($enrollment->phancong)
                                         {{ $enrollment->phancong->giangvien->mgv ?? 'N/A' }} - {{ $enrollment->phancong->hocphan->title ?? 'N/A' }}
