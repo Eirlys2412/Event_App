@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Modules\Teaching_1\Models\Student;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -98,6 +100,12 @@ class User extends Authenticatable
         // Cập nhật giá trị 'photo' trong bảng users
         $this->photo = $photoPath;
         $this->save();
+    }
+
+    // Khai báo quan hệ
+    public function student()
+    {
+        return $this->hasOne(Student::class, 'user_id'); // 'user_id' là khóa ngoại trong bảng 'students'
     }
     
 }   

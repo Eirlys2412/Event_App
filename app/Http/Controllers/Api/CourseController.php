@@ -11,14 +11,30 @@ use Illuminate\Support\Facades\Log;
 class CourseController extends Controller
 {
 
-    public function getAvailableCourses()
+    public function getAvailableCourses(Request $request)
 {
+    // Kiểm tra student_id có được gửi trong request không
+    if (!$request->student_id) {
+        return response()->json(['message' => 'Missing student_id'], 400);
+    }
+
+    // Lấy ngành của sinh viên
+    $studentMajor = DB::table('students')
+        ->join('nganh', 'students.nganh_id', '=', 'nganh.id')
+        ->where('students.id', $request->student_id)
+        ->value('nganh.id');
+
+    if (!$studentMajor) {
+        return response()->json(['message' => 'Student major not found'], 404);
+    }
+
+    // Lấy các học phần liên quan đến ngành của sinh viên
     $courses = DB::table('phancong')
         ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
         ->join('program_details', 'phancong.hocphan_id', '=', 'program_details.hocphan_id')
-        // Nối bảng teacher để lấy giảng viên
+        ->join('chuong_trinh_dao_tao', 'program_details.chuongtrinh_id', '=', 'chuong_trinh_dao_tao.id')
+        ->join('nganh', 'chuong_trinh_dao_tao.nganh_id', '=', 'nganh.id')
         ->join('teacher', 'phancong.giangvien_id', '=', 'teacher.id')
-        // Nối bảng users để lấy tên giảng viên
         ->join('users', 'teacher.user_id', '=', 'users.id')
         ->select(
             'hoc_phans.title', 
@@ -26,12 +42,14 @@ class CourseController extends Controller
             'hoc_phans.tinchi', 
             'phancong.class_course', 
             'phancong.max_student',
-            'users.full_name as teacher_name'  // Thêm tên giảng viên
+            'users.full_name as teacher_name'
         )
+        ->where('nganh.id', $studentMajor)  // Chỉ lấy học phần thuộc ngành của sinh viên
         ->get();
 
     return response()->json($courses);
 }
+
 
 public function enrollCourse(Request $request)
 {

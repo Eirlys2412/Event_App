@@ -12,7 +12,7 @@
  
     <div class="intro-y flex items-center mt-8">
         <h2 class="text-lg font-medium mr-auto">
-            Thêm câu hỏi trắc nghiệm
+            Thêm thời khóa biểu
         </h2>
     </div>
     <div class="grid grid-cols-12 gap-12 mt-5">
@@ -35,11 +35,12 @@
                             @endforeach
                         </select>
                     </div>
+
                     <div class="mt-3">
-                        <label for="regular-form-1" class="form-label">Địa điểm</label>
-                        <select name="diadiem_id" id="diadiem_id" class="form-select mt-2">
-                            @foreach ($diadiem as $dd)
-                                <option value="{{ $dd->id }}">{{ $dd->title }}</option>
+                        <label for="tag_ids" class="form-label">Địa điểm</label>
+                        <select id="select-junk" name="tag_ids[]" multiple autocomplete="off">
+                            @foreach ($tags as $tag)
+                                <option value="{{ $tag->id }}">{{ $tag->title }}</option>
                             @endforeach
                         </select>
                     </div>

@@ -6,6 +6,8 @@ use App\Modules\Teaching_3\Controllers\AttendanceController;
 use App\Modules\Teaching_3\Controllers\PhancongGroupController;
 use App\Modules\Teaching_3\Controllers\LoaiChungchiController;
 use App\Modules\Teaching_3\Controllers\EnrollmentController;
+use App\Modules\Teaching_3\Controllers\EnrollCertificatesController;
+use App\Modules\Teaching_3\Controllers\LearningController;
 use App\Modules\Teaching_3\Controllers\EnrollResultController;
 
 Route::prefix('phanconggroup')->group(function () {
@@ -56,7 +58,10 @@ Route::group(['prefix' => 'admin/', 'as' => 'admin.'], function () {
     // Route::delete('/admin/tracnghiemcauhoi/{tracnghiemcauhoiId}/resource/{resourceId}', [TracNghiemCauHoiController::class, 'removeResource'])->name('tracnghiemcauhoi.removeResource');
     Route::resource('thoikhoabieu', ThoiKhoaBieuController::class);
     Route::resource('diemdanh', AttendanceController::class);
-    Route::resource('enroll_results', EnrollResultController::class);
     Route::get('diemdanh/{id}', [AttendanceController::class, 'show'])->name('admin.diemdanh.show');
+    Route::resource('enrollcertificates', EnrollCertificatesController::class);
+    Route::resource('learning', LearningController::class);
+    Route::resource('enroll_results', EnrollResultController::class);
 });
+
 

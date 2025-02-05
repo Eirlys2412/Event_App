@@ -65,7 +65,19 @@
                             @endforeach
                         @endforeach
                         <td>
-                            <p target="_blank" href="" class="font-medium whitespace-nowrap">{{ optional($item->diaDiem)->title }}</p> 
+                            @php
+                                $relatedTags = $tag_diadiem->filter(function($data2) use ($item) {
+                                    return $data2->diadiems_id == $item->id;
+                                });
+                            @endphp
+                        
+                            @foreach ($relatedTags as $data2)
+                                @foreach ($tags as $data1)
+                                    @if ($data2->tag_id == $data1->id)
+                                        <p class="font-medium whitespace-nowrap">{{ $data1->title }}</p>
+                                    @endif
+                                @endforeach
+                            @endforeach
                         </td>
                         <td>
                             <p target="_blank" href="" class="font-medium whitespace-nowrap">{{ ($item->buoi) }}</p> 
