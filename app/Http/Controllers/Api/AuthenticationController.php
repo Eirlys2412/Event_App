@@ -91,11 +91,13 @@ class AuthenticationController extends Controller
             else
             {
                 $user_token['token'] = $user->createToken('appToken')->accessToken;
-
+                $user = User::with('student')->find(Auth::user()->id);
+                $studentId = $user->student ? $user->student->id : null;
                 return response()->json([
                     'success' => true,
                     'token' => $user_token,
                     'user' => $user,
+                    'student_id' => $studentId,  // Trả về student_id
                 ], 200);
             }
             
