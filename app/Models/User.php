@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Modules\Teaching_1\Models\Student;
+use App\Modules\Teaching_1\Models\Teacher;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -74,8 +75,7 @@ class User extends Authenticatable
             $user->status = "inactive";
             $user->save();
             return 0;
-        }
-            
+        }     
         
     }
     public static function c_create($data)
@@ -108,6 +108,11 @@ class User extends Authenticatable
         return $this->hasOne(Student::class, 'user_id'); // 'user_id' là khóa ngoại trong bảng 'students'
     }
     
+    // Khai báo quan hệ
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class, 'user_id'); // 'user_id' là khóa ngoại trong bảng 'teachers'
+    }
 }   
 
 

@@ -169,14 +169,14 @@ public function update(Request $request, $id)
 
         // Validate dữ liệu từ request
         $validatedData = $request->validate([
-            'hocphan_id' => 'required|exists:modules,id',
+            'hocphan_id' => 'required|exists:hoc_phans,id',
             'chuongtrinh_id' => 'required|exists:chuong_trinh_dao_tao,id',
             'hoc_ky_id' =>  'required|exists:hoc_ky,id',// Bắt buộc, số nguyên, không nhỏ hơn 1
             'loai' => 'required|string|max:50|in:Bắt buộc,Tự chọn',
             'hocphantienquyet' => 'nullable|array',
-            'hocphantienquyet.*' => 'integer|exists:modules,id',
+            'hocphantienquyet.*' => 'integer|exists:hoc_phans,id',
             'hocphansongsong' => 'nullable|array',
-            'hocphansongsong.*' => 'integer|exists:modules,id',
+            'hocphansongsong.*' => 'integer|exists:hoc_phans,id',
         ]);
 
         // Xử lý dữ liệu học phần tiên quyết
@@ -236,7 +236,7 @@ public function update(Request $request, $id)
             $searchdata =$request->datasearch;
             $program_details = ProgramDetails::with(['hocPhan', 'chuongTrinhdaotao'])
             ->where('id', 'LIKE', "%{$searchdata}%")
-            ->paginate($this->pagesize)->withQueryString();
+            ->paginate($this->pagesize);
             $breadcrumb = '
             <li class="breadcrumb-item"><a href="#">/</a></li>
             <li class="breadcrumb-item  " aria-current="page"><a href="'.route('admin.blog.index').'">Bài viết</a></li>
@@ -247,7 +247,6 @@ public function update(Request $request, $id)
         {
             return redirect()->route('admin.program_details.index')->with('success','Không có thông tin tìm kiếm!');
         }
-
     }
     // Tìm kiếm 
     // public function search(Request $request)

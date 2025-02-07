@@ -35,7 +35,6 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::put('/student/{userId}', [\App\Http\Controllers\Api\StudentController::class, 'update'])->middleware('auth:api');
     Route::post('student', [\App\Http\Controllers\Api\AuthenticationController::class, 'createStudent'])->middleware('auth:api');
 
-
     //Teacher
     Route::get('/teacher/{userId}', [\App\Http\Controllers\Api\TeacherController::class, 'show'])->middleware('auth:api');
     Route::put('/teacher/{userId}', [\App\Http\Controllers\Api\TeacherController::class, 'update'])->middleware('auth:api');
@@ -46,7 +45,10 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
 
     //Course
     Route::get('/courses', [\App\Http\Controllers\Api\CourseController::class, 'getAvailableCourses']);
+    Route::get('/classifyCourses', [\App\Http\Controllers\Api\CourseController::class, 'classifyAvailableCourses']);
     Route::post('/enroll', [\App\Http\Controllers\Api\CourseController::class, 'enrollCourse']);
+    Route::post('/getEnroll', [\App\Http\Controllers\Api\CourseController::class, 'getEnrolledCourses']);
+    Route::post('/deleteEnroll', [\App\Http\Controllers\Api\CourseController::class, 'deleteEnrollment']);
 
 
   });
