@@ -75,7 +75,6 @@ class AuthenticationController extends Controller
 }
 
     
-
 public function store()
 {
     if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {

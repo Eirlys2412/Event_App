@@ -166,7 +166,6 @@ public function getEnrolledCourses(Request $request)
     return response()->json($courses);
 }
 
-
 public function deleteEnrollment(Request $request)
 {
     if (!$request->enrollment_id) {

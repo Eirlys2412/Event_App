@@ -247,7 +247,6 @@ public function update(Request $request, $id)
         {
             return redirect()->route('admin.program_details.index')->with('success','Không có thông tin tìm kiếm!');
         }
-
     }
     // Tìm kiếm 
     // public function search(Request $request)

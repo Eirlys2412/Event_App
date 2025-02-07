@@ -75,8 +75,7 @@ class User extends Authenticatable
             $user->status = "inactive";
             $user->save();
             return 0;
-        }
-            
+        }     
         
     }
     public static function c_create($data)
