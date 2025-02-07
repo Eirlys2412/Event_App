@@ -46,7 +46,10 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
 
     //Course
     Route::get('/courses', [\App\Http\Controllers\Api\CourseController::class, 'getAvailableCourses']);
+    Route::get('/classifyCourses', [\App\Http\Controllers\Api\CourseController::class, 'classifyAvailableCourses']);
     Route::post('/enroll', [\App\Http\Controllers\Api\CourseController::class, 'enrollCourse']);
+    Route::post('/getEnroll', [\App\Http\Controllers\Api\CourseController::class, 'getEnrolledCourses']);
+    Route::post('/deleteEnroll', [\App\Http\Controllers\Api\CourseController::class, 'deleteEnrollment']);
 
 
   });

@@ -76,39 +76,41 @@ class AuthenticationController extends Controller
 
     
 
-    public function store()
-    {
-        if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
-            // successfull authentication
-            $user = User::find(Auth::user()->id);
-            if($user->status=='inactive')
-            {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to authenticate.',
-                ], 401);
-            }
-            else
-            {
-                $user_token['token'] = $user->createToken('appToken')->accessToken;
-                $user = User::with('student')->find(Auth::user()->id);
-                $studentId = $user->student ? $user->student->id : null;
-                return response()->json([
-                    'success' => true,
-                    'token' => $user_token,
-                    'user' => $user,
-                    'student_id' => $studentId,  // Trả về student_id
-                ], 200);
-            }
-            
-        } else {
-            // failure to authenticate
+public function store()
+{
+    if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
+        // Successful authentication
+        $user = User::with(['student', 'teacher'])->find(Auth::user()->id);
+
+        if ($user->status == 'inactive') {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to authenticate.',
             ], 401);
+        } else {
+            $user_token['token'] = $user->createToken('appToken')->accessToken;
+
+            // Get student_id and teacher_id if they exist
+            $studentId = $user->student ? $user->student->id : 0;
+            $teacherId = $user->teacher ? $user->teacher->id : 0;
+
+            return response()->json([
+                'success' => true,
+                'token' => $user_token,
+                'user' => $user,
+                'student_id' => $studentId,
+                'teacher_id' => $teacherId, // Return teacher_id
+            ], 200);
         }
+    } else {
+        // Failure to authenticate
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to authenticate.',
+        ], 401);
     }
+}
+
 
 
 
