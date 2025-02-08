@@ -4,14 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Modules\Teaching_2\Models\PhanCong;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\DB;
 
 class UniverInfoController extends Controller
 {
@@ -71,32 +65,38 @@ public function chuyenNganhs()
 }
 
 
-// Lấy danh sách phân công
-public function index(Request $request)
+// Lấy danh sách phân công theo giangvien_id
+public function phancong(Request $request)
 {
     try {
-        // Lọc danh sách theo các trường nếu cần (ví dụ: hocky_id, hocphan_id)
-        $query = PhanCong::query();
-
-        if ($request->has('giangvien_id')) {
-            $query->where('giangvien_id', $request->giangvien_id);
-        }
-        if ($request->has('hocphan_id')) {
-            $query->where('hocphan_id', $request->hocphan_id);
-        }
-        if ($request->has('hocky_id')) {
-            $query->where('hocky_id', $request->hocky_id);
-        }
-        if ($request->has('namhoc_id')) {
-            $query->where('namhoc_id', $request->namhoc_id);
+        if (!$request->has('giangvien_id')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Thiếu tham số giangvien_id'
+            ], 400);
         }
 
-        // Lấy danh sách phân công
-        $phancongs = $query->orderBy('ngayphancong', 'desc')->get();
+        // Join các bảng liên quan
+        $phancongs = DB::table('phancong')
+            ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
+            ->join('teacher', 'phancong.giangvien_id', '=', 'teacher.id')
+            ->join('users', 'teacher.user_id', '=', 'users.id')
+            ->select(
+                'phancong.id as phancong_id',
+                'hoc_phans.title as hocphan_title',
+                'hoc_phans.tinchi as tinchi',
+                'hoc_phans.code as hocphan_code',
+                'phancong.class_course',
+                'phancong.ngayphancong',
+                'users.full_name as teacher_name'
+            )
+            ->where('phancong.giangvien_id', $request->giangvien_id)
+            ->orderBy('phancong.ngayphancong', 'desc')
+            ->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'Danh sách phân công',
+            'message' => 'Danh sách phân công theo giangvien_id',
             'data' => $phancongs
         ], 200);
     } catch (\Exception $e) {
@@ -106,5 +106,6 @@ public function index(Request $request)
         ], 500);
     }
 }
+
 
 }
