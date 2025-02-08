@@ -25,10 +25,26 @@
                     </select>
                 </div>
                 <div class="mt-3">
+                    <label for="user_id" class="form-label">User</label>
+                    <select name="user_id" class="form-select mt-2" required>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->full_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mt-3">
                     <label for="nganh_id" class="form-label">Ngành</label>
                     <select name="nganh_id" class="form-select mt-2" required>
                         @foreach($nganhs as $nganh)
                             <option value="{{ $nganh->id }}">{{ $nganh->title }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mt-3">
+                    <label for="class_id" class="form-label">Lớp</label>
+                    <select name="class_id" class="form-select mt-2" required>
+                        @foreach($classes as $class)
+                            <option value="{{ $class->id }}">{{ $class->class_name }}</option>
                         @endforeach
                     </select>
                 </div>

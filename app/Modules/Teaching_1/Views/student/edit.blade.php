@@ -36,6 +36,18 @@
                     </select>
                 </div>
 
+                <!-- User -->
+                <div class="mt-3">
+                    <label for="user_id" class="form-label">User</label>
+                    <select name="user_id" class="form-select mt-2" required>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}" {{ $student->user_id == $user->id ? 'selected' : '' }}>
+                                {{ $user->full_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Ngành -->
                 <div class="mt-3">
                     <label for="nganh_id" class="form-label">Ngành</label>
@@ -43,6 +55,18 @@
                         @foreach($nganhs as $nganh)
                             <option value="{{ $nganh->id }}" {{ $student->nganh_id == $nganh->id ? 'selected' : '' }}>
                                 {{ $nganh->title }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Lớp -->
+                <div class="mt-3">
+                    <label for="class_id" class="form-label">Lớp</label>
+                    <select name="class_id" class="form-select mt-2" required>
+                        @foreach($classes as $class)
+                            <option value="{{ $class->id }}" {{ $student->class_id == $class->id ? 'selected' : '' }}>
+                                {{ $class->class_name }}
                             </option>
                         @endforeach
                     </select>

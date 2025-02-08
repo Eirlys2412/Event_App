@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\User;
 use App\Modules\Teaching_1\Models\Student;
 
 class StudentController extends Controller
@@ -36,8 +37,10 @@ class StudentController extends Controller
     {
         $this->authorizeFunction("student_add");
 
+        $data['users'] = User::where('role', 'student')->orderBy('full_name', 'ASC')->get();
         $data['donvis'] = \App\Modules\Teaching_1\Models\Donvi::orderBy('title', 'ASC')->get();
         $data['nganhs'] = \App\Modules\Teaching_1\Models\Nganh::orderBy('title', 'ASC')->get();
+        $data['classes'] = \App\Modules\Teaching_1\Models\ClassModel::orderBy('class_name', 'ASC')->get();
         $data['active_menu'] = "student_add";
         $data['breadcrumb'] = '
         <li class="breadcrumb-item"><a href="#">/</a></li>
@@ -67,8 +70,10 @@ class StudentController extends Controller
     {
         $this->authorizeFunction("student_edit");
 
+        $users =User::where('role', 'student')->orderBy('full_name', 'ASC')->get();
         $donvis = \App\Modules\Teaching_1\Models\Donvi::orderBy('title', 'ASC')->get();
         $nganhs = \App\Modules\Teaching_1\Models\Nganh::orderBy('title', 'ASC')->get();
+        $classes = \App\Modules\Teaching_1\Models\ClassModel::orderBy('class_name', 'ASC')->get();
         $student = Student::findOrFail($id);
 
         $active_menu = "student_list";
@@ -77,7 +82,7 @@ class StudentController extends Controller
         <li class="breadcrumb-item" aria-current="page"><a href="' . route('student.index') . '">Sinh viên</a></li>
         <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa Sinh viên</li>';
 
-        return view('Teaching_1::student.edit', compact('breadcrumb', 'student', 'active_menu', 'donvis', 'nganhs'));
+        return view('Teaching_1::student.edit', compact('breadcrumb', 'student', 'active_menu', 'donvis', 'nganhs', 'classes', 'users'));
     }
 
     public function update(Request $request, string $id)
@@ -124,6 +129,7 @@ class StudentController extends Controller
             'mssv' => 'string|required', // Không cần kiểm tra duy nhất cho mssv nữa
             'donvi_id' => 'numeric|required',
             'nganh_id' => 'numeric|required',
+            'class_id' => 'numeric|required',
             'khoa' => 'string|required',
             'status' => 'required|in:đang học,thôi học,tốt nghiệp',
             'user_id' => 'numeric|required|unique:students,user_id,' . $studentId, // Kiểm tra tính duy nhất của user_id

@@ -29,7 +29,7 @@ class TeacherController extends Controller
     {
         $active_menu = 'teacher_add';
         $donVis = Donvi::all(); // Lấy tất cả đơn vị để chọn
-        $users = User::all(); // Lấy tất cả người dùng để chọn
+        $users = User::where('role', 'teacher')->orderBy('full_name', 'ASC')->get();
         $chuyenNganhs = ChuyenNganh::all(); // Lấy tất cả chuyên ngành để chọn
         return view('Teaching_1::teacher.create', compact('active_menu', 'users','donVis','chuyenNganhs'));
     }
@@ -64,7 +64,7 @@ class TeacherController extends Controller
     {
         $active_menu = 'teacher_edit';
         $donVis = DonVi::all(); // Lấy tất cả đơn vị để chọn
-        $users = User::all(); // Lấy tất cả người dùng để chọn
+        $users = User::where('role', 'teacher')->orderBy('full_name', 'ASC')->get();
         $chuyenNganhs = ChuyenNganh::all(); // Lấy tất cả chuyên ngành để chọn
 
         return view('Teaching_1::teacher.edit', compact('teacher', 'active_menu', 'users','donVis','chuyenNganhs'));

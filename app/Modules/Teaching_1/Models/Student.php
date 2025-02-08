@@ -16,6 +16,7 @@ class Student extends Model
         'khoa',
         'donvi_id',
         'nganh_id',
+        'class_id',
         'user_id',
         'status',
         'slug',
@@ -35,4 +36,10 @@ class Student extends Model
     {
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
+
+    public function classes()
+    {
+        return $this->belongsTo(\App\Modules\Teaching_1\Models\ClassModel::class, 'class_id');
+    }
+    
 }

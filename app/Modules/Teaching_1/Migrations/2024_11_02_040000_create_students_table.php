@@ -17,6 +17,8 @@ class CreateStudentsTable extends Migration
             $table->string('mssv');
             $table->unsignedBigInteger('donvi_id');
             $table->unsignedBigInteger('nganh_id');
+            $table->unsignedBigInteger('class_id');
+            $table->foreign('class_id')->references('id')->on('classes')->onDelete('cascade'); // Giảng viên có thể là null
             $table->string('khoa');
             $table->enum('status', ['đang học', 'thôi học', 'tốt nghiệp']);
             $table->unsignedBigInteger('user_id');
