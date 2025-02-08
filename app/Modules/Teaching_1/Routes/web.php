@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Modules\Teaching_1\Controllers\NganhController;
 use App\Modules\Teaching_1\Controllers\TeacherController;
+use App\Modules\Teaching_1\Controllers\ClassesController;
 use App\Modules\Teaching_1\Controllers\DonviController;
 use App\Modules\Teaching_1\Controllers\StudentController;
 use App\Modules\Teaching_1\Controllers\DiemdanhController;
@@ -31,6 +32,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     // Route cho giảng viên
     Route::get('teacher/search', [TeacherController::class, 'search'])->name('teacher.search');
     Route::resource('teacher', TeacherController::class);
+
+    // Route cho giảng viên
+    Route::get('class/search', [ClassesController::class, 'search'])->name('class.search');
+    Route::resource('class', ClassesController::class);
     
     // Route cho don vi
     Route::resource('donvi', DonviController::class);
