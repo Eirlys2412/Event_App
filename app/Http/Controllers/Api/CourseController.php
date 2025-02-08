@@ -154,6 +154,7 @@ public function getEnrolledCourses(Request $request)
         ->select(
             'enrollments.id as enrollment_id',
             'hoc_phans.title as title',
+            'hoc_phans.tinchi as tinchi',
             'hoc_phans.code as course_code',
             'phancong.class_course',
             'users.full_name as teacher_name',
@@ -181,6 +182,57 @@ public function deleteEnrollment(Request $request)
     } else {
         return response()->json(['message' => 'Enrollment not found or already deleted'], 404);
     }
+}
+
+public function searchCourses(Request $request)
+{
+    // Kiểm tra student_id có được gửi trong request không
+    if (!$request->student_id) {
+        return response()->json(['message' => 'Missing student_id'], 400);
+    }
+
+    // Lấy ngành của sinh viên
+    $studentMajor = DB::table('students')
+        ->join('nganh', 'students.nganh_id', '=', 'nganh.id')
+        ->where('students.id', $request->student_id)
+        ->value('nganh.id');
+
+    if (!$studentMajor) {
+        return response()->json(['message' => 'Student major not found'], 404);
+    }
+
+    // Lấy từ khóa tìm kiếm từ request
+    $keyword = $request->keyword;
+
+    // Lấy các học phần liên quan đến ngành của sinh viên, có lọc theo keyword
+    $courses = DB::table('phancong')
+        ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
+        ->join('program_details', 'phancong.hocphan_id', '=', 'program_details.hocphan_id')
+        ->join('chuong_trinh_dao_tao', 'program_details.chuongtrinh_id', '=', 'chuong_trinh_dao_tao.id')
+        ->join('nganh', 'chuong_trinh_dao_tao.nganh_id', '=', 'nganh.id')
+        ->join('teacher', 'phancong.giangvien_id', '=', 'teacher.id')
+        ->join('users', 'teacher.user_id', '=', 'users.id')
+        ->join('hoc_ky', 'program_details.hoc_ky_id', '=', 'hoc_ky.id')
+        ->select(
+            'phancong.id as phancong_id',
+            'hoc_phans.title',
+            'hoc_phans.code',
+            'hoc_phans.tinchi',
+            'phancong.class_course',
+            'phancong.max_student',
+            'users.full_name as teacher_name',
+            'hoc_ky.so_hoc_ky',
+            'program_details.loai'
+        )
+        ->where('nganh.id', $studentMajor)
+        ->when($keyword, function ($query, $keyword) {
+            // Tìm kiếm theo tên học phần, mã học phần hoặc tên giảng viên
+            $query->where('hoc_phans.title', 'like', "%$keyword%")
+                  ->orWhere('hoc_phans.code', 'like', "%$keyword%");
+        })
+        ->get();
+
+    return response()->json($courses);
 }
 
 

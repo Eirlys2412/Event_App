@@ -45,7 +45,7 @@ class AuthenticationController extends Controller
     // Gán các giá trị mặc định
     $data['photo'] = asset('backend/images/profile-6.jpg');
     $data['password'] = Hash::make($data['password']);
-    $data['username'] = $data['phone'];
+    // $data['username'] = $data['phone'];
 
     // Tạo user
     $user = \App\Models\User::create($data);
