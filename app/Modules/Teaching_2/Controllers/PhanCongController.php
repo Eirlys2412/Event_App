@@ -3,6 +3,7 @@
 namespace App\Modules\Teaching_2\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Teaching_1\Models\ClassModel;
 use Illuminate\Http\Request;
 use App\Modules\Teaching_2\Models\PhanCong;
 use App\Modules\Teaching_1\Models\teacher;
@@ -38,11 +39,12 @@ class PhanCongController extends Controller
         $hocphans = HocPhan::all();
         $hockys = HocKy::all();
         $namhocs = NamHoc::all();
+        $classes = ClassModel::all();
         
         $active_menu = 'phancong';
         
 
-        return view('Teaching_2::phancong.create', compact('giangviens', 'hocphans', 'hockys', 'namhocs', 'active_menu'));
+        return view('Teaching_2::phancong.create', compact('giangviens', 'hocphans', 'hockys', 'namhocs', 'classes','active_menu'));
     }
 
     /**
@@ -62,7 +64,7 @@ class PhanCongController extends Controller
         'ngayphancong' => 'required|date',
         'time_start' => 'nullable|date',
         'time_end' => 'nullable|date',
-        'class_course' => 'required|string|max:255',
+        'class_id' => 'required|exists:classes,id',
         'max_student' =>  'required|integer|min:0',
     ]);
 
@@ -83,7 +85,7 @@ class PhanCongController extends Controller
         'ngayphancong' => $request->ngayphancong,
         'time_start' => $request->time_start,
         'time_end' => $request->time_end,
-        'class_course' => $request->class_course,
+        'class_id' => $request->class_id,
         'max_student' => $request->max_student,
     ]);
 
@@ -103,15 +105,16 @@ class PhanCongController extends Controller
     $phancong = PhanCong::findOrFail($id);
 
     // Lấy danh sách giảng viên, học phần, học kỳ và năm học
-    $giangviens = teacher::all(['id', 'mgv']);
+    $giangviens = Teacher::all(['id', 'mgv']);
     $hocphans = HocPhan::all();
     $hockys = HocKy::all();
     $namhocs = NamHoc::all();
+    $classes = ClassModel::all();
 
     $active_menu = 'phancong';
 
     // Trả về view với dữ liệu cần thiết
-    return view('Teaching_2::phancong.edit', compact('phancong', 'giangviens', 'hocphans', 'hockys', 'namhocs', 'active_menu'));
+    return view('Teaching_2::phancong.edit', compact('phancong', 'giangviens', 'hocphans', 'hockys', 'namhocs','classes', 'active_menu'));
 }
 
     /**
@@ -132,7 +135,7 @@ class PhanCongController extends Controller
         'ngayphancong' => 'required|date',
         'time_start' => 'nullable|date',
         'time_end' => 'nullable|date',
-        'class_course' => 'required|string|max:255',
+        'class_id' => 'required|exists:classes,id',
         'max_student' =>  'required|integer|min:0',
 
     ]);
@@ -141,7 +144,7 @@ class PhanCongController extends Controller
     $phancong = PhanCong::findOrFail($id);
 
     // Tìm giảng viên dựa trên mã giảng viên (mgv)
-    $giangvien = teacher::where('mgv', $request->giangvien_id)->first();
+    $giangvien = Teacher::where('mgv', $request->giangvien_id)->first();
 
     if (!$giangvien) {
         // Nếu không tìm thấy giảng viên, trả về thông báo lỗi
@@ -157,7 +160,7 @@ class PhanCongController extends Controller
         'ngayphancong' => $request->ngayphancong,
         'time_start' => $request->time_start,
         'time_end' => $request->time_end,
-        'class_course' => $request->class_course,
+        'class_id' => $request->class_id,
         'max_student' => $request->max_student,
     ]);
 

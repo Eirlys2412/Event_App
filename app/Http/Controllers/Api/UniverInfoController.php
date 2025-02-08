@@ -64,7 +64,23 @@ public function chuyenNganhs()
     }
 }
 
+public function classes() 
+{
+    try {
+        // Lấy tất cả dữ liệu từ bảng `chuyennganhs`
+        $classes = \App\Modules\Teaching_1\Models\ClassModel::all();
 
+        return response()->json([
+            'success' => true,
+            'data' => $classes,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Lỗi khi lấy danh sách lớp: ' . $e->getMessage(),
+        ], 500);
+    }
+}
 // Lấy danh sách phân công theo giangvien_id
 public function phancong(Request $request)
 {

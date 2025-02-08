@@ -22,6 +22,7 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::get('/nganhs', [\App\Http\Controllers\Api\UniverInfoController::class, 'getNganhs']);
     Route::get('/donvi', [\App\Http\Controllers\Api\UniverInfoController::class, 'getDonVis']);
     Route::get('/chuyenNganh', [\App\Http\Controllers\Api\UniverInfoController::class, 'chuyenNganhs']);
+    Route::get('/classes', [\App\Http\Controllers\Api\UniverInfoController::class, 'classes']);
 
      
     //Profile
