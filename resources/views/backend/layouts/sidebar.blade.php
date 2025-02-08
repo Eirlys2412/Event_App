@@ -308,6 +308,32 @@
         </ul>
     </li>
 
+    <!-- Class -->
+    <li>
+        <a href="javascript:;" class="side-menu {{($active_menu=='class_list' || $active_menu=='class_add')?'side-menu--active':''}}">
+            <div class="side-menu__icon"> <i data-lucide="users"></i> </div>
+            <div class="side-menu__title">
+               Lớp học
+                <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+            </div>
+        </a>
+        <ul class="{{($active_menu=='class_list' || $active_menu=='class_add')?'side-menu__sub-open':''}}">
+            <li>
+                <a href="{{route('admin.class.index')}}" class="side-menu {{$active_menu=='class_list'?'side-menu--active':''}}">
+                    <div class="side-menu__icon"> <i data-lucide="layers"></i> </div>
+                    <div class="side-menu__title">Danh sách lớp học</div>
+                </a>
+            </li>
+            <li>
+                <a href="{{route('admin.class.create')}}" class="side-menu {{$active_menu=='class_add'?'side-menu--active':''}}">
+                    <div class="side-menu__icon"> <i data-lucide="plus"></i> </div>
+                    <div class="side-menu__title">Thêm Lớp học</div>
+                </a>
+            </li>
+        </ul>
+    </li>
+
+
     <!-- Event -->
 <li>
     <a href="javascript:;" class="side-menu {{($active_menu=='event_list' || $active_menu=='event_add')?'side-menu--active':''}}">
