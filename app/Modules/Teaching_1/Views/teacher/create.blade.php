@@ -38,7 +38,7 @@
                     <label for="user_id" class="form-label">Người Dùng</label>
                     <select name="user_id" id="user_id" class="form-select">
                         @foreach($users as $user)
-                            <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>{{ $user->username }}</option>
+                            <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>{{ $user->full_name }}</option>
                         @endforeach
                     </select>
                 </div>

@@ -43,7 +43,7 @@
                 <td>
                     <a target="_blank" href="" class="font-medium whitespace-nowrap">{{ $item->mgv }}</a> 
                 </td>
-                <td class="text-left">{{ $item->user->username ?? 'N/A' }}</td> <!-- Lấy tên người dùng -->
+                <td class="text-left">{{ $item->user->full_name ?? 'N/A' }}</td> <!-- Lấy tên người dùng -->
                 <td class="text-left">{{ $item->donVi->title ?? 'N/A' }}</td> <!-- Lấy tên đơn vị -->
                 <td class="text-left">{{ $item->chuyenNganhs->title ?? 'N/A' }}</td> <!-- Lấy tên chuyên ngành -->
                 <td class="table-report__action w-56">
