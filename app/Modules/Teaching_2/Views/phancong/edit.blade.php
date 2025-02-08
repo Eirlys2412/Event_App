@@ -76,6 +76,21 @@
                         @enderror
                     </div>
 
+                    <!-- Lớp -->
+                    <div class="mb-4">
+                        <label for="class_id" class="form-label">Lớp</label>
+                        <select name="class_id" id="class_id" class="form-control">
+                            <option value="">Chọn Lớp</option>
+                            @foreach($classes as $class)
+                                <option value="{{ $class->id }}" {{ $phancong->class_id == $class->id ? 'selected' : '' }}>
+                                    {{ $class->class_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('class_id')
+                            <div class="text-red-600 mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
                     <!-- Ngày phân công -->
                     <div class="mb-4">
                         <label for="ngayphancong" class="form-label">Ngày phân công</label>
@@ -99,15 +114,6 @@
                         <label for="time_end" class="form-label">Ngày kết thúc</label>
                         <input type="date" name="time_end" id="time_end" class="form-control" value="{{ old('time_end', $phancong->time_end) }}">
                         @error('time_end')
-                            <div class="text-red-600 mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Lớp học phần -->
-                    <div class="mb-4">
-                        <label for="class_course" class="form-label">Lớp học phần</label>
-                        <input type="text" name="class_course" id="class_course" class="form-control" value="{{ old('class_course', $phancong->class_course) }}">
-                        @error('class_course')
                             <div class="text-red-600 mt-1">{{ $message }}</div>
                         @enderror
                     </div>

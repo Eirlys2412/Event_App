@@ -119,6 +119,7 @@ public function createStudent(Request $request)
         'mssv' => 'string|required|unique:students,mssv',
         'donvi_id' => 'integer|required|exists:donvi,id',
         'nganh_id' => 'integer|required|exists:nganh,id',
+        'class_id' => 'integer|required|exists:classes,id',
         'khoa' => 'string|required',
         'user_id' => 'integer|required|exists:users,id',
     ]);
@@ -134,6 +135,7 @@ public function createStudent(Request $request)
             'mssv' => $data['mssv'],
             'donvi_id' => $data['donvi_id'],
             'nganh_id' => $data['nganh_id'],
+            'class_id' => $data['class_id'],
             'khoa' => $data['khoa'],
             'user_id' => $data['user_id'],
             'slug' => $data['slug'],

@@ -103,11 +103,18 @@
                         @enderror
                     </div>
 
-                    <!-- Lớp học phần -->
+                    <!-- Lớp -->
                     <div class="mb-4">
-                        <label for="class_course" class="form-label">Lớp học phần</label>
-                        <input type="text" name="class_course" id="class_course" class="form-control" value="{{ old('class_course') }}">
-                        @error('class_course')
+                        <label for="class_id" class="form-label">Lớp</label>
+                        <select name="class_id" id="class_id" class="form-control">
+                            <option value="">Chọn lớp</option>
+                            @foreach($classes as $class)
+                                <option value="{{ $class->id }}" {{ old('class_id') == $class->id ? 'selected' : '' }}>
+                                    {{ $class->class_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('class_id')
                             <div class="text-red-600 mt-1">{{ $message }}</div>
                         @enderror
                     </div>
