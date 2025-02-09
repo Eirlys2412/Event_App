@@ -23,27 +23,33 @@
                 <div class="intro-y box p-5">
                     <div class="mt-3">
                         <label for="regular-form-1" class="form-label">Phân công</label>
-                        <select id = "phancong_id" name="phancong_id" class="form-select mt-2">
+                        <select id="phancong_id" name="phancong_id" class="form-select mt-2">
                             @foreach($phancong as $pc)
                                 @foreach($teacher as $tc)
                                     @foreach($hocphan as $hp)
                                         @if ($pc->giangvien_id == $tc->id && $pc->hocphan_id == $hp->id)
-                                            <option value="{{ $pc->id }}">Mã giảng viên: {{ $tc->mgv }}, Môn học: {{ $hp->title }}</option>
+                                            <option value="{{ $pc->id }}">
+                                                Giảng viên: {{ $tc->user->full_name ?? 'N/A' }}, Môn học: {{ $hp->title }}
+                                            </option>
                                         @endif
                                     @endforeach
                                 @endforeach
                             @endforeach
                         </select>
-                    </div>
+                    </div>                    
 
-                    <div class="mt-3">
-                        <label for="tag_ids" class="form-label">Địa điểm</label>
-                        <select id="select-junk" name="tag_ids[]" multiple autocomplete="off">
-                            @foreach ($tags as $tag)
-                                <option value="{{ $tag->id }}">{{ $tag->title }}</option>
+                    <div class="mb-4">
+                        <label for="diadiem_id" class="form-label">Địa điểm</label>
+                        <select name="diadiem_id" id="diadiem_id" class="form-control">
+                            <option value="">-- Chọn địa điểm --</option>
+                            @foreach($diadiem as $dd)
+                                <option value="{{ $dd->id }}">
+                                    {{ $dd->title ?? 'N/A' }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
+
                     <div class="mt-3">
                         <label for="buoi" class="form-label">Buổi</label>
                         <select id="buoi" name="buoi" class="form-select mt-2">
