@@ -36,35 +36,50 @@
                             @endforeach
                         </select>
                     </div>
+                    
                     <div class="mt-3">
-                        <label for="tag_ids" class="form-label">Địa điểm</label>
-                        <select id="select-junk" name="tag_ids[]" multiple autocomplete="off">
-                            @foreach ($tags as $tag)
-                                <option value="{{ $tag->id }}">{{ $tag->title }}</option>
+                        <label for="diadiem_id" class="form-label">Địa điểm</label>
+                        <select name="diadiem_id" id="diadiem_id" class="form-select">
+                            @foreach($diadiem as $dd)
+                                <option value="{{ $dd->id }}" {{ $dd->id == $thoikhoabieu->diadiem_id ? 'selected' : '' }}>
+                                    {{ $dd->title }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
+
+
                     <div class="mt-3">
                         <label for="buoi" class="form-label">Buổi</label>
-                        <select id="buoi" name="buoi" class="form-select mt-2">
-                            <option value="Sáng">Sáng</option>
-                            <option value="Chiều">Chiều</option>
-                            <option value="Tối">Tối</option>
+                        <select id="buoi" name="buoi" class="form-control">
+                            <option value="">Chọn buổi</option>
+                            <option value="Sáng" {{ old('buoi', $thoikhoabieu->buoi ?? '') == 'Sáng' ? 'selected' : '' }}>
+                                Sáng
+                            </option>
+                            <option value="Chiều" {{ old('buoi', $thoikhoabieu->buoi ?? '') == 'Chiều' ? 'selected' : '' }}>
+                                Chiều
+                            </option>
+                            <option value="Tối" {{ old('buoi', $thoikhoabieu->buoi ?? '') == 'Tối' ? 'selected' : '' }}>
+                                Tối
+                            </option>
                         </select>
                     </div>
+                    
                     <div class="mt-3">
                         <label for="ngay" class="form-label">Ngày</label>
-                        <input name="ngay" id="ngay" type="date" class="form-control" placeholder="Chọn ngày">
-                    </div>    
+                        <input name="ngay" id="ngay" type="date" value="{{ $thoikhoabieu->ngay }}" class="form-control" placeholder="Chọn ngày">
+                    </div>  
+
                     <div class="mt-3">
                         <label for="tietdau" class="form-label">Tiết đầu</label>
-                        <select id="tietdau" name="tietdau" class="form-select mt-2">
+                        <select id="tietdau" name="tietdau" value="{{ $thoikhoabieu->tietdau }}" class="form-select mt-2">
                             <!-- Các tùy chọn tiết học sẽ được cập nhật động -->
                         </select>
                     </div>
+
                     <div class="mt-3">
                         <label for="tietcuoi" class="form-label">Tiết cuối</label>
-                        <select id="tietcuoi" name="tietcuoi" class="form-select mt-2">
+                        <select id="tietcuoi" name="tietcuoi" value="{{ $thoikhoabieu->tietcuoi }}" class="form-select mt-2">
                             <!-- Các tùy chọn tiết học sẽ được cập nhật động -->
                         </select>
                     </div>

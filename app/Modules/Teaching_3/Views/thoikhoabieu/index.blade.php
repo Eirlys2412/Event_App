@@ -64,21 +64,13 @@
                                 @endif
                             @endforeach
                         @endforeach
-                        <td>
-                            @php
-                                $relatedTags = $tag_diadiem->filter(function($data2) use ($item) {
-                                    return $data2->diadiems_id == $item->id;
-                                });
-                            @endphp
-                        
-                            @foreach ($relatedTags as $data2)
-                                @foreach ($tags as $data1)
-                                    @if ($data2->tag_id == $data1->id)
-                                        <p class="font-medium whitespace-nowrap">{{ $data1->title }}</p>
-                                    @endif
-                                @endforeach
-                            @endforeach
-                        </td>
+                        @foreach ($diadiem as $dd)
+                            @if ($item->diadiem_id == $dd->id)
+                                <td>
+                                    <p target="_blank" href="" class="font-medium whitespace-nowrap">{{ $dd->title }}</p> 
+                                </td>
+                            @endif
+                        @endforeach
                         <td>
                             <p target="_blank" href="" class="font-medium whitespace-nowrap">{{ ($item->buoi) }}</p> 
                         </td>

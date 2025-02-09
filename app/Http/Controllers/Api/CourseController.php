@@ -31,6 +31,7 @@ class CourseController extends Controller
     // Lấy các học phần liên quan đến ngành của sinh viên
     $courses = DB::table('phancong')
         ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
+        ->join('classes', 'phancong.class_id', '=', 'classes.id')
         ->join('program_details', 'phancong.hocphan_id', '=', 'program_details.hocphan_id')
         ->join('chuong_trinh_dao_tao', 'program_details.chuongtrinh_id', '=', 'chuong_trinh_dao_tao.id')
         ->join('nganh', 'chuong_trinh_dao_tao.nganh_id', '=', 'nganh.id')
@@ -42,7 +43,7 @@ class CourseController extends Controller
             'hoc_phans.title', 
             'hoc_phans.code', 
             'hoc_phans.tinchi', 
-            'phancong.class_course', 
+            'classes.class_name as class_course',  // Thay đổi tên cột class_course
             'phancong.max_student',
             'users.full_name as teacher_name',
             'hoc_ky.so_hoc_ky',           
@@ -149,6 +150,7 @@ public function getEnrolledCourses(Request $request)
     $courses = DB::table('enrollments')
         ->join('phancong', 'enrollments.phancong_id', '=', 'phancong.id')
         ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
+        ->join('classes', 'phancong.class_id', '=', 'classes.id')
         ->join('teacher', 'phancong.giangvien_id', '=', 'teacher.id')
         ->join('users', 'teacher.user_id', '=', 'users.id')
         ->select(
@@ -156,7 +158,7 @@ public function getEnrolledCourses(Request $request)
             'hoc_phans.title as title',
             'hoc_phans.tinchi as tinchi',
             'hoc_phans.code as course_code',
-            'phancong.class_course',
+            'classes.class_name as class_course',
             'users.full_name as teacher_name',
             'enrollments.status',
             'enrollments.created_at'
@@ -207,6 +209,7 @@ public function searchCourses(Request $request)
     // Lấy các học phần liên quan đến ngành của sinh viên, có lọc theo keyword
     $courses = DB::table('phancong')
         ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
+        ->join('classes', 'phancong.class_id', '=', 'classes.id')
         ->join('program_details', 'phancong.hocphan_id', '=', 'program_details.hocphan_id')
         ->join('chuong_trinh_dao_tao', 'program_details.chuongtrinh_id', '=', 'chuong_trinh_dao_tao.id')
         ->join('nganh', 'chuong_trinh_dao_tao.nganh_id', '=', 'nganh.id')
@@ -218,7 +221,7 @@ public function searchCourses(Request $request)
             'hoc_phans.title',
             'hoc_phans.code',
             'hoc_phans.tinchi',
-            'phancong.class_course',
+            'classes.class_name as class_course',
             'phancong.max_student',
             'users.full_name as teacher_name',
             'hoc_ky.so_hoc_ky',
@@ -234,6 +237,54 @@ public function searchCourses(Request $request)
 
     return response()->json($courses);
 }
+
+
+// Thời khoá biểu
+public function getTimetable(Request $request)
+{
+    if (!$request->student_id) {
+        return response()->json(['message' => 'Missing student_id'], 400);
+    }
+
+    try {
+        // Truy vấn thời khóa biểu với các thông tin liên quan
+        $timetable = DB::table('thoi_khoa_bieus')
+            ->join('phancong', 'thoi_khoa_bieus.phancong_id', '=', 'phancong.id')
+            ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
+            ->join('enrollments', 'phancong.id', '=', 'enrollments.phancong_id')
+            ->join('students', 'enrollments.student_id', '=', 'students.id')
+            ->join('classes', 'phancong.class_id', '=', 'classes.id')
+            ->join('dia_diem', 'thoi_khoa_bieus.diadiem_id', '=', 'dia_diem.id')
+            ->join('teacher', 'phancong.giangvien_id', '=', 'teacher.id')
+            ->join('users', 'teacher.user_id', '=', 'users.id')
+            ->select(
+                'thoi_khoa_bieus.id as timetable_id',
+                'hoc_phans.title',
+                'thoi_khoa_bieus.buoi',
+                'thoi_khoa_bieus.ngay',
+                'thoi_khoa_bieus.tietdau',
+                'thoi_khoa_bieus.tietcuoi',
+                'dia_diem.title as location',
+                'classes.class_name as class_course',
+                'users.full_name as teacher_name'
+            )
+            ->where('students.id', $request->student_id)
+            ->orderBy('thoi_khoa_bieus.ngay', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Danh sách thời khóa biểu',
+            'data' => $timetable
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Lỗi khi lấy thời khóa biểu: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
 
 
 }
