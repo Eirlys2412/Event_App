@@ -96,13 +96,14 @@ public function phancong(Request $request)
         $phancongs = DB::table('phancong')
             ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
             ->join('teacher', 'phancong.giangvien_id', '=', 'teacher.id')
+            ->join('classes', 'phancong.class_id', '=', 'classes.id')
             ->join('users', 'teacher.user_id', '=', 'users.id')
             ->select(
                 'phancong.id as phancong_id',
                 'hoc_phans.title as hocphan_title',
                 'hoc_phans.tinchi as tinchi',
                 'hoc_phans.code as hocphan_code',
-                'phancong.class_course',
+                'classes.class_name as class_course',  // Thay đổi tên cột class_course
                 'phancong.ngayphancong',
                 'users.full_name as teacher_name'
             )

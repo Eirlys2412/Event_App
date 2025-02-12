@@ -285,6 +285,30 @@ public function getTimetable(Request $request)
     }
 }
 
+public function getClassStudents(Request $request)
+    {
+        $teacherId = $request->input('teacher_id');
 
+        $students = DB::table('students')
+            ->join('classes', 'students.class_id', '=', 'classes.id')
+            ->join('teacher', 'classes.teacher_id', '=', 'teacher.id')
+            ->join('users', 'students.user_id', '=', 'users.id')  // Join để lấy tên sinh viên
+            ->select(
+                'students.id as student_id',
+                'students.mssv',
+                'users.full_name as student_name',
+                'classes.class_name',
+                'classes.description',
+                'students.khoa',
+                'students.status'
+            )
+            ->where('classes.teacher_id', $teacherId)
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $students
+        ], 200);
+    }
 
 }
