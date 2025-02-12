@@ -44,6 +44,10 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     //Phan cong
     Route::get('/phancong', [\App\Http\Controllers\Api\UniverInfoController::class, 'phancong']);
 
+    //Classes
+    Route::get('/getClass', [\App\Http\Controllers\Api\CourseController::class, 'getClassStudents']);
+    
+
     //Course
     Route::get('/courses', [\App\Http\Controllers\Api\CourseController::class, 'getAvailableCourses']);
     Route::get('/searchCourses', [\App\Http\Controllers\Api\CourseController::class, 'searchCourses']);
