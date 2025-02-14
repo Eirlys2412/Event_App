@@ -29,10 +29,13 @@
                     <select name="teacher_id" id="teacher_id" class="form-select">
                         <option value="">Chọn giảng viên</option>
                         @foreach($teachers as $teacher)
-                            <option value="{{ $teacher->id }}" {{ $teacher->id == old('teacher_id', $class->teacher_id) ? 'selected' : '' }}>{{ $teacher->name }}</option>
+                            <option value="{{ $teacher->id }}" {{ $teacher->id == old('teacher_id', $class->teacher_id) ? 'selected' : '' }}>
+                                {{ $teacher->user->full_name ?? 'N/A' }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
+                
 
                 <div class="mt-3">
                     <label for="nganh_id" class="form-label">Ngành</label>

@@ -311,4 +311,47 @@ public function getClassStudents(Request $request)
         ], 200);
     }
 
+
+    public function getStudentCourses(Request $request)
+{
+    $studentId = $request->input('student_id');  // Thêm tham số student_id để lọc theo sinh viên
+    
+    // Lấy danh sách học phần sinh viên đã đăng ký trong lớp của giảng viên
+    $studentCourses = DB::table('enrollments')
+        ->join('phancong', 'enrollments.phancong_id', '=', 'phancong.id')
+        ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
+        ->join('students', 'enrollments.student_id', '=', 'students.id')
+        ->join('classes', 'students.class_id', '=', 'classes.id')
+        ->join('teacher', 'classes.teacher_id', '=', 'teacher.id')
+        ->join('users', 'students.user_id', '=', 'users.id')
+        ->select(
+            'students.id as student_id',
+            'users.full_name as student_name',
+            'students.mssv',
+            'hoc_phans.title as course_title',
+            'hoc_phans.code as course_code',
+            'hoc_phans.tinchi as credits',
+            'classes.class_name as class_course',
+            'enrollments.status as enrollment_status',
+            'enrollments.created_at as enrollment_date'
+        )
+        ->where('students.id', $studentId)  // Lọc theo student_id
+        ->orderBy('enrollments.created_at', 'desc')
+        ->get();
+    
+    if ($studentCourses->isEmpty()) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Không tìm thấy học phần nào cho sinh viên này.'
+        ], 404);
+    }
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $studentCourses
+    ], 200);
+}
+
+    
+
 }

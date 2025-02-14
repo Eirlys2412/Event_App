@@ -37,7 +37,7 @@
                     @foreach($classes as $class)
                         <tr class="intro-x">
                             <td class="text-left">{{ $class->class_name }}</td>
-                            <td class="text-left">{{ $class->teacher->user->username ?? 'N/A' }}</td> <!-- Tên giảng viên -->
+                            <td class="text-left">{{ $class->teacher->user->full_name ?? 'N/A' }}</td> <!-- Tên giảng viên -->
                             <td class="text-left">{{ $class->nganh->title ?? 'N/A' }}</td> <!-- Tên ngành -->
                             <td class="text-left">{{ $class->max_students }}</td>
                             <td class="table-report__action w-56">
