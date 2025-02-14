@@ -10,23 +10,25 @@ use Illuminate\Support\Facades\DB;
 class UniverInfoController extends Controller
 {
     //
-    public function getNganhs() 
-{
-    try {
-        // Lấy tất cả dữ liệu từ bảng `nganhs`
-        $nganhs = \App\Modules\Teaching_1\Models\Nganh::all();
-
-        return response()->json([
-            'success' => true,
-            'data' => $nganhs,
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Lỗi khi lấy danh sách ngành: ' . $e->getMessage(),
-        ], 500);
+    public function getNganhs(Request $request) 
+    {
+        try {
+            $donviId = $request->input('donvi_id');
+    
+            $nganhs = \App\Modules\Teaching_1\Models\Nganh::where('donvi_id', $donviId)->get();
+    
+            return response()->json([
+                'success' => true,
+                'data' => $nganhs,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi lấy danh sách ngành: ' . $e->getMessage(),
+            ], 500);
+        }
     }
-}
+    
 
 public function getDonVis() 
 {
@@ -64,11 +66,12 @@ public function chuyenNganhs()
     }
 }
 
-public function classes() 
+public function classes(Request $request) 
 {
     try {
-        // Lấy tất cả dữ liệu từ bảng `chuyennganhs`
-        $classes = \App\Modules\Teaching_1\Models\ClassModel::all();
+        $nganhId = $request->input('nganh_id');
+
+        $classes = \App\Modules\Teaching_1\Models\ClassModel::where('nganh_id', $nganhId)->get();
 
         return response()->json([
             'success' => true,
@@ -81,6 +84,7 @@ public function classes()
         ], 500);
     }
 }
+
 // Lấy danh sách phân công theo giangvien_id
 public function phancong(Request $request)
 {

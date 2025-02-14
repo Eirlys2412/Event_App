@@ -46,6 +46,7 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
 
     //Classes
     Route::get('/getClass', [\App\Http\Controllers\Api\CourseController::class, 'getClassStudents']);
+    Route::get('/getStudentCourses', [\App\Http\Controllers\Api\CourseController::class, 'getStudentCourses']);
     
 
     //Course
