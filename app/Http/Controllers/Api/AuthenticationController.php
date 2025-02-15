@@ -205,8 +205,8 @@ public function googleSignIn(Request $request)
         'email' => 'required|email',
         'full_name' => 'required|string',
         'google_id' => 'required|string',
-        'role' => 'nullable|string|in:student,teacher', // role chỉ nhận 'student' hoặc 'teacher'
-        'budget' => 'nullable|numeric', // nếu cần thiết
+        'role' => 'nullable|string|in:student,teacher',
+        'budget' => 'nullable|numeric',
     ]);
 
     // Kiểm tra nếu user đã tồn tại hoặc tạo mới
@@ -215,16 +215,22 @@ public function googleSignIn(Request $request)
         [
             'full_name' => $request->full_name,
             'google_id' => $request->google_id,
-            'username' => $request->input('username', null), // username có thể bỏ qua nếu không có
-            'role' => $request->input('role', 'student'), // mặc định là 'student' nếu không có
-            'budget' => $request->input('budget', 0), // mặc định là 0 nếu không có
-            'phone' => $request->input('phone', null), // phone là bắt buộc
-            'password' => bcrypt('default_password'), // Google không yêu cầu mật khẩu
-            'status' => 'active', // mặc định là 'active'
-            'photo' => 'backend/images/profile-6.jpg', // mặc định là 'active'
-            'remember_token' => Str::random(60), // tạo remember_token nếu cần
+            'username' => $request->input('username', null),
+            'role' => $request->input('role', 'student'),
+            'budget' => $request->input('budget', 0),
+            'phone' => $request->input('phone', null),
+            'password' => bcrypt('default_password'),
+            'status' => 'active',
+            'photo' => 'backend/images/profile-6.jpg',
+            'remember_token' => Str::random(60),
         ]
     );
+
+    // Lấy thông tin student_id và teacher_id nếu có
+    $user->load(['student', 'teacher']); // Eager load để tránh query thừa
+
+    $studentId = $user->student ? $user->student->id : 0;
+    $teacherId = $user->teacher ? $user->teacher->id : 0;
 
     // Tạo token cho user
     $token = $user->createToken('GoogleSignIn')->accessToken;
@@ -237,6 +243,8 @@ public function googleSignIn(Request $request)
             'role' => $user->role,
             'photo' => $user->photo,
         ],
+        'student_id' => $studentId,
+        'teacher_id' => $teacherId,
         'token' => $token,
     ]);
 }

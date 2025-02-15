@@ -82,8 +82,8 @@
                     </select>
                 </div>
 
-                <!-- Trường user_id ẩn -->
-                <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
+                {{-- <!-- Trường user_id ẩn -->
+                <input type="hidden" name="user_id" value="{{ auth()->user()->id }}"> --}}
 
                 <div class="text-right mt-5">
                     <button type="submit" class="btn btn-primary w-24">Lưu</button>
