@@ -13,12 +13,10 @@ class CourseController extends Controller
 
     public function getAvailableCourses(Request $request)
 {
-    // Kiểm tra student_id có được gửi trong request không
     if (!$request->student_id) {
         return response()->json(['message' => 'Missing student_id'], 400);
     }
 
-    // Lấy ngành của sinh viên
     $studentMajor = DB::table('students')
         ->join('nganh', 'students.nganh_id', '=', 'nganh.id')
         ->where('students.id', $request->student_id)
@@ -28,32 +26,60 @@ class CourseController extends Controller
         return response()->json(['message' => 'Student major not found'], 404);
     }
 
-    // Lấy các học phần liên quan đến ngành của sinh viên
-    $courses = DB::table('phancong')
-        ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
-        ->join('classes', 'phancong.class_id', '=', 'classes.id')
-        ->join('program_details', 'phancong.hocphan_id', '=', 'program_details.hocphan_id')
-        ->join('chuong_trinh_dao_tao', 'program_details.chuongtrinh_id', '=', 'chuong_trinh_dao_tao.id')
-        ->join('nganh', 'chuong_trinh_dao_tao.nganh_id', '=', 'nganh.id')
-        ->join('teacher', 'phancong.giangvien_id', '=', 'teacher.id')
-        ->join('users', 'teacher.user_id', '=', 'users.id')
-        ->join('hoc_ky', 'program_details.hoc_ky_id', '=', 'hoc_ky.id')  // Thêm join với bảng hoc_ky
-        ->select(
-            'phancong.id as phancong_id',  // Thêm phancong_id để trả về
-            'hoc_phans.title', 
-            'hoc_phans.code', 
-            'hoc_phans.tinchi', 
-            'classes.class_name as class_course',  // Thay đổi tên cột class_course
-            'phancong.max_student',
-            'users.full_name as teacher_name',
-            'hoc_ky.so_hoc_ky',           
-            'program_details.loai'        // Loại học phần (Bắt buộc/Tự chọn)
-        )
-        ->where('nganh.id', $studentMajor)
-        ->get();
+    $courses = [];
+    $ctdts = DB::select("
+        SELECT a.id FROM chuong_trinh_dao_tao a
+        JOIN program_details b ON a.id = b.chuongtrinh_id
+        WHERE a.nganh_id = ?", [$studentMajor]);
+
+    if (count($ctdts) > 0) {
+        $ctdt = $ctdts[0];
+
+        $rawCourses = DB::select("
+            SELECT 
+                d.id AS phancong_id,
+                h.title,
+                h.code,
+                h.tinchi,
+                COALESCE(b.class_name, 'Không có lớp') AS class_course,
+                d.max_student,
+                COALESCE(f.full_name, 'Chưa có giảng viên') AS teacher_name,
+                COALESCE(g.so_hoc_ky, 'Không xác định') AS so_hoc_ky,
+                d.loai
+            FROM (
+                SELECT a.*, c.loai, c.hoc_ky_id
+                FROM phancong a
+                JOIN (
+                    SELECT hocphan_id, loai, hoc_ky_id FROM program_details 
+                    WHERE chuongtrinh_id = ?
+                ) AS c ON a.hocphan_id = c.hocphan_id
+            ) AS d
+            LEFT JOIN classes b ON d.class_id = b.id
+            LEFT JOIN (SELECT users.full_name, teacher.id FROM teacher
+                LEFT JOIN users ON teacher.user_id = users.id) AS f ON d.giangvien_id = f.id
+            LEFT JOIN hoc_ky g ON d.hoc_ky_id = g.id
+            LEFT JOIN hoc_phans h ON d.hocphan_id = h.id", [$ctdt->id]);
+
+        $courses = array_map(function ($course) {
+            return [
+                "phancong_id"  => $course->phancong_id,
+                "title"        => $course->title,
+                "code"         => $course->code,
+                "tinchi"       => $course->tinchi,
+                "class_course" => $course->class_course,
+                "max_student"  => $course->max_student,
+                "teacher_name" => $course->teacher_name,
+                "so_hoc_ky"    => $course->so_hoc_ky,
+                "loai"         => $course->loai,
+            ];
+        }, $rawCourses);
+    } else {
+        return response()->json(['message' => 'Không tìm thấy dữ liệu'], 200);
+    }
 
     return response()->json($courses);
 }
+
 
 
 

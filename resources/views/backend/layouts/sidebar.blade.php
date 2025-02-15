@@ -822,6 +822,26 @@
             </li>
         </ul>
     </li>
+
+    <!-- Lịch thi -->
+    <li>
+        <a href="javascript:;" class="side-menu {{($active_menu=='lichthi_list'|| $active_menu=='lichthi_add')?'side-menu--active':''}}">
+            <div class="side-menu__icon"><i data-lucide="calendar"></i>
+            </div>
+            <div class="side-menu__title">
+                Lịch thi
+                <div class="side-menu__sub-icon transform"> <i data-lucide="chevron-down"></i> </div>
+            </div>
+        </a>
+        <ul class="{{($active_menu==''|| $active_menu=='')?'side-menu__sub-open':''}}">
+            <li>
+                <a href="{{route('admin.lichthi.index')}}" class="side-menu {{$active_menu=='lichthi_list'?'side-menu--active':''}}">
+                    <div class="side-menu__icon"> <i data-lucide="list"></i> </div>
+                    <div class="side-menu__title">Danh sách lịch thi</div>
+                </a>
+            </li>
+        </ul>
+    </li>
     <!-- Attendance: Sự tham dự -->
     <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='attendance_list'|| $active_menu=='bode_tracnghiem_add')?'side-menu--active':''}}">
