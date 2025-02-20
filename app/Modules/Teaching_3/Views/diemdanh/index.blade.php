@@ -45,7 +45,6 @@
                     <tr>
                         <th class="whitespace-nowrap">THỜI KHÓA BIỂU</th>
                         <th class="whitespace-nowrap">DANH SÁCH NGƯỜI HỌC</th>    
-                        <th></th>                    
                         <th class="whitespace-nowrap">TRẠNG THÁI</th>
                     </tr>
                 </thead>
@@ -58,29 +57,20 @@
                         <td>
                             <p class="font-medium whitespace-nowrap">
                                 @php
-                                    $userList = json_decode($item->user_list); // Giải mã JSON từ user_list
-                                    $fullNames = []; // Mảng để lưu tên đầy đủ
+                                    $studentList = json_decode($item->student_list); // Giải mã JSON từ student_list
+                                    $studentIds = collect($studentList)->pluck('student_id')->toArray(); // Lấy danh sách student_id
+                                    $fullNames = $students->whereIn('id', $studentIds)->pluck('full_name')->toArray(); // Lọc danh sách theo ID
                                 @endphp
-                                @foreach ($userList as $user)
-                                    @foreach ($users as $data)
-                                        @if ($user->user_id == $data->id)
-                                            @php
-                                                $fullNames[] = $data->full_name; // Thêm tên vào mảng
-                                            @endphp
-                                        @endif
-                                    @endforeach
-                                @endforeach
-                                @php
-                                    $namesString = implode(', ', $fullNames); // Nối các tên thành một chuỗi
-                                @endphp                                
+                        
                                 <span>
-                                    {{ Str::limit($namesString, 10, '...') }}
+                                    {{ Str::limit(implode(', ', $fullNames), 10, '...') }}
                                 </span>
                             </p> 
                         </td>
-                        <td>
+                                             
+                        {{-- <td>
                             <a href="{{ route('admin.diemdanh.show', $item->id) }}" style="text-decoration: underline;">Chi tiết</a></p> 
-                        </td>
+                        </td> --}}
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
                                 <a href="{{route('admin.diemdanh.edit',$item->id)}}" class="flex items-center mr-3" href="javascript:;"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tkb_id')->constrained('thoi_khoa_bieus')->onDelete('cascade'); // Liên kết với bảng TimeTable
-            $table->json('user_list')->nullable(); // Cho phép null nếu không có dữ liệu
+            $table->json('student_list')->nullable(); // Cho phép null nếu không có dữ liệu
             $table->timestamps();
         });
     }
