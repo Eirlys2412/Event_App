@@ -35,7 +35,7 @@ class PhanCongController extends Controller
      */
     public function create()
     {
-        $giangviens = teacher::all(['id', 'mgv']);  // Chỉ lấy mã giảng viên (mgv)
+        $giangviens = Teacher::with('user')->get(); 
         $hocphans = HocPhan::all();
         $hockys = HocKy::all();
         $namhocs = NamHoc::all();
@@ -57,7 +57,7 @@ class PhanCongController extends Controller
 {
     // Validate dữ liệu
     $request->validate([
-        'giangvien_id' => 'required|exists:teacher,mgv',  // Kiểm tra sự tồn tại của 'mgv' trong bảng 'teacher'
+        'giangvien_id' => 'required|exists:teacher,id', // Đảm bảo tên bảng đúng
         'hocphan_id' => 'required|exists:hoc_phans,id',
         'hocky_id' => 'required|exists:hoc_ky,id',
         'namhoc_id' => 'required|exists:nam_hoc,id',
@@ -69,7 +69,7 @@ class PhanCongController extends Controller
     ]);
 
     // Tìm giảng viên dựa trên mã giảng viên (mgv)
-    $giangvien = Teacher::where('mgv', $request->giangvien_id)->first();
+    $giangvien = Teacher::where('id', $request->giangvien_id)->first();
 
     if (!$giangvien) {
         // Nếu không tìm thấy giảng viên, trả về thông báo lỗi
@@ -105,7 +105,7 @@ class PhanCongController extends Controller
     $phancong = PhanCong::findOrFail($id);
 
     // Lấy danh sách giảng viên, học phần, học kỳ và năm học
-    $giangviens = Teacher::all(['id', 'mgv']);
+    $giangviens = Teacher::with('user')->get(); 
     $hocphans = HocPhan::all();
     $hockys = HocKy::all();
     $namhocs = NamHoc::all();
@@ -128,7 +128,7 @@ class PhanCongController extends Controller
 {
     // Validate dữ liệu
     $request->validate([
-        'giangvien_id' => 'required|exists:teacher,mgv',  // Mã giảng viên phải tồn tại trong bảng teacher
+        'giangvien_id' => 'required|exists:teacher,id',  // Mã giảng viên phải tồn tại trong bảng teacher
         'hocphan_id' => 'required|exists:hoc_phans,id',
         'hocky_id' => 'required|exists:hoc_ky,id',
         'namhoc_id' => 'required|exists:nam_hoc,id',
@@ -144,7 +144,7 @@ class PhanCongController extends Controller
     $phancong = PhanCong::findOrFail($id);
 
     // Tìm giảng viên dựa trên mã giảng viên (mgv)
-    $giangvien = Teacher::where('mgv', $request->giangvien_id)->first();
+    $giangvien = Teacher::where('id', $request->giangvien_id)->first();
 
     if (!$giangvien) {
         // Nếu không tìm thấy giảng viên, trả về thông báo lỗi

@@ -17,10 +17,10 @@
                         <label for="giangvien_id" class="form-label">Giảng viên</label>
                         <select name="giangvien_id" id="giangvien_id" class="form-control">
                             <option value="">Chọn Giảng viên</option>
-                            @foreach($giangviens as $giangvien)
-                                <option value="{{ $giangvien->mgv }}" {{ $phancong->giangvien_id == $giangvien->mgv ? 'selected' : '' }}>
-                                    {{ $giangvien->mgv }}
-                                </option>
+                            @foreach($giangviens as $teacher)
+                            <option value="{{ $teacher->id }}" {{ $teacher->id == old('teacher_id', $phancong->teacher_id) ? 'selected' : '' }}>
+                                {{ $teacher->user->full_name ?? 'N/A' }}
+                            </option>
                             @endforeach
                         </select>
                         @error('giangvien_id')

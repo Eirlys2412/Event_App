@@ -1,4 +1,4 @@
-@extends('backend.layouts.master')
+{{-- @extends('backend.layouts.master')
 
 @section('content')
     <h2 class="intro-y text-lg font-medium mt-10">
@@ -21,35 +21,23 @@
                 </thead>
                 <tbody>
                     <tr class="intro-x">
-                         <td>
-                            <p> {{ $diemdanh->thoikhoabieu->phancong->giangvien->mgv }}</p>
-                        </td>
-                        <td>
-                            <p> {{ $diemdanh->thoikhoabieu->phancong->hocphan->title }}</p>
-                        </td>
-                        <td>
-                            <p> {{ $diemdanh->thoikhoabieu->diaDiem->title }}</p>
-                        </td>
-                        <td>
-                            <p> {{ $diemdanh->thoikhoabieu->buoi }}</p>
-                        </td>
-                        <td>
-                            <p> {{ $diemdanh->thoikhoabieu->ngay }}</p>
-                        </td>
-                        <td>
-                            <p> {{ $diemdanh->thoikhoabieu->tietdau }}</p>
-                        </td>
-                        <td>
-                            <p> {{ $diemdanh->thoikhoabieu->tietcuoi }}</p>
-                        </td>
+                        <td>{{ $diemdanh->thoikhoabieu->phancong->giangvien->mgv ?? 'N/A' }}</td>
+                        <td>{{ $diemdanh->thoikhoabieu->phancong->hocphan->title ?? 'N/A' }}</td>
+                        <td>{{ $diemdanh->thoikhoabieu->diaDiem->title ?? 'N/A' }}</td>
+                        <td>{{ $diemdanh->thoikhoabieu->buoi ?? 'N/A' }}</td>
+                        <td>{{ $diemdanh->thoikhoabieu->ngay ?? 'N/A' }}</td>
+                        <td>{{ $diemdanh->thoikhoabieu->tietdau ?? 'N/A' }}</td>
+                        <td>{{ $diemdanh->thoikhoabieu->tietcuoi ?? 'N/A' }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
+
     <h2 class="intro-y text-lg font-medium mt-10">
         Chi tiết danh sách người học
     </h2>
+
     <div class="grid grid-cols-12 gap-6 mt-5">
         <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
             <table class="table table-report -mt-2">
@@ -60,34 +48,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="intro-x">
-                        <td>                        
-                            <p>
-                                @php
-                                $userList = json_decode($diemdanh->user_list); // Giải mã JSON từ user_list
-                                @endphp
-                                @foreach ($userList as $user)
-                                    @foreach ($users as $data)
-                                        @if ($user->user_id == $data->id)
-                                            <span>{{ $data->full_name }}</p>
-                                        @endif
-                                    @endforeach
-                                @endforeach
-                            </p>
-                        </td>
-                        <td>                        
-                            <p>
-                                @php
-                                $userList = json_decode($diemdanh->user_list); // Giải mã JSON từ user_list
-                                @endphp
-                                @foreach ($userList as $user)
-                                    <span>{{ $user->time }}</p>
-                                @endforeach
-                            </p>
-                        </td>
-                    </tr>
+                    @php
+                        $studentList = json_decode($diemdanh->student_list, true) ?? []; // Giải mã JSON và kiểm tra null
+                    @endphp
+
+                    @if (!empty($studentList))
+                        @foreach ($studentList as $studentData)
+                            @php
+                                // Tìm sinh viên trong danh sách đã tải từ Controller
+                                $student = $students->firstWhere('id', $studentData);
+                            @endphp
+                            <tr class="intro-x">
+                                <td>{{ $student ? $student->user->full_name : 'Không xác định' }}</td>
+                                <td>{{ $studentData['time'] ?? 'Không có dữ liệu' }}</td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="2" class="text-center">Không có dữ liệu điểm danh.</td>
+                        </tr>
+                    @endif
                 </tbody>
             </table>
         </div>
     </div>
-@endsection
+@endsection --}}

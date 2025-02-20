@@ -14,8 +14,8 @@ class Attendance extends Model
 
     protected $fillable = [
         'tkb_id',
-        'user_list',
-        'user_list'
+        'student_list',
+        'student_list'
     ];
     public function thoikhoabieu()
     {

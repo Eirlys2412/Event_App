@@ -29,26 +29,30 @@
                                 $selectedTkbId = $diemdanh->tkb_id; // Lấy id của thời khóa biểu đang được điểm danh
                             @endphp
                             @foreach ($thoikhoabieu as $data)
-                                <option value="{{ $data->id }}" {{ $selectedTkbId == $data->id ? 'selected' : '' }}>
-                                    MGV: {{ $data->phancong->giangvien->mgv }}, Môn học: {{ $data->phancong->hocphan->title }}, Ngày: {{ $data->ngay }}
-                                </option>
+                            <option value="{{ $data->id }}" {{ $selectedTkbId == $data->id ? 'selected' : '' }}>
+                                GV: {{ $data->phancong->giangvien->user->full_name }}, 
+                                Môn học: {{ $data->phancong->hocphan->title }}, 
+                                Ngày: {{ $data->ngay }}
+                            </option>
                             @endforeach
+                        
                         </select>
                     </div>
                     <div class="mt-3">
                         <label class="form-label">Điểm danh người học</label>
                         <div class="form-check d-flex flex-column">
                             @php
-                                $userList = json_decode($diemdanh->user_list); // Giải mã JSON
-                                $checkedUserIds = collect($userList)->pluck('user_id'); // Lấy ra chỉ user_id
+                                $studentList = json_decode($diemdanh->student_list); // Giải mã JSON
+                                $checkedStudentIds = collect($studentList)->pluck('student_id'); // Lấy ra chỉ user_id
                             @endphp
                     
-                            @foreach ($user as $data)
-                                <div class="form-check mb-3">
-                                    <input type="checkbox" class="form-check-input" id="user_{{ $data->id }}" name="user_list[]" value="{{ $data->id }}" {{ $checkedUserIds->contains($data->id) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="user_{{ $data->id }}">{{ $data->full_name }}</label>
-                                </div>
-                            @endforeach
+                    @foreach ($students as $data)
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="student_{{ $data->id }}" name="student_list[]" value="{{ $data->id }}" {{ $checkedStudentIds->contains($data->id) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="student_{{ $data->id }}">{{ $data->user?->full_name ?? 'Không xác định' }}</label>
+                    </div>
+                    @endforeach
+                
                         </div>
                     </div>
                     <style>

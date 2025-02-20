@@ -25,19 +25,27 @@
                         <label for="regular-form-1" class="form-label">Thời khóa biểu</label>
                         <select id = "tkb_id " name="tkb_id" class="form-select mt-2">
                             @foreach ($thoikhoabieu as $data)
-                                <option value="{{ $data->id }}">MGV: {{ $data->phancong->giangvien->mgv }}, Môn học: {{ $data->phancong->hocphan->title }}, Ngày: {{ $data->ngay }}</option>
+                            <option value="{{ $data->id }}">
+                            MGV: {{ $data->phancong->giangvien->mgv ?? 'N/A' }}, 
+                            Tên: {{ $data->phancong->giangvien->user?->full_name ?? 'Không có dữ liệu' }}, 
+                            Môn học: {{ $data->phancong->hocphan->title }}, 
+                            Ngày: {{ $data->ngay }}
+                            </option>
                             @endforeach
+                    
                         </select>
                     </div>
                     <div class="mt-3">
                         <label class="form-label">Điểm danh người học</label>
                         <div class="form-check d-flex flex-column">
-                            @foreach ($user as $data)
-                                <div class="form-check mb-3">
-                                    <input type="checkbox" class="form-check-input" id="user_{{ $data->id }}" name="user_list[]" value="{{ $data->id }}">
-                                    <label class="form-check-label" for="user_{{ $data->id }}">{{ $data->full_name }}</label>
-                                </div>
-                            @endforeach
+                            @foreach ($students as $data)
+                            <div class="form-check mb-3">
+                                <input type="checkbox" class="form-check-input" id="student_{{ $data->id }}" name="student_list[]" value="{{ $data->id }}">
+                                <label class="form-check-label" for="student_{{ $data->id }}">
+                                    {{ $data->user?->full_name ?? 'Không có dữ liệu' }}
+                                </label>
+                            </div>
+                            @endforeach                        
                         </div>
                     </div>
                     <style>
