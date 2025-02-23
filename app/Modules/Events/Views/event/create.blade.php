@@ -27,15 +27,6 @@
                     @enderror
                 </div>
 
-                <!-- Slug
-                <div class="mt-3">
-                    <label for="slug" class="form-label">Slug</label>
-                    <input id="slug" name="slug" type="text" class="form-control @error('slug') is-invalid @enderror" placeholder="Slug tự động tạo" required readonly>
-                    @error('slug')
-                        <div class="text-red-500 text-sm">{{ $message }}</div>
-                    @enderror
-                </div> -->
-
                 <!-- Tóm tắt -->
                 <div class="mt-3">
                     <label for="summary" class="form-label">Tóm tắt</label>
@@ -56,12 +47,12 @@
 
                 <!-- Tài nguyên (File) -->
                 <div class="mt-3">
-    <label for="documents" class="form-label">Tài liệu (File)</label>
-    <input id="documents" name="documents[]" type="file" class="form-control @error('documents') is-invalid @enderror" multiple>
-    @error('documents')
-        <div class="text-red-500 text-sm">{{ $message }}</div>
-    @enderror
-</div>
+                    <label for="documents" class="form-label">Tài liệu (File)</label>
+                    <input id="documents" name="documents[]" type="file" class="form-control @error('documents') is-invalid @enderror" multiple>
+                    @error('documents')
+                        <div class="text-red-500 text-sm">{{ $message }}</div>
+                    @enderror
+                </div>
 
                 <!-- Thời gian bắt đầu -->
                 <div class="mt-3">
@@ -105,6 +96,20 @@
                     </select>
                 </div>
 
+                <!-- Người tham gia -->
+                <div class="mt-3">
+                    <label for="select-users" class="form-label">Người tham gia</label>
+                    <select id="select-users" name="user_ids[]" multiple required>
+                        <option value="">Chọn người tham gia...</option>
+                        @foreach ($users as $user)
+                            <option value="{{ $user->id }}" 
+                                @if(in_array($user->id, old('user_ids', []))) selected @endif>
+                                {{ $user->full_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Nút lưu -->
                 <div class="text-right mt-5">
                     <button type="submit" class="btn btn-primary w-24">Lưu</button>
@@ -117,27 +122,21 @@
 
 @section('scripts')
 <script>
-    // Tạo slug tự động từ title khi gửi biểu mẫu
-    document.querySelector('form').addEventListener('submit', function (e) {
-        const title = document.getElementById('title').value;
-        const timestart = document.getElementById('timestart').value;
-        const timeend = document.getElementById('timeend').value;
-
-        if (!title || !timestart || !timeend) {
-            e.preventDefault(); // Ngăn form gửi nếu có trường trống
-            alert('Vui lòng điền đầy đủ thông tin!');
-        } else {
-            // Tạo slug tự động từ title
-            const slug = title.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-            
-            console.log('Generated slug:', slug);
-        }
-    });
-
     // Khởi tạo Tom Select cho trường tags
     var selectTags = new TomSelect('#select-tags', {
         create: true,
         placeholder: "Chọn tags...",
+        plugins: ['remove_button'],
+        sortField: {
+            field: "text",
+            direction: "asc"
+        }
+    });
+
+    // Khởi tạo Tom Select cho trường người tham gia
+    var selectUsers = new TomSelect('#select-users', {
+        create: false,
+        placeholder: "Chọn người tham gia...",
         plugins: ['remove_button'],
         sortField: {
             field: "text",

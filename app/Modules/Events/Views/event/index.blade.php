@@ -7,29 +7,31 @@
 
     <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
         <a href="{{ route('admin.event.create') }}" class="btn btn-primary shadow-md mr-2">Thêm sự kiện</a>
-        <div class="hidden md:block mx-auto text-slate-500">Hiển thị trang {{ $eventList->currentPage() }} trong
-            {{ $eventList->lastPage() }} trang</div>
+        <div class="hidden md:block mx-auto text-slate-500">
+            Hiển thị trang {{ $eventList->currentPage() }} trong {{ $eventList->lastPage() }} trang
+        </div>
     </div>
 
     <div class="intro-y col-span-12 overflow-auto lg:overflow-visible mt-5">
-        <table class="table table-report -mt-2">
+        <table class="table table-report -mt-2 table-auto">
             <thead>
                 <tr>
                     <th class="whitespace-nowrap">TÊN SỰ KIỆN</th>
                     <th class="text-center whitespace-nowrap">THỜI GIAN BẮT ĐẦU</th>
                     <th class="text-center whitespace-nowrap">THỜI GIAN KẾT THÚC</th>
-                    <th class="text-center whitespace-nowrap">TÓM TẮT</th>
-                    <th class="text-center whitespace-nowrap">MÔ TẢ</th>
+                    <!-- <th class="text-center whitespace-nowrap">TÓM TẮT</th> -->
+                    <!-- <th class="text-center whitespace-nowrap">MÔ TẢ</th> -->
                     <th class="text-center whitespace-nowrap">URL</th>
                     <th class="text-center whitespace-nowrap">LOẠI SỰ KIỆN</th>
+                    <th class="text-center whitespace-nowrap">NGƯỜI THAM GIA</th>
                     <th class="text-center whitespace-nowrap">HÀNH ĐỘNG</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($eventList as $event)
                     <tr class="intro-x">
-                        <td class="text-left">
-                            <a target="_blank" href="#" class="font-medium whitespace-nowrap">{{ $event->title ?? 'Chưa có tiêu đề' }}</a>
+                        <td class="text-left break-words">
+                            <a target="_blank" href="#" class="font-medium">{{ $event->title ?? 'Chưa có tiêu đề' }}</a>
                         </td>
                         <td class="text-center">
                             {{ \Carbon\Carbon::parse($event->timestart)->format('d/m/Y H:i') }}
@@ -37,21 +39,36 @@
                         <td class="text-center">
                             {{ \Carbon\Carbon::parse($event->timeend)->format('d/m/Y H:i') }}
                         </td>
-                        <td class="text-center">{{ $event->summary ?? 'Chưa có tóm tắt' }}</td>
-                        <td class="text-center">{{ $event->description ?? 'Chưa có mô tả' }}</td>
+                        <!-- <td class="text-center">
+                            {{ $event->summary ?? 'Chưa có tóm tắt' }}
+                        </td>
+                        <td class="text-center">
+                            {{ $event->description ?? 'Chưa có mô tả' }}
+                        </td> -->
                         <td class="text-center">
                             @if (!empty($event->resource_urls))
                                 @foreach ($event->resource_urls as $url)
-                                    <a href="{{ asset($url) }}" target="_blank">{{ Str::limit($url, 30) }}</a><br>
+                                    <a href="{{ asset($url) }}" target="_blank">
+                                        {{ Str::limit($url, 30) }}
+                                    </a><br>
                                 @endforeach
                             @else
                                 N/A
                             @endif
                         </td>
-                        <td class="text-center">{{ $event->eventType->title ?? 'Chưa có loại sự kiện' }}</td>
-                        <td class="table-report__action text-center align-middle">
-                            <div class="flex justify-center items-center">
-                                <a href="{{ route('admin.event.edit', $event->id) }}" class="flex items-center mr-3">
+                        <td class="text-center">
+                            {{ $event->eventType->title ?? 'Chưa có loại sự kiện' }}
+                        </td>
+                        <td class="text-center">
+                            @php
+                                $userIds = is_string($event->user_ids) ? json_decode($event->user_ids, true) : (is_array($event->user_ids) ? $event->user_ids : []);
+                                $users = \App\Models\User::whereIn('id', $userIds)->pluck('full_name')->toArray();
+                            @endphp
+                            {{ !empty($users) ? implode(', ', $users) : 'Chưa có người tham gia' }}
+                        </td>
+                        <td class="table-report__action text-center">
+                            <div class="flex flex-col justify-center items-center space-y-2">
+                                <a href="{{ route('admin.event.edit', $event->id) }}" class="flex items-center">
                                     <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Chỉnh sửa
                                 </a>
                                 <form action="{{ route('admin.event.destroy', $event->id) }}" method="post">
@@ -94,7 +111,7 @@
                 confirmButtonText: 'Vâng, tôi muốn xóa!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    form.submit(); // Gửi form để thực hiện xóa
+                    form.submit();
                 }
             });
         });
