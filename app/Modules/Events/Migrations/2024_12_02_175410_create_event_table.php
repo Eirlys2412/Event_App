@@ -24,6 +24,7 @@ return new class extends Migration
                 ->constrained('event_type') // Bảng `event_types`
                 ->onDelete('cascade'); // Xóa sự kiện khi xóa loại sự kiện
             $table->json('tags')->nullable(); // Thẻ dưới dạng JSON
+            $table->json('user_ids')->nullable();
             $table->timestamps(); // Thêm cột created_at và updated_at
         });
     }

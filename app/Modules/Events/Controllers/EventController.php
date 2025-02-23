@@ -11,6 +11,7 @@ use App\Models\Tag;
 use App\Modules\Events\Models\TagEvent;
 use App\Modules\Resource\Models\Resource;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class EventController extends Controller
 {
@@ -43,137 +44,155 @@ class EventController extends Controller
 
     // Tạo mới sự kiện
     public function create()
-    {
-        $eventTypes = EventType::all();
-        $tags = Tag::where('status', 'active')->orderBy('title', 'ASC')->get();
-        $active_menu = "event_add";
-        $breadcrumb = '
-            <li class="breadcrumb-item"><a href="#">/</a></li>
-            <li class="breadcrumb-item"><a href="' . route('admin.event.index') . '">Sự kiện</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Tạo Sự kiện</li>';
+{
+    $eventTypes = EventType::all();
+    $tags = Tag::where('status', 'active')->orderBy('title', 'ASC')->get();
+    $users = User::all(); // Lấy danh sách người dùng
+    $active_menu = "event_add";
+    $breadcrumb = '
+        <li class="breadcrumb-item"><a href="#">/</a></li>
+        <li class="breadcrumb-item"><a href="' . route('admin.event.index') . '">Sự kiện</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Tạo Sự kiện</li>';
 
-        return view('Events::event.create', compact('breadcrumb', 'active_menu', 'eventTypes', 'tags'));
+    return view('Events::event.create', compact('breadcrumb', 'active_menu', 'eventTypes', 'tags', 'users'));
+}
+
+// Lưu sự kiện mới
+public function store(Request $request)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'summary' => 'nullable|string',
+        'description' => 'nullable|string',
+        'timestart' => 'required|date',
+        'timeend' => 'required|date|after:timestart',
+        'event_type_id' => 'required|exists:event_type,id', // Sửa tên bảng
+        'tag_ids' => 'nullable|array',
+        'user_ids' => 'nullable|array', // Thêm xác thực cho user_ids
+        'documents.*' => 'file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:204800',
+    ]);
+
+    // Tạo slug tự động từ title
+    $slug = Str::slug($request->title);
+
+    // Tạo sự kiện
+    $event = Event::create($request->only([
+        'title',
+        'summary',
+        'description',
+        'timestart',
+        'timeend',
+        'event_type_id',
+    ]) + ['slug' => $slug]);
+
+    // Lưu tài liệu
+    $resourceIds = [];
+    if ($request->hasFile('documents')) {
+        foreach ($request->file('documents') as $file) {
+            $resource = Resource::createResource($request, $file, 'Event');
+            $resourceIds[] = $resource->id;
+        }
     }
 
-    // Lưu sự kiện mới
-    public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'summary' => 'nullable|string',
-            'description' => 'nullable|string',
-            'timestart' => 'required|date',
-            'timeend' => 'required|date|after:timestart',
-            'event_type_id' => 'required|exists:event_type,id',
-            'tag_ids' => 'nullable|array',
-            'documents.*' => 'file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:204800', // Thêm xác thực cho tài liệu
-        ]);
+    // Cập nhật tài liệu vào Event
+    $event->resources = json_encode([
+        'event_id' => $event->id,
+        'resource_ids' => $resourceIds,
+    ]);
+    $event->save();
 
-        // Tạo slug tự động từ title
-        $slug = Str::slug($request->title);
+    // Lưu tag
+    if ($request->has('tag_ids')) {
+        (new \App\Http\Controllers\TagController())->store_event_tag($event->id, $request->tag_ids);
+    }
 
-        $event = Event::create($request->only([
-            'title',
-            'summary',
-            'description',
-            'timestart',
-            'timeend',
-            'event_type_id',
-        ]) + ['slug' => $slug]); // Thêm slug vào mảng dữ liệu
-
-        // Lưu tài liệu
-        $resourceIds = [];
-        if ($request->hasFile('documents')) {
-            foreach ($request->file('documents') as $file) {
-                $resource = Resource::createResource($request, $file, 'Event');
-                $resourceIds[] = $resource->id;
-            }
-        }
-
-        // Cập nhật tài liệu vào Event
-        $event->resources = json_encode([
-            'event_id' => $event->id,
-            'resource_ids' => $resourceIds,
-        ]);
+    // Lưu user
+    if ($request->has('user_ids')) {
+        $event->user_ids = json_encode($request->user_ids); // Lưu danh sách user_ids dưới dạng JSON
         $event->save();
-
-        // Lưu tag
-        if ($request->has('tag_ids')) {
-            (new \App\Http\Controllers\TagController())->store_event_tag($event->id, $request->tag_ids);
-        }
-
-        return redirect()->route('admin.event.index')->with('success', 'Sự kiện đã được tạo thành công!');
     }
+
+    return redirect()->route('admin.event.index')->with('success', 'Sự kiện đã được tạo thành công!');
+}
 
     // Chỉnh sửa sự kiện
     public function edit($id)
-    {
-        $event = Event::findOrFail($id);
-        $eventTypes = EventType::all();
-        $tags = Tag::where('status', 'active')->orderBy('title', 'ASC')->get();
-        $tag_ids = DB::table('tag_events')->where('event_id', $event->id)->pluck('tag_id')->toArray();
+{
+    $event = Event::findOrFail($id);
+    $eventTypes = EventType::all();
+    $tags = Tag::where('status', 'active')->orderBy('title', 'ASC')->get();
+    $tag_ids = DB::table('tag_events')->where('event_id', $event->id)->pluck('tag_id')->toArray();
+    $users = User::all(); // Lấy danh sách người dùng
+    $user_ids = json_decode($event->user_ids, true) ?? []; // Lấy danh sách người dùng đã tham gia từ trường user_ids
 
-        $active_menu = 'event';
-        $breadcrumb = '
-            <li class="breadcrumb-item"><a href="#">/</a></li>
-            <li class="breadcrumb-item"><a href="' . route('admin.event.index') . '">Sự kiện</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa Sự kiện</li>';
+    $active_menu = 'event';
+    $breadcrumb = '
+        <li class="breadcrumb-item"><a href="#">/</a></li>
+        <li class="breadcrumb-item"><a href="' . route('admin.event.index') . '">Sự kiện</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa Sự kiện</li>';
 
-        return view('Events::event.edit', compact('event', 'eventTypes', 'breadcrumb', 'active_menu', 'tags', 'tag_ids'));
-    }
+    return view('Events::event.edit', compact('event', 'eventTypes', 'breadcrumb', 'active_menu', 'tags', 'tag_ids', 'users', 'user_ids'));
+}
+
+// Cập nhật sự kiện
+public function update(Request $request, $id)
+{
+    $event = Event::findOrFail($id);
+
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'summary' => 'nullable|string',
+        'description' => 'nullable|string',
+        'timestart' => 'required|date',
+        'timeend' => 'required|date|after:timestart',
+        'event_type_id' => 'required|exists:event_type,id', // Sửa tên bảng
+        'tag_ids' => 'nullable|array',
+        'user_ids' => 'nullable|array', // Thêm xác thực cho user_ids
+        'documents.*' => 'file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:204800',
+    ]);
+
+    // Tạo slug tự động từ title
+    $slug = Str::slug($request->title);
 
     // Cập nhật sự kiện
-    public function update(Request $request, $id)
-    {
-        $event = Event::findOrFail($id);
+    $event->update($request->only([
+        'title',
+        'summary',
+        'description',
+        'timestart',
+        'timeend',
+        'event_type_id',
+    ]) + ['slug' => $slug]);
 
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'summary' => 'nullable|string',
-            'description' => 'nullable|string',
-            'timestart' => 'required|date',
-            'timeend' => 'required|date|after:timestart',
-            'event_type_id' => 'required|exists:event_type,id',
-            'tag_ids' => 'nullable|array',
-            'documents.*' => 'file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:204800', // Thêm xác thực cho tài liệu
-        ]);
-
-        // Tạo slug tự động từ title
-        $slug = Str::slug($request->title);
-
-        $event->update($request->only([
-            'title',
-            'summary',
-            'description',
-            'timestart',
-            'timeend',
-            'event_type_id',
-        ]) + ['slug' => $slug]); // Cập nhật slug
-
-        // Xử lý tài liệu mới
-        $resourceIds = json_decode($event->resources, true)['resource_ids'] ?? [];
-        if ($request->hasFile('documents')) {
-            foreach ($request->file('documents') as $file) {
-                $resource = Resource::createResource($request, $file, 'Event');
-                $resourceIds[] = $resource->id;
-            }
+    // Xử lý tài liệu mới
+    $resourceIds = json_decode($event->resources, true)['resource_ids'] ?? [];
+    if ($request->hasFile('documents')) {
+        foreach ($request->file('documents') as $file) {
+            $resource = Resource::createResource($request, $file, 'Event');
+            $resourceIds[] = $resource->id;
         }
-
-        // Lưu cập nhật tài liệu
-        $event->resources = json_encode([
-            'event_id' => $event->id,
-            'resource_ids' => array_unique($resourceIds),
-        ]);
-        $event->save();
-
-        // Cập nhật tag
-        if ($request->has('tag_ids')) {
-            (new \App\Http\Controllers\TagController())->update_event_tag($event->id, $request->tag_ids);
-        }
-
-        return redirect()->route('admin.event.index')->with('success', 'Sự kiện đã được cập nhật!');
     }
 
+    // Lưu cập nhật tài liệu
+    $event->resources = json_encode([
+        'event_id' => $event->id,
+        'resource_ids' => array_unique($resourceIds),
+    ]);
+    $event->save();
+
+    // Cập nhật tag
+    if ($request->has('tag_ids')) {
+        (new \App\Http\Controllers\TagController())->update_event_tag($event->id, $request->tag_ids);
+    }
+
+    // Cập nhật user
+    if ($request->has('user_ids')) {
+        $event->user_ids = json_encode($request->user_ids); // Cập nhật danh sách user_ids
+        $event->save();
+    }
+
+    return redirect()->route('admin.event.index')->with('success', 'Sự kiện đã được cập nhật!');
+}
 
     // Xóa tài nguyên của sự kiện
     public function removeResource($eventId, $resourceId)
@@ -204,6 +223,7 @@ class EventController extends Controller
         // Trả về phản hồi JSON
         return response()->json(['success' => true, 'message' => 'Tài nguyên đã được xóa thành công.']);
     }
+
     // Xóa sự kiện
     public function destroy($id)
     {

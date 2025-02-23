@@ -1,9 +1,9 @@
 @extends('backend.layouts.master')
 
 @section('scriptop')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-<script src="{{ asset('js/js/tom-select.complete.min.js') }}"></script>
-<link rel="stylesheet" href="{{ asset('/js/css/tom-select.min.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="{{ asset('js/js/tom-select.complete.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('/js/css/tom-select.min.css') }}">
 @endsection
 
 @section('content')
@@ -120,6 +120,20 @@
                     </select>
                 </div>
 
+                <!-- Người tham gia -->
+                <div class="mt-3">
+                    <label for="select-users" class="form-label">Người tham gia</label>
+                    <select id="select-users" name="user_ids[]" multiple required>
+                        <option value="">Chọn người tham gia...</option>
+                        @foreach ($users as $user)
+                            <option value="{{ $user->id }}" 
+                                {{ in_array($user->id, json_decode($event->user_ids, true) ?? []) ? 'selected' : '' }}>
+                                {{ $user->full_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Nút lưu -->
                 <div class="text-right mt-5">
                     <button type="submit" class="btn btn-primary w-24">Cập nhật</button>
@@ -133,53 +147,47 @@
 @section('scripts')
 <script>
     // Khởi tạo Tom Select cho trường tags
-new TomSelect("#select-tags", {
-    create: true,
-    placeholder: "Nhập các thẻ, cách nhau bởi dấu phẩy",
-});
-
-// Validate form trước khi gửi
-document.querySelector('form').addEventListener('submit', function (e) {
-    const title = document.getElementById('title').value;
-    const timestart = document.getElementById('timestart').value;
-    const timeend = document.getElementById('timeend').value;
-
-    if (!title || !timestart || !timeend) {
-        e.preventDefault(); // Ngăn form gửi nếu có trường trống
-        alert('Vui lòng điền đầy đủ thông tin!');
-    }
-});
-
-// Xử lý sự kiện click cho nút xóa
-document.querySelectorAll('.dltBtn').forEach(button => {
-    button.addEventListener('click', function (e) {
-        e.preventDefault(); // Ngăn chặn hành động mặc định
-
-        const url = this.getAttribute('data-url');
-        const resourceName = this.getAttribute('data-name');
-
-        if (confirm(`Bạn có chắc chắn muốn xóa tài nguyên "${resourceName}"?`)) {
-            fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                },
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Xóa phần tử khỏi danh sách
-                    this.closest('li').remove();
-                    alert('Tài nguyên đã được xóa thành công.');
-                } else {
-                    alert('Có lỗi xảy ra khi xóa tài nguyên.');
-                }
-            })
-            .catch(error => {
-                alert('Có lỗi xảy ra. Xin thử lại.');
-                console.error('Error:', error);
-            });
-        }
+    new TomSelect("#select-tags", {
+        create: true,
+        placeholder: "Nhập các thẻ, cách nhau bởi dấu phẩy",
     });
-});
+
+    // Khởi tạo Tom Select cho trường người tham gia
+    new TomSelect("#select-users", {
+        create: false,
+        placeholder: "Chọn người tham gia...",
+    });
+
+    // Xử lý sự kiện click cho nút xóa
+    document.querySelectorAll('.dltBtn').forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault(); // Ngăn chặn hành động mặc định
+
+            const url = this.getAttribute('data-url');
+            const resourceName = this.getAttribute('data-name');
+
+            if (confirm(`Bạn có chắc chắn muốn xóa tài nguyên "${resourceName}"?`)) {
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Xóa phần tử khỏi danh sách
+                        this.closest('li').remove();
+                        alert('Tài nguyên đã được xóa thành công.');
+                    } else {
+                        alert('Có lỗi xảy ra khi xóa tài nguyên.');
+                    }
+                })
+                .catch(error => {
+                    alert('Có lỗi xảy ra. Xin thử lại.');
+                    console.error('Error:', error);
+                });
+            }
+        });
+    });
 </script>
 @endsection
