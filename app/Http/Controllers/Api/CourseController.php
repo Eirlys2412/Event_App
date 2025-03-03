@@ -311,6 +311,99 @@ public function getTimetable(Request $request)
     }
 }
 
+public function getTeacherSchedule(Request $request)
+{
+    if (!$request->teacher_id) {
+        return response()->json(['message' => 'Missing teacher_id'], 400);
+    }
+
+    try {
+        // Truy vấn thời khóa biểu của giảng viên
+        $schedule = DB::table('thoi_khoa_bieus')
+            ->join('phancong', 'thoi_khoa_bieus.phancong_id', '=', 'phancong.id')
+            ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
+            ->join('classes', 'phancong.class_id', '=', 'classes.id')
+            ->join('dia_diem', 'thoi_khoa_bieus.diadiem_id', '=', 'dia_diem.id')
+            ->join('teacher', 'phancong.giangvien_id', '=', 'teacher.id')
+            ->join('users', 'teacher.user_id', '=', 'users.id')
+            ->select(
+                'thoi_khoa_bieus.id as timetable_id',
+                'phancong.id as phancong_id',
+                'hoc_phans.title as subject',
+                'thoi_khoa_bieus.buoi',
+                'thoi_khoa_bieus.ngay',
+                'thoi_khoa_bieus.tietdau',
+                'thoi_khoa_bieus.tietcuoi',
+                'dia_diem.title as location',
+                'classes.class_name as class_course',
+                'users.full_name as teacher_name'
+            )
+            ->where('teacher.id', $request->teacher_id)
+            ->orderBy('thoi_khoa_bieus.ngay', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Danh sách lịch dạy của giảng viên',
+            'data' => $schedule
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Lỗi khi lấy lịch dạy: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+
+public function getStudentExamSchedules(Request $request)
+{
+    if (!$request->student_id) {
+        return response()->json(['message' => 'Missing student_id'], 400);
+    }
+
+    try {
+        // Lấy danh sách lịch thi chỉ của các học phần mà sinh viên đã đăng ký
+        $examSchedules = DB::table('lich_thi')
+            ->join('phancong', 'lich_thi.phancong_id', '=', 'phancong.id')
+            ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
+            ->join('enrollments', 'phancong.id', '=', 'enrollments.phancong_id')
+            ->join('students', 'enrollments.student_id', '=', 'students.id')
+            ->join('classes', 'phancong.class_id', '=', 'classes.id')
+            ->select(
+                'lich_thi.id as exam_id',
+                'hoc_phans.title as subject',
+                'lich_thi.buoi',
+                'lich_thi.ngay1 as exam_date',
+                'lich_thi.ngay2 as backup_exam_date',
+                'lich_thi.dia_diem_thi as location',
+                'classes.class_name as class_course'
+            )
+            ->where('students.id', $request->student_id)
+            ->orderBy('lich_thi.ngay1', 'asc')
+            ->get();
+
+        // Xử lý dữ liệu để giải mã JSON trong cột location
+        $examSchedules->transform(function ($exam) {
+            $locationData = json_decode($exam->location, true);
+            $exam->location = isset($locationData['location']) ? implode(', ', $locationData['location']) : null;
+            return $exam;
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Danh sách lịch thi',
+            'data' => $examSchedules
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Lỗi khi lấy lịch thi: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+
 public function getClassStudents(Request $request)
     {
         $teacherId = $request->input('teacher_id');
@@ -378,6 +471,50 @@ public function getClassStudents(Request $request)
     ], 200);
 }
 
-    
+public function getStudentsByTeacher(Request $request)
+{
+    if (!$request->teacher_id) {
+        return response()->json(['message' => 'Missing teacher_id'], 400);
+    }
+
+    if (!$request->phancong_id) {
+        return response()->json(['message' => 'Missing phancong_id'], 400);
+    }
+
+    try {
+        // Truy vấn danh sách sinh viên theo giảng viên và học phần
+        $students = DB::table('enrollments')
+            ->join('phancong', 'enrollments.phancong_id', '=', 'phancong.id')
+            ->join('hoc_phans', 'phancong.hocphan_id', '=', 'hoc_phans.id')
+            ->join('students', 'enrollments.student_id', '=', 'students.id')
+            ->join('users', 'students.user_id', '=', 'users.id')
+            ->join('classes', 'students.class_id', '=', 'classes.id')
+            ->select(
+                'students.id as student_id',
+                'users.full_name as student_name',
+                'users.email as student_email',
+                'hoc_phans.title as subject',
+                'hoc_phans.code as subject_code',
+                'classes.class_name as class_name'
+            )
+            ->where('phancong.giangvien_id', $request->teacher_id)
+            ->where('phancong.id', $request->phancong_id) // Thêm điều kiện lọc theo học phần
+            ->orderBy('students.id', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Danh sách sinh viên theo giảng viên và học phần',
+            'data' => $students
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Lỗi khi lấy danh sách sinh viên: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+
 
 }

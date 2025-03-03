@@ -6,22 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tkb_id')->constrained('thoi_khoa_bieus')->onDelete('cascade'); // Liên kết với bảng TimeTable
-            $table->json('student_list')->nullable(); // Cho phép null nếu không có dữ liệu
+            $table->foreignId('tkb_id')->constrained('thoi_khoa_bieus')->onDelete('cascade');
+            $table->json('student_list')->nullable();
+            $table->timestamp('start_time')->nullable();
+            $table->timestamp('end_time')->nullable();
+            $table->integer('absent_count')->default(0);
+            $table->string('qr_token', 64)->nullable(); // Thêm cột qr_token để lưu mã định danh QR
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('attendances');

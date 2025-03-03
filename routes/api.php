@@ -48,6 +48,17 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::get('/getClass', [\App\Http\Controllers\Api\CourseController::class, 'getClassStudents']);
     Route::get('/getStudentCourses', [\App\Http\Controllers\Api\CourseController::class, 'getStudentCourses']);
     
+    //attendance
+    Route::post('/startAttendance', [\App\Http\Controllers\Api\AttendanceController::class, 'startAttendance']);
+    Route::post('/markAttendance', [\App\Http\Controllers\Api\AttendanceController::class, 'markAttendance']);
+    Route::post('/closeAttendance', [\App\Http\Controllers\Api\AttendanceController::class, 'closeAttendance']);
+    Route::get('/getAttendanceBySchedule', [\App\Http\Controllers\Api\AttendanceController::class, 'getAttendanceBySchedule']);
+
+    //Exercises
+    Route::post('/questions', [\App\Http\Controllers\Api\ExerciseController::class, 'storeQuestion']);
+    Route::post('/answers', [\App\Http\Controllers\Api\ExerciseController::class, 'storeAnswer']);
+    Route::post('/quiz', [\App\Http\Controllers\Api\ExerciseController::class, 'storeQuiz']);
+
 
     //Course
     Route::get('/courses', [\App\Http\Controllers\Api\CourseController::class, 'getAvailableCourses']);
@@ -57,6 +68,9 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('/getEnroll', [\App\Http\Controllers\Api\CourseController::class, 'getEnrolledCourses']);
     Route::post('/deleteEnroll', [\App\Http\Controllers\Api\CourseController::class, 'deleteEnrollment']);
     Route::get('/timeTable', [\App\Http\Controllers\Api\CourseController::class, 'getTimetable']);
+    Route::get('/lichthi', [\App\Http\Controllers\Api\CourseController::class, 'getStudentExamSchedules']);
+    Route::get('/lichday', [\App\Http\Controllers\Api\CourseController::class, 'getTeacherSchedule']);
+    Route::get('/getListstudentCourse', [\App\Http\Controllers\Api\CourseController::class, 'getStudentsByTeacher']);
 
 
   });
