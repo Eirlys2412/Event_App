@@ -16,15 +16,15 @@ return new class extends Migration
             $table->string('title'); // Tiêu đề sự kiện
             $table->string('slug')->unique(); // Slug duy nhất
             $table->text('summary')->nullable(); // Tóm tắt
-            $table->longText('description')->nullable(); // Mô tả chi tiết
+            $table->text('description')->nullable(); // Mô tả chi tiết
             $table->json('resources')->nullable(); // Tài nguyên dưới dạng JSON
-            $table->dateTime('timestart'); // Thời gian bắt đầu
-            $table->dateTime('timeend'); // Thời gian kết thúc
+            $table->timestamp('timestart')->nullable(); // Thời gian bắt đầu
+            $table->timestamp('timeend')->nullable(); // Thời gian kết thúc
+            $table->string('diadiem')->nullable();// địa điểm
             $table->foreignId('event_type_id') // Loại sự kiện
                 ->constrained('event_type') // Bảng `event_types`
                 ->onDelete('cascade'); // Xóa sự kiện khi xóa loại sự kiện
             $table->json('tags')->nullable(); // Thẻ dưới dạng JSON
-            $table->json('user_ids')->nullable();
             $table->timestamps(); // Thêm cột created_at và updated_at
         });
     }

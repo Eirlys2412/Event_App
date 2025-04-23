@@ -141,11 +141,11 @@
         }
     });
 
-    $("[name='toogle']").change(function() {
+    $("[name='toggle']").change(function() {
         var mode = $(this).prop('checked');
         var id=$(this).val();
         $.ajax({
-            url:"{{route('admin.blog.status')}}",
+            url:"{{ route('admin.userpage.status') }}",
             type:"post",
             data:{
                 _token:'{{csrf_token()}}',
@@ -162,10 +162,8 @@
                 });
                 console.log(response.msg);
             }
-            
         });
-  
-});  
+    });  
     
 </script>
  

@@ -2,6 +2,7 @@
 
 namespace App\Modules\Blog\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
  
@@ -32,7 +33,7 @@ class BlogCategoryController extends Controller
         <li class="breadcrumb-item"><a href="#">/</a></li>
         <li class="breadcrumb-item active" aria-current="page"> Danh mục bài viết </li>';
         $blogcats = BlogCategory::orderBy('id','DESC')->paginate($this->pagesize);
-        return view('backend.blogcat.index',compact('blogcats','breadcrumb','active_menu'));
+        return view('Blog::blogcat.index',compact('blogcats','breadcrumb','active_menu'));
 
     }
     public function blogcatSearch(Request $request)
@@ -52,7 +53,7 @@ class BlogCategoryController extends Controller
             <li class="breadcrumb-item"><a href="#">/</a></li>
             <li class="breadcrumb-item  " aria-current="page"><a href="'.route('admin.blogcategory.index').'">Danh mục bài viết</a></li>
             <li class="breadcrumb-item active" aria-current="page"> tìm kiếm </li>';
-            return view('backend.blogcat.search',compact('blogcats','breadcrumb','searchdata','active_menu'));
+            return view('Blog::blogcat.search',compact('blogcats','breadcrumb','searchdata','active_menu'));
         }
         else
         {
@@ -76,7 +77,7 @@ class BlogCategoryController extends Controller
         <li class="breadcrumb-item"><a href="#">/</a></li>
         <li class="breadcrumb-item  " aria-current="page"><a href="'.route('admin.blogcategory.index').'">Danh mục bài viết</a></li>
         <li class="breadcrumb-item active" aria-current="page"> tạo danh mục bài viết </li>';
-        return view('backend.blogcat.create',compact('breadcrumb','active_menu'));
+        return view('Blog::blogcat.create',compact('breadcrumb','active_menu'));
   
     }
 
@@ -144,7 +145,7 @@ class BlogCategoryController extends Controller
             <li class="breadcrumb-item"><a href="#">/</a></li>
             <li class="breadcrumb-item  " aria-current="page"><a href="'.route('admin.blogcategory.index').'">Danh mục bài viết</a></li>
             <li class="breadcrumb-item active" aria-current="page"> điều chỉnh mục bài viết </li>';
-             return view('backend.blogcat.edit',compact('breadcrumb','blogcat','active_menu'));
+             return view('Blog::blogcat.edit',compact('breadcrumb','blogcat','active_menu'));
         }
         else
         {

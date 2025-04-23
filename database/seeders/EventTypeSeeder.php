@@ -11,8 +11,8 @@ class EventTypeSeeder extends Seeder
     {
         // Thêm dữ liệu mẫu vào bảng event_types
         EventType::create([
-            'title' => 'Hội thảo',
-            'slug' => 'hoi-thao',
+            'title' => 'chương trình',
+            'slug' => 'chuong-trinh',
             'status' => 'active',
             'location_type' => 'indoor',
             'location_address' => 'Phòng A1',

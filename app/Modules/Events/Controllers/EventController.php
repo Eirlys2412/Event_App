@@ -11,7 +11,7 @@ use App\Models\Tag;
 use App\Modules\Events\Models\TagEvent;
 use App\Modules\Resource\Models\Resource;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
+
 
 class EventController extends Controller
 {
@@ -47,14 +47,13 @@ class EventController extends Controller
 {
     $eventTypes = EventType::all();
     $tags = Tag::where('status', 'active')->orderBy('title', 'ASC')->get();
-    $users = User::all(); // Lấy danh sách người dùng
     $active_menu = "event_add";
     $breadcrumb = '
         <li class="breadcrumb-item"><a href="#">/</a></li>
         <li class="breadcrumb-item"><a href="' . route('admin.event.index') . '">Sự kiện</a></li>
         <li class="breadcrumb-item active" aria-current="page">Tạo Sự kiện</li>';
 
-    return view('Events::event.create', compact('breadcrumb', 'active_menu', 'eventTypes', 'tags', 'users'));
+    return view('Events::event.create', compact('breadcrumb', 'active_menu', 'eventTypes', 'tags'));
 }
 
 // Lưu sự kiện mới
@@ -68,7 +67,6 @@ public function store(Request $request)
         'timeend' => 'required|date|after:timestart',
         'event_type_id' => 'required|exists:event_type,id', // Sửa tên bảng
         'tag_ids' => 'nullable|array',
-        'user_ids' => 'nullable|array', // Thêm xác thực cho user_ids
         'documents.*' => 'file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:204800',
     ]);
 
@@ -106,12 +104,6 @@ public function store(Request $request)
         (new \App\Http\Controllers\TagController())->store_event_tag($event->id, $request->tag_ids);
     }
 
-    // Lưu user
-    if ($request->has('user_ids')) {
-        $event->user_ids = json_encode($request->user_ids); // Lưu danh sách user_ids dưới dạng JSON
-        $event->save();
-    }
-
     return redirect()->route('admin.event.index')->with('success', 'Sự kiện đã được tạo thành công!');
 }
 
@@ -122,8 +114,6 @@ public function store(Request $request)
     $eventTypes = EventType::all();
     $tags = Tag::where('status', 'active')->orderBy('title', 'ASC')->get();
     $tag_ids = DB::table('tag_events')->where('event_id', $event->id)->pluck('tag_id')->toArray();
-    $users = User::all(); // Lấy danh sách người dùng
-    $user_ids = json_decode($event->user_ids, true) ?? []; // Lấy danh sách người dùng đã tham gia từ trường user_ids
 
     $active_menu = 'event';
     $breadcrumb = '
@@ -131,7 +121,7 @@ public function store(Request $request)
         <li class="breadcrumb-item"><a href="' . route('admin.event.index') . '">Sự kiện</a></li>
         <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa Sự kiện</li>';
 
-    return view('Events::event.edit', compact('event', 'eventTypes', 'breadcrumb', 'active_menu', 'tags', 'tag_ids', 'users', 'user_ids'));
+    return view('Events::event.edit', compact('event', 'eventTypes', 'breadcrumb', 'active_menu', 'tags', 'tag_ids'));
 }
 
 // Cập nhật sự kiện
@@ -147,7 +137,6 @@ public function update(Request $request, $id)
         'timeend' => 'required|date|after:timestart',
         'event_type_id' => 'required|exists:event_type,id', // Sửa tên bảng
         'tag_ids' => 'nullable|array',
-        'user_ids' => 'nullable|array', // Thêm xác thực cho user_ids
         'documents.*' => 'file|mimes:jpg,jpeg,png,mp4,mp3,pdf,doc,mov,docx,ppt,pptx,xls,xlsx|max:204800',
     ]);
 
@@ -185,12 +174,7 @@ public function update(Request $request, $id)
         (new \App\Http\Controllers\TagController())->update_event_tag($event->id, $request->tag_ids);
     }
 
-    // Cập nhật user
-    if ($request->has('user_ids')) {
-        $event->user_ids = json_encode($request->user_ids); // Cập nhật danh sách user_ids
-        $event->save();
-    }
-
+ 
     return redirect()->route('admin.event.index')->with('success', 'Sự kiện đã được cập nhật!');
 }
 

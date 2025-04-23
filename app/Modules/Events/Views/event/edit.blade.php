@@ -120,19 +120,6 @@
                     </select>
                 </div>
 
-                <!-- Người tham gia -->
-                <div class="mt-3">
-                    <label for="select-users" class="form-label">Người tham gia</label>
-                    <select id="select-users" name="user_ids[]" multiple required>
-                        <option value="">Chọn người tham gia...</option>
-                        @foreach ($users as $user)
-                            <option value="{{ $user->id }}" 
-                                {{ in_array($user->id, json_decode($event->user_ids, true) ?? []) ? 'selected' : '' }}>
-                                {{ $user->full_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
 
                 <!-- Nút lưu -->
                 <div class="text-right mt-5">
@@ -152,12 +139,7 @@
         placeholder: "Nhập các thẻ, cách nhau bởi dấu phẩy",
     });
 
-    // Khởi tạo Tom Select cho trường người tham gia
-    new TomSelect("#select-users", {
-        create: false,
-        placeholder: "Chọn người tham gia...",
-    });
-
+    
     // Xử lý sự kiện click cho nút xóa
     document.querySelectorAll('.dltBtn').forEach(button => {
         button.addEventListener('click', function (e) {

@@ -18,21 +18,21 @@ class AuthenticationController extends Controller
     $this->validate($request, [
         'full_name' => 'string|required',
         'description' => 'string|nullable',
-        // 'phone' => 'string|required',
+        'phone' => 'string|nullable',
         'email' => 'string|required|email',
         'password' => 'string|required',
-        'role' => 'string|required|in:student,teacher',
+        'role' => 'string|required|in:eventmanager,eventmember',
     ]);
 
     $data = $request->all();
 
     // // Kiểm tra số điện thoại đã tồn tại
-    // if (\App\Models\User::where('phone', $data['phone'])->exists()) {
-    //     return response()->json([
-    //         'success' => false,
-    //         'message' => 'Số điện thoại đã tồn tại',
-    //     ], 200);
-    // }
+    if (\App\Models\User::where('phone', $data['phone'])->exists()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Số điện thoại đã tồn tại',
+        ], 200);
+    }
 
     // Kiểm tra email đã tồn tại
     if (\App\Models\User::where('email', $data['email'])->exists()) {
@@ -45,6 +45,8 @@ class AuthenticationController extends Controller
     // Gán các giá trị mặc định
     $data['photo'] = asset('backend/images/profile-6.jpg');
     $data['password'] = Hash::make($data['password']);
+    $data['phone'] = $data['phone'] ?? null; // Cho phép phone NULL
+
     // $data['username'] = $data['phone'];
 
     // Tạo user
@@ -79,7 +81,7 @@ public function store()
 {
     if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
         // Successful authentication
-        $user = User::with(['student', 'teacher'])->find(Auth::user()->id);
+        $user = User::with(['eventmanager', 'eventregistration'])->find(Auth::user()->id);
 
         if ($user->status == 'inactive') {
             return response()->json([
@@ -90,15 +92,15 @@ public function store()
             $user_token['token'] = $user->createToken('appToken')->accessToken;
 
             // Get student_id and teacher_id if they exist
-            $studentId = $user->student ? $user->student->id : 0;
-            $teacherId = $user->teacher ? $user->teacher->id : 0;
 
+            $eventmanagerId = $user->eventmanager ? $user->eventmanager->id : 0;
+            $eventregistrationId = $user->eventregistration ? $user->eventregistration->id : 0;
             return response()->json([
                 'success' => true,
                 'token' => $user_token,
                 'user' => $user,
-                'student_id' => $studentId,
-                'teacher_id' => $teacherId, // Return teacher_id
+                'eventmanager_id' => $eventmanagerId,
+                'eventregistration_id' => $eventregistrationId, // Return teacher_id
             ], 200);
         }
     } else {
@@ -113,91 +115,76 @@ public function store()
 
 
 
-public function createStudent(Request $request)
-{
-    $this->validate($request, [
-        'mssv' => 'string|required|unique:students,mssv',
-        'donvi_id' => 'integer|required|exists:donvi,id',
-        'nganh_id' => 'integer|required|exists:nganh,id',
-        'class_id' => 'integer|required|exists:classes,id',
-        'khoa' => 'string|required',
-        'user_id' => 'integer|required|exists:users,id',
-    ]);
+// public function createEventmember(Request $request)
+// {
+//     $this->validate($request, [
+        
+//         'user_id' => 'integer|required|exists:users,id',
+        
+//     ]);
 
-    try {
-        $data = $request->all();
+//     try {
+//         $data = $request->all();
 
-        // Tạo slug từ MSSV
-        $data['slug'] = Str::slug($data['mssv'], '-');
+//         // Tạo slug từ MSSV
+//         $data['slug'] = Str::slug($data['user_id'], '-');
 
-        // Thêm dữ liệu vào bảng students
-        $student = \App\Modules\Teaching_1\Models\Student::create([
-            'mssv' => $data['mssv'],
-            'donvi_id' => $data['donvi_id'],
-            'nganh_id' => $data['nganh_id'],
-            'class_id' => $data['class_id'],
-            'khoa' => $data['khoa'],
-            'user_id' => $data['user_id'],
-            'slug' => $data['slug'],
-        ]);
+//         // Thêm dữ liệu vào bảng students
+//         $eventmember = \App\Modules\Events\Models\EventRegistration::create([
+//             'user_id' => $data['user_id'],
+//             'event_id' => $data['event_id'],
+//             'status' => 'pending',
+//             'reason' => $data['reason'],
+//             'created_at' => now(),
+//             'updated_at' => now(),
+//         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Student created successfully',
-            'data' => $student,
-        ], 201); // Trả về mã trạng thái 201 khi tạo thành công
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to create student',
-            'error' => $e->getMessage(),
-        ], 500);
-    }
-}
+//         return response()->json([
+//             'success' => true,
+//             'message' => 'Eventmember created successfully',
+//             'data' => $eventmember,
+//         ], 201); // Trả về mã trạng thái 201 khi tạo thành công
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Failed to create eventmember',
+//             'error' => $e->getMessage(),
+//         ], 500);
+//     }
+// }
 
-public function createTeacher(Request $request)
-{
-    $this->validate($request, [
-        'mgv' => 'string|required|unique:teacher,mgv', // Mã giảng viên phải là duy nhất
-        'ma_donvi' => 'integer|required|exists:donvi,id', // Mã đơn vị phải tồn tại
-        'user_id' => 'integer|required|exists:users,id', // user_id phải tồn tại
-        'chuyen_nganh' => 'integer|required', // Chuyên ngành là bắt buộc
-        'hoc_ham' => 'string|nullable', // Học hàm (nếu có)
-        'hoc_vi' => 'string|nullable', // Học vị (nếu có)
-        'loai_giangvien' => 'string|required', // Loại giảng viên chỉ chấp nhận full-time hoặc part-time
-    ]);
+// public function createEventmanager(Request $request)
+// {
+//     $this->validate($request, [
+//         'user_id' => 'integer|required|exists:users,id',
+//         'slug' => 'string|required|unique:event_managers,slug',
+//     ]);
 
-    try {
-        $data = $request->all();
+//     try {
+//         $data = $request->all();
 
-        // Tạo slug từ mã giảng viên
-        $data['slug'] = Str::slug($data['mgv'], '-');
+//         // Tạo slug từ mã giảng viên
+//         $data['slug'] = Str::slug($data['user_id'], '-');
 
-        // Thêm dữ liệu vào bảng teachers
-        $teacher = \App\Modules\Teaching_1\Models\Teacher::create([
-            'mgv' => $data['mgv'],
-            'ma_donvi' => $data['ma_donvi'],
-            'user_id' => $data['user_id'],
-            'chuyen_nganh' => $data['chuyen_nganh'],
-            'hoc_ham' => $data['hoc_ham'] ?? null,
-            'hoc_vi' => $data['hoc_vi'] ?? null,
-            'loai_giangvien' => $data['loai_giangvien'],
-            'slug' => $data['slug'],
-        ]);
+//         // Thêm dữ liệu vào bảng teachers
+//         $eventmanager = \App\Modules\Events\Models\EventManager::create([
+//             'user_id' => $data['user_id'],
+//             'slug' => $data['slug'],
+//         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Teacher created successfully',
-            'data' => $teacher,
-        ], 201);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to create teacher',
-            'error' => $e->getMessage(),
-        ], 500);
-    }
-}
+//         return response()->json([
+//             'success' => true,
+//             'message' => 'Eventmanager created successfully',
+//             'data' => $eventmanager,
+//         ], 201);
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Failed to create eventmanager',
+//             'error' => $e->getMessage(),
+//         ], 500);
+//     }
+// }
 
 public function googleSignIn(Request $request)
 {
@@ -205,7 +192,7 @@ public function googleSignIn(Request $request)
         'email' => 'required|email',
         'full_name' => 'required|string',
         'google_id' => 'required|string',
-        'role' => 'nullable|string|in:student,teacher',
+        'role' => 'nullable|string|in:eventmanager,eventmember',
         'budget' => 'nullable|numeric',
     ]);
 
@@ -216,7 +203,7 @@ public function googleSignIn(Request $request)
             'full_name' => $request->full_name,
             'google_id' => $request->google_id,
             'username' => $request->input('username', null),
-            'role' => $request->input('role', 'student'),
+            'role' => $request->input('role', 'eventmember'),
             'budget' => $request->input('budget', 0),
             'phone' => $request->input('phone', null),
             'password' => bcrypt('default_password'),
@@ -227,10 +214,10 @@ public function googleSignIn(Request $request)
     );
 
     // Lấy thông tin student_id và teacher_id nếu có
-    $user->load(['student', 'teacher']); // Eager load để tránh query thừa
+    $user->load(['eventmanager', 'eventmember']); // Eager load để tránh query thừa
 
-    $studentId = $user->student ? $user->student->id : 0;
-    $teacherId = $user->teacher ? $user->teacher->id : 0;
+    $eventmanagerId = $user->eventmanager ? $user->eventmanager->id : 0;
+    $eventmemberId = $user->eventmember ? $user->eventmember->id : 0;
 
     // Tạo token cho user
     $token = $user->createToken('GoogleSignIn')->accessToken;
@@ -243,8 +230,8 @@ public function googleSignIn(Request $request)
             'role' => $user->role,
             'photo' => $user->photo,
         ],
-        'student_id' => $studentId,
-        'teacher_id' => $teacherId,
+        'eventmanager_id' => $eventmanagerId,
+        'eventmember_id' => $eventmemberId,
         'token' => $token,
     ]);
 }

@@ -93,4 +93,22 @@ class ApiUserController extends Controller
         return response()->json(['message' => 'Lỗi upload ảnh: ' . $e->getMessage()], 500);
     }
 }
+public function show($id)
+{
+    $user = User::with('roles')->findOrFail($id);
+
+    return response()->json([
+        'status' => true,
+        'data' => [
+            'id' => $user->id,
+            'full_name' => $user->full_name,
+            'email' => $user->email,
+            'photo' => asset($user->photo ?? 'backend/images/profile-6.jpg'),
+            'description' => $user->description,
+            'roles' => $user->roles->pluck('name'),
+            'vote_average' => $user->votes()->avg('rating'), // nếu có bảng votes
+        ]
+    ]);
+}
+
 }

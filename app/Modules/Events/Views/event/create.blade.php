@@ -71,7 +71,22 @@
                         <div class="text-red-500 text-sm">{{ $message }}</div>
                     @enderror
                 </div>
+        
+            <<!-- Địa điểm -->
+<div class="mt-3">
+    <label for="diadiem" class="form-label">Địa điểm</label>
+    <input id="diadiem" name="diadiem" type="text" class="form-control @error('diadiem') is-invalid @enderror" placeholder="Nhập địa điểm" required>
+    @error('diadiem')
+        <div class="text-red-500 text-sm">{{ $message }}</div>
+    @enderror
+</div>
 
+        
+        <div class="form-group">
+            <label for="ticket_price">Phí sự kiện</label>
+            <input type="number" name="ticket_price" class="form-control" required>
+            <small class="text-muted">Giá phí tính bằng đồng (VND)</small>
+        </div>
                 <!-- Loại sự kiện -->
                 <div class="mt-3">
                     <label for="event_type_id" class="form-label">Loại sự kiện</label>
@@ -96,19 +111,7 @@
                     </select>
                 </div>
 
-                <!-- Người tham gia -->
-                <div class="mt-3">
-                    <label for="select-users" class="form-label">Người tham gia</label>
-                    <select id="select-users" name="user_ids[]" multiple required>
-                        <option value="">Chọn người tham gia...</option>
-                        @foreach ($users as $user)
-                            <option value="{{ $user->id }}" 
-                                @if(in_array($user->id, old('user_ids', []))) selected @endif>
-                                {{ $user->full_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+            
 
                 <!-- Nút lưu -->
                 <div class="text-right mt-5">
@@ -133,15 +136,8 @@
         }
     });
 
-    // Khởi tạo Tom Select cho trường người tham gia
-    var selectUsers = new TomSelect('#select-users', {
-        create: false,
-        placeholder: "Chọn người tham gia...",
-        plugins: ['remove_button'],
-        sortField: {
-            field: "text",
-            direction: "asc"
-        }
-    });
+   
 </script>
 @endsection
+
+

@@ -23,7 +23,7 @@
                     <!-- <th class="text-center whitespace-nowrap">MÔ TẢ</th> -->
                     <th class="text-center whitespace-nowrap">URL</th>
                     <th class="text-center whitespace-nowrap">LOẠI SỰ KIỆN</th>
-                    <th class="text-center whitespace-nowrap">NGƯỜI THAM GIA</th>
+                    <!-- <th class="text-center whitespace-nowrap">NGƯỜI THAM GIA</th> -->
                     <th class="text-center whitespace-nowrap">HÀNH ĐỘNG</th>
                 </tr>
             </thead>
@@ -59,13 +59,13 @@
                         <td class="text-center">
                             {{ $event->eventType->title ?? 'Chưa có loại sự kiện' }}
                         </td>
-                        <td class="text-center">
+                        <!-- <td class="text-center">
                             @php
                                 $userIds = is_string($event->user_ids) ? json_decode($event->user_ids, true) : (is_array($event->user_ids) ? $event->user_ids : []);
                                 $users = \App\Models\User::whereIn('id', $userIds)->pluck('full_name')->toArray();
                             @endphp
                             {{ !empty($users) ? implode(', ', $users) : 'Chưa có người tham gia' }}
-                        </td>
+                        </td> -->
                         <td class="table-report__action text-center">
                             <div class="flex flex-col justify-center items-center space-y-2">
                                 <a href="{{ route('admin.event.edit', $event->id) }}" class="flex items-center">

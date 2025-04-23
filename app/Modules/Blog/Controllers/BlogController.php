@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Modules\Blog\Models\Blog;
+use App\Modules\Events\Models\TagEvent;
+use App\Models\Tag;
+use Illuminate\Support\Facades\Auth;
 
 class BlogController extends Controller
 {
@@ -43,66 +46,89 @@ class BlogController extends Controller
             return redirect()->route('unauthorized');
         }
         //
-        $data['categories'] = \App\Modules\Blog\Models\BlogCategory::where('status','active')->orderBy('title','ASC')->get();
-        $data['tags'] = \App\Models\Tag::where('status','active')->orderBy('title','ASC')->get();
+        $tags = Tag::where('status', 'active')->orderBy('title')->get();
+        $data['categories'] = \App\Modules\Blog\Models\BlogCategory::where('status','active')->orderBy('title')->get();
+        $data['tags'] = \App\Models\Tag::where('status','active')->orderBy('title')->get();
         $data['active_menu']="blog_add";
         $data['breadcrumb'] = '
         <li class="breadcrumb-item"><a href="#">/</a></li>
         <li class="breadcrumb-item  " aria-current="page"><a href="'.route('admin.blog.index').'">bài viết</a></li>
         <li class="breadcrumb-item active" aria-current="page"> tạo bài viết </li>';
-        return view('Blog::blog.create', $data);
+        return view('Blog::blog.create', $data, compact( 'tags'));
   
     }
      
     public function store(Request $request)
-    {
-        $func = "blog_add";
-        if(!$this->check_function($func))
-        {
-            return redirect()->route('unauthorized');
-        }
-        
-      
-        //
-        $this->validate($request,[
-            'title'=>'string|required',
-            'photo'=>'string|nullable',
-            'summary'=>'string|required',
-            'content'=>'string|required',
-            'photo'=>'string|nullable',
-            'cat_id'=>'numeric|nullable',
-            'status'=>'required|in:active,inactive',
-        ]);
-        $tag_ids = $request->tag_ids;
-        $data = $request->all();
-        /// ------end replace --///
-        $helpController = new \App\Http\Controllers\HelpController();
-        $data['content'] = $helpController->uploadImageInContent( $data['content'] );
-        $data['content'] = $helpController->removeImageStyle( $data['content'] );
-        
-        // ------end replace --///
-
-        $slug = Str::slug($request->input('title'));
-        $slug_count = Blog::where('slug',$slug)->count();
-        if($slug_count > 0)
-        {
-            $slug .= time().'-'.$slug;
-        }
-        $data['slug'] = $slug;
-        if($request->photo == null)
-            $data['photo'] = asset('backend/images/profile-6.jpg');
-        $data['user_id'] = auth()->user()->id;
-        $blog = Blog::create($data);
-        $tagservice = new \App\Http\Controllers\TagController();
-        $tagservice->store_blog_tag($blog->id,$tag_ids);
-        if($blog){
-            return redirect()->route('admin.blog.index')->with('success','Tạo bài viết thành công!');
-        }
-        else
-        {
-            return back()->with('error','Có lỗi xãy ra!');
-        }    
+{
+    $func = "blog_add";
+    if (!$this->check_function($func)) {
+        return redirect()->route('unauthorized');
     }
+
+    // Validate dữ liệu
+    $validatedData = $request->validate([
+        'title' => 'string|required',
+        'photo' => 'string|nullable',
+        'tags' => 'nullable|array',
+        'tags.*' => 'exists:tags,id',
+        'new_tags' => 'nullable|string',
+        'summary' => 'string|required',
+        'content' => 'string|required',
+        'cat_id' => 'numeric|nullable',
+        'status' => 'required|in:active,inactive',
+    ]);
+
+    // Khởi tạo mảng tagsArray từ tags đã chọn
+    $tagsArray = $request->tags ?? [];
+
+    // Xử lý tag mới nhập vào (nếu có)
+    if ($request->new_tags) {
+        $newTags = explode(',', $request->new_tags);
+        foreach ($newTags as $newTag) {
+            $newTag = trim($newTag);
+            if (!empty($newTag)) {
+                $tag = Tag::firstOrCreate(['title' => $newTag]);
+                $tagsArray[] = $tag->id;
+            }
+        }
+    }
+
+    // Xử lý slug
+    $slug = Str::slug($validatedData['title']);
+    $slugCount = Blog::where('slug', $slug)->count();
+    if ($slugCount > 0) {
+        $slug .= '-' . time();
+    }
+
+    // Xử lý content thông qua HelpController
+    $helpController = new \App\Http\Controllers\HelpController();
+    $content = $helpController->uploadImageInContent($validatedData['content']);
+    $content = $helpController->removeImageStyle($content);
+
+    // Xử lý ảnh mặc định nếu không có
+    $photo = $validatedData['photo'] ?? asset('backend/images/profile-6.jpg');
+
+    // Tạo Blog
+    $blog = Blog::create([
+        'title' => $validatedData['title'],
+        'slug' => $slug,
+        'summary' => $validatedData['summary'],
+        'content' => $content,
+        'photo' => $photo,
+        'cat_id' => $validatedData['cat_id'] ?? null,
+        'status' => $validatedData['status'],
+        'tags' => json_encode($tagsArray),
+        'user_id' => Auth::id(),
+    ]);
+
+    // Kiểm tra kết quả
+    if ($blog) {
+        return redirect()->route('admin.blog.index')->with('success', 'Tạo bài viết thành công!');
+    } else {
+        return back()->with('error', 'Có lỗi xảy ra!');
+    }
+}
+
  /**
      * Display the specified resource.
      */
@@ -122,9 +148,11 @@ class BlogController extends Controller
             return redirect()->route('unauthorized');
         }
         //
-        $categories = \App\Modules\Blog\Models\BlogCategory::where('status','active')->orderBy('title','ASC')->get();
+        $blog = Blog::findOrFail($id);
+        $attachedTags = json_decode($blog->tags, true) ?? []; // Mặc định là mảng rỗng nếu không có dữ liệu
+        $tags = Tag::where('status', 'active')->orderBy('title')->get();
+        $categories = \App\Modules\Blog\Models\BlogCategory::where('status','active')->orderBy('title')->get();
         $blog = Blog::find($id);
-        $tags  = \App\Models\Tag::where('status','active')->orderBy('title','ASC')->get();
         $tag_ids =DB::select("select tag_id from tag_blogs where blog_id = ".$blog->id)  ;
         if($blog)
         {
@@ -133,7 +161,7 @@ class BlogController extends Controller
             <li class="breadcrumb-item"><a href="#">/</a></li>
             <li class="breadcrumb-item  " aria-current="page"><a href="'.route('admin.blog.index').'">bài viết</a></li>
             <li class="breadcrumb-item active" aria-current="page"> điều chỉnh bài viết </li>';
-            return view('Blog::blog.edit',compact('breadcrumb','blog','active_menu','categories','tag_ids','tags'));
+            return view('Blog::blog.edit',compact('breadcrumb','blog','active_menu','categories','tags','attachedTags'));
         }
         else
         {
@@ -146,59 +174,75 @@ class BlogController extends Controller
     public function update(Request $request, string $id)
     {
         $func = "blog_edit";
-        if(!$this->check_function($func))
-        {
+        if (!$this->check_function($func)) {
             return redirect()->route('unauthorized');
         }
-        //
+    
         $blog = Blog::find($id);
-        if($blog)
-        {
-            $this->validate($request,[
-                'title'=>'string|required',
-                'photo'=>'string|nullable',
-                'summary'=>'string|required',
-                'content'=>'string|required',
-                'photo'=>'string|nullable',
-                'cat_id'=>'numeric|nullable',
-                'status'=>'required|in:active,inactive',
-            ]);
-            $data = $request->all();
+        if (!$blog) {
+            return back()->with('error', 'Không tìm thấy dữ liệu');
+        }
+    
+        // Validate dữ liệu
+        $validatedData = $request->validate([
+            'title' => 'string|required',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
+            'new_tags' => 'nullable|string',
+            'photo' => 'string|nullable',
+            'summary' => 'string|required',
+            'content' => 'string|required',
+            'cat_id' => 'numeric|nullable',
+            'status' => 'required|in:active,inactive',
+        ]);
+    
+        // Xử lý tags
+        $tagsArray = $validatedData['tags'] ?? [];
+        if (!empty($request->new_tags)) {
+            $newTags = explode(',', $request->new_tags);
+            foreach ($newTags as $newTag) {
+                $newTag = trim($newTag);
+                if (!empty($newTag)) {
+                    $tag = Tag::firstOrCreate(['title' => $newTag]);
+                    $tagsArray[] = $tag->id;
+                }
+            }
+        }
+    
+        // Xử lý nội dung qua HelpController
+        $helpController = new \App\Http\Controllers\HelpController();
+        $validatedData['content'] = $helpController->uploadImageInContent($validatedData['content']);
+        $validatedData['content'] = $helpController->removeImageStyle($validatedData['content']);
+    
+        // Xử lý ảnh
+        $validatedData['photo'] = $validatedData['photo'] ?? $blog->photo;
+        if (empty($validatedData['photo'])) {
+            $validatedData['photo'] = asset('backend/images/profile-6.jpg');
+        }
+    
+        // Cập nhật slug
+        $slug = Str::slug($validatedData['title']);
+        $slugCount = Blog::where('slug', $slug)->where('id', '!=', $id)->count();
+        if ($slugCount > 0) {
+            $slug .= '-' . time();
+        }
+        $validatedData['slug'] = $slug;
+    
+        // Cập nhật blog
+        $blog->fill($validatedData);
+        $blog->tags = json_encode($tagsArray);
+        $status = $blog->save();
+    
 
-            /// ------end replace --///
-            $helpController = new \App\Http\Controllers\HelpController();
-            $data['content'] = $helpController->uploadImageInContent( $data['content'] );
-            
-            // ------end replace --///
-            if($request->photo_old == null)
-            {
-                $data['photo_old'] =   $blog->photo;
-            }
-              
-            if($data['photo'] == null || $data['photo']=="")
-                $data['photo'] = $data['photo_old'] ;
-            
-            if($data['photo'] == null || $data['photo']=="")
-                $data['photo'] = asset('backend/images/profile-6.jpg');
-       
-            $status = $blog->fill($data)->save();
-            $tagservice = new \App\Http\Controllers\TagController();
-            $tag_ids = $request->tag_ids;
-            $tagservice->update_blog_tag($blog->id,$tag_ids);
-            if($status){
-                return redirect()->route('admin.blog.index')->with('success','Cập nhật thành công');
-            }
-            else
-            {
-                return back()->with('error','Có lỗi xãy ra!');
-            }    
+    
+        // Kết quả
+        if ($status) {
+            return redirect()->route('admin.blog.index')->with('success', 'Cập nhật thành công');
+        } else {
+            return back()->with('error', 'Có lỗi xảy ra!');
         }
-        else
-        {
-            return back()->with('error','Không tìm thấy dữ liệu');
-        }
-      
     }
+    
       /**
      * Remove the specified resource from storage.
      */
@@ -252,22 +296,28 @@ class BlogController extends Controller
         {
             return redirect()->route('unauthorized');
         }
+
         if($request->datasearch)
         {
-            $active_menu="blog_list";
-            $searchdata =$request->datasearch;
-            $blogs = DB::table('blogs')->where('title','LIKE','%'.$request->datasearch.'%')->orWhere('content','LIKE','%'.$request->datasearch.'%')
-            ->paginate($this->pagesize)->withQueryString();
-            $breadcrumb = '
-            <li class="breadcrumb-item"><a href="#">/</a></li>
-            <li class="breadcrumb-item  " aria-current="page"><a href="'.route('admin.blog.index').'">Bài viết</a></li>
-            <li class="breadcrumb-item active" aria-current="page"> tìm kiếm </li>';
-            return view('Blog::blog.search',compact('blogs','breadcrumb','searchdata','active_menu'));
-        }
-        else
-        {
-            return redirect()->route('admin.blog.index')->with('success','Không có thông tin tìm kiếm!');
-        }
+            $active_menu = "blog_list";
+            $searchdata = $request->datasearch;
+            $blogs = DB::table('blogs')
+                ->where('title', 'LIKE', '%' . $searchdata . '%')
+                ->orWhere('content', 'LIKE', '%' . $searchdata . '%')
+                ->orderBy('id', 'DESC')
+                ->paginate($this->pagesize)
+                ->appends(request()->query());
 
+            $breadcrumb = '
+                <li class="breadcrumb-item"><a href="#">/</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tìm kiếm bài viết: <strong>' . e($searchdata) . '</strong></li>';
+
+            return view('Blog::blog.index', compact('blogs', 'breadcrumb', 'active_menu', 'searchdata'));
+        } 
+        else 
+        {
+            return redirect()->route('admin.blog.index')->with('error', 'Vui lòng nhập từ khóa tìm kiếm!');
+        }
     }
+
 }

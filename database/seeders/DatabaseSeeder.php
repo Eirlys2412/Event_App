@@ -3,12 +3,15 @@
 namespace Database\Seeders;
 
 use App\Modules\Event\Models\EventType;
+use App\Modules\Teaching_1\Models\Teacher;
+
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
  
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -93,9 +96,19 @@ class DatabaseSeeder extends Seeder
                 'title'=>"Sinhvien",
                 'status'=>'active',
             ],
+            [
+                'alias'=>'eventmanager',
+                'title'=>"Event Manager",
+                'status'=>'active',
+            ],
             [   
-                'alias'=>'soft',
-                'title'=>"soft",
+                'alias'=>'eventmember',
+                'title'=>"Event Member",
+                'status'=>'active',
+            ],
+            [   
+                'alias'=>'leaderteam',
+                'title'=>"leader team",
                 'status'=>'active',
             ],
         ]);
@@ -108,6 +121,9 @@ class DatabaseSeeder extends Seeder
             NganhSeeder::class,
             EventTypeSeeder::class,
             LoaiTracNghiemSeeder::class,
+            TeacherSeeder::class,
+            ClassSeeder::class,
+            
         ]);
     }
 }

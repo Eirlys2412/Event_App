@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\File; // Use the File facade
+use Laravel\Passport\Passport;
 class ModuleServiceProvider extends ServiceProvider
 {
     public function register()
@@ -13,11 +14,21 @@ class ModuleServiceProvider extends ServiceProvider
         //
     }
 
+    protected function registerPolicies()
+    {
+        // Define your policy registration logic here
+    }
+
     public function boot()
     {
         // $this->loadModuleRoutes();
         $this->loadModuleViews();
         $this->loadMigration();
+        $this->registerPolicies();
+
+        Route::group(['prefix' => 'api', 'middleware' => ['api']], function () {
+            Passport::loadKeysFrom(base_path('storage/oauth-public.key'), base_path('storage/oauth-private.key'));
+        });
          
     }
     

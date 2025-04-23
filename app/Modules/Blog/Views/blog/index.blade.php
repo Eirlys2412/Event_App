@@ -1,8 +1,6 @@
 @extends('backend.layouts.master')
 @section('content')
 
- 
- 
     <h2 class="intro-y text-lg font-medium mt-10">
         Danh sách bài viết
     </h2>
@@ -40,7 +38,7 @@
                         <td>
                             <a target="_blank" href="" class="font-medium whitespace-nowrap">{{$item->title}}</a> 
                         </td>
-                        <td class="text-left">{{$item->cat_id?\App\Models\BlogCategory::find($item->cat_id)->title:''}}</td>
+                        <td class="text-left">{{$item->cat_id?\App\Modules\Blog\Models\BlogCategory::find($item->cat_id)->title:''}}</td>
                         <td class="w-40">
                             <div class="flex">
                                 <div class="w-10 h-10 image-fit zoom-in">

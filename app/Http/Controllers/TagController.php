@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Tag;
+use App\Modules\Events\Models\TagEvent;
 use Illuminate\Support\Facades\DB;
 
 class TagController extends Controller
@@ -82,7 +83,7 @@ class TagController extends Controller
             }
             $data['tag_id'] = $tag->id;
             $data['product_id'] = $product_id;
-            \App\Models\TagProduct::create($data);
+            TagProduct::create($data);
             $tag->hit += 1;
             $tag->save();
             sleep(1);

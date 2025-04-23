@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Blog; 
 use App\Modules\UserPage\Models\UserPage;
+use Illuminate\Support\Facades\DB;
 
 class UserPageController extends Controller
 {
@@ -89,5 +90,13 @@ class UserPageController extends Controller
     {
         $userpage->delete();
         return redirect()->route('admin.userpage.index')->with('success', 'User page deleted successfully.');
+    }
+
+    // Add AJAX status toggle for UserPage
+    public function userpageStatus(Request $request)
+    {
+        $status = ($request->mode === 'true' || $request->mode === true) ? 'active' : 'inactive';
+        DB::table('user_pages')->where('id', $request->id)->update(['status' => $status]);
+        return response()->json(['msg' => 'Cập nhật thành công', 'status' => true]);
     }
 }
