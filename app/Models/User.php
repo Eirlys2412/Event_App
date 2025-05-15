@@ -3,11 +3,18 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Modules\Teaching_1\Models\Student;
+use App\Modules\Teaching_1\Models\Teacher;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
+use App\Modules\Events\Models\EventManager;
+use App\Modules\Events\Models\EventRegistration;
+use App\Modules\Events\Models\EventUser;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -72,8 +79,7 @@ class User extends Authenticatable
             $user->status = "inactive";
             $user->save();
             return 0;
-        }
-            
+        }     
         
     }
     public static function c_create($data)
@@ -87,8 +93,86 @@ class User extends Authenticatable
        
         return $pro;
     }
+    /**
+     * Cập nhật ảnh đại diện cho người dùng
+     *
+     * @param string $photoPath
+     * @return void
+     */
+    public function updatePhoto($photoPath)
+    {
+        // Cập nhật giá trị 'photo' trong bảng users
+        $this->photo = $photoPath;
+        $this->save();
+    }
+
+    // Khai báo quan hệ
+    public function student()
+    {
+        return $this->hasOne(Student::class, 'user_id'); // 'user_id' là khóa ngoại trong bảng 'students'
+    }
     
+    // Khai báo quan hệ
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class, 'user_id'); // 'user_id' là khóa ngoại trong bảng 'teachers'
+    }
     
+    public function hasRole($role)
+    {
+        return $this->role->title === $role;
+    }
+
+    public function isAdmin()
+    {
+        return $this->hasRole('admin');
+    }
+
+    public function isEventManager()
+    {
+        return $this->hasRole('event_manager');
+    }
+
+    public function isParticipant()
+    {
+        return $this->hasRole('participant');
+    }
+    public function eventManager()
+    {
+        return $this->hasOne(EventManager::class, 'user_id');
+    }
+    public function eventRegistration()
+    {
+        return $this->hasOne(EventRegistration::class, 'user_id');
+    }
+    public function eventuser()
+    {
+        return $this->hasOne(EventUser::class, 'user_id');
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->photo) {
+            return asset('storage/' . $this->photo);
+        }
+        return asset('storage/resources/default.png');
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
 }   
+class OauthClient extends Model
+{
+    use HasApiTokens;
+
+    public static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            $model->id = (string) Str::uuid();
+        });
+    }
+}
 
 

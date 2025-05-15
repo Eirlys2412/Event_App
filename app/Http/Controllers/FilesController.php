@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Http\File;
+use Intervention\Image\Facades\Image;
+
 class FilesController extends Controller
 {
     //
@@ -33,19 +35,26 @@ class FilesController extends Controller
                 $folder='public/ckupload';
             }
             $file = $request->file('upload');
-            $url  = $file->storeAs(
+            $storagePath = $file->storeAs(
                 $folder,
                 $filename,
                 $disk
             );
-            $url = Storage::disk($disk)->url($url);
-            if($disk == 'local')
-            {
-                $url = asset( $url);
+            
+            if($disk == 's3') {
+                // Đối với S3, tạo URL từ cấu hình bucket và region
+                $s3Url = env('AWS_URL', 'https://s3.' . env('AWS_DEFAULT_REGION', 'us-east-1') . '.amazonaws.com');
+                $bucket = env('AWS_BUCKET', '');
+                $url = $s3Url . '/' . $bucket . '/' . $storagePath;
+            } else {
+                // Đối với local storage
+                $relativePath = str_replace('public/', '', $storagePath);
+                $url = asset('storage/' . $relativePath);
             }
+            
             return response()->json(['fileName' => $filename_ten, 'uploaded'=> 1, 'url' => $url]);
         }
-        return response()->json($response);
+        return response()->json(['error' => 'No file uploaded.']);
     }
 
     public function avartarUpload(Request $request)
@@ -70,49 +79,76 @@ class FilesController extends Controller
         
         return response()->json(['status'=>'true','link'=>$link]);
     }
-    public function blogimageUpload($url)
-    {
-        $imageContent = file_get_contents($url);
-        // Save the image content to a temporary file
+    public function blogimageUpload($data)
+{
+    if (!$data) return null;
+
+    // Nếu là ảnh base64 (gửi từ Flutter)
+    if (Str::startsWith($data, 'data:image')) {
+        try {
+            $folder = 'avatar'; // hoặc 'blogs'
+            $image = preg_replace('#^data:image/\w+;base64,#i', '', $data);
+            $image = str_replace(' ', '+', $image);
+            $imageData = base64_decode($image);
+
+            $fileName = 'blog_' . time() . '.jpg';
+            $filePath = storage_path("app/public/{$folder}/" . $fileName);
+            file_put_contents($filePath, $imageData);
+
+            return asset("storage/{$folder}/" . $fileName);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    // Nếu là URL hoặc local path
+    if (!filter_var($data, FILTER_VALIDATE_URL)) {
+        $data = public_path('storage/' . ltrim($data, '/'));
+    }
+
+    try {
+        $imageContent = file_get_contents($data);
         $tempImagePath = tempnam(sys_get_temp_dir(), 'image');
         file_put_contents($tempImagePath, $imageContent);
-        // Check if the file is an image
+
         $imageInfo = @getimagesize($tempImagePath);
         if (!$imageInfo) {
-            // Delete the temporary file and return false
             unlink($tempImagePath);
-            return false;
+            return null;
         }
-        // Check if the file size exceeds 0.5 MB
-        $fileSize = filesize($tempImagePath);
-        if ($fileSize > 0.5 * 1024 * 1024) { // Convert MB to bytes
-            // Compress the image
+
+        if (filesize($tempImagePath) > 0.5 * 1024 * 1024) {
             $this->compressImage($tempImagePath, $imageInfo['mime']);
         }
-        $s3Path = "blogs";
-        $awsKey = env('AWS_ACCESS_KEY_ID');
-        $awsSecret = env('AWS_SECRET_ACCESS_KEY');
-        if ($awsKey && $awsSecret) {
-            // Store the file on S3
-            $disk = 's3';
-            $folder='blogs';
+
+        $folder = 'blogs';
+        $disk = env('AWS_ACCESS_KEY_ID') && env('AWS_SECRET_ACCESS_KEY') ? 's3' : 'local';
+        $folder = $disk == 's3' ? 'blogs' : 'public/blogs';
+
+        $stored = Storage::disk($disk)->putFile($folder, new File($tempImagePath));
+
+        if ($disk === 's3') {
+            // Tạo URL cho S3
+            $s3Url = env('AWS_URL', 'https://s3.' . env('AWS_DEFAULT_REGION', 'us-east-1') . '.amazonaws.com');
+            $bucket = env('AWS_BUCKET', '');
+            $url = $s3Url . '/' . $bucket . '/' . $stored;
         } else {
-            // Store the file locally
-            $disk = 'local';
-            $folder='public/ckupload';
+            $relativePath = str_replace('public/', '', $stored);
+            $url = asset('storage/' . $relativePath);
+        
+            // ⚠️ Fix: thêm domain nếu thiếu
+            if (!Str::startsWith($url, 'http')) {
+                $url = url($url);  // ← thêm domain đầy đủ như http://localhost:8000/...
+            }
         }
         
-        // Upload the temporary file to S3
-        $s3Path = Storage::disk( $disk)->putFile($folder, new File($tempImagePath) );
-        $s3Path = Storage::disk( $disk)->url( $s3Path);
-        if($disk == 'local')
-        {
-            $s3Path = asset( $s3Path);
-        }
-        // Delete the temporary file
+
         unlink($tempImagePath);
-        return $s3Path;
+        return $url;
+    } catch (\Exception $e) {
+        return null;
     }
+}
 
     private function compressImage($imagePath, $mimeType)
     {
@@ -160,19 +196,24 @@ class FilesController extends Controller
             $folder = 'public/'.$folder;
         }
         $name = !is_null($filename) ? $filename.'_'.Str::random(5) : Str::random(25);
-        $link =  $file->storeAs(
+        $storagePath = $file->storeAs(
             $folder,
             $name . "." . $file->getClientOriginalExtension(),
             $disk
         );
-        $link = Storage::disk( $disk)->url($link);
-        if($disk == 'local')
-        {
-            $link = asset( $link);
-        }
-        return $link;
-     
         
+        if($disk == 's3') {
+            // Tạo URL cho S3
+            $s3Url = env('AWS_URL', 'https://s3.' . env('AWS_DEFAULT_REGION', 'us-east-1') . '.amazonaws.com');
+            $bucket = env('AWS_BUCKET', '');
+            $link = $s3Url . '/' . $bucket . '/' . $storagePath;
+        } else {
+            // Đối với local storage
+            $relativePath = str_replace('public/', '', $storagePath);
+            $link = asset('storage/' . $relativePath);
+        }
+        
+        return $link;
     }
   
 }

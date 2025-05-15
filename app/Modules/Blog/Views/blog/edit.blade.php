@@ -16,7 +16,7 @@
     <div class="grid grid-cols-12 gap-12 mt-5">
         <div class="intro-y col-span-12 lg:col-span-12">
             <!-- BEGIN: Form Layout -->
-            <form method="post" action="{{route('admin.blog.update',$blog->id)}}">
+            <form method="post" action="{{route('admin.blog.update',$blog->id)}}" enctype="multipart/form-data">
                 @csrf
                 @method('patch')
                 <div class="intro-y box p-5">
@@ -77,32 +77,36 @@
                             </select>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <label for="post-form-4" class="form-label">Tags</label>
-                        <select id="select-junk" name="tag_ids[]" multiple placeholder="..." autocomplete="off">
-                    
-                        <!-- <select name="tag_ids[]" data-placeholder="tag .."   class="tom-select w-full" id="post-form-4" multiple> -->
-                            @foreach ($tags as $tag )
-                                <option value="{{$tag->id}}" 
-                                    <?php 
-                                        foreach($tag_ids as $item)
-                                        {
-                                                if($item->tag_id == $tag->id)
-                                                    echo 'selected';
-                                        } 
-                                    ?>
-                                >{{$tag->title}}</option>
-                            @endforeach
-                        </select>
-                    </div>     
+                       <!-- Trường Tags (chọn các tags đã có từ trước) -->
+<div class="form-group">
+    <label for="tags">Tags</label>
+    <select id="tags" name="tags[]" class="form-control" multiple>
+        @foreach ($tags as $tag)
+            <option value="{{ $tag->id }}" 
+                {{ in_array($tag->id, old('tags', $attachedTags)) ? 'selected' : '' }}>
+                {{ $tag->title }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
+<!-- Input field for new tags (nhập tags mới) -->
+<div class="form-group">
+    <label for="new_tags">Nhập tags mới (cách nhau bằng dấu phẩy)</label>
+    <input type="text" name="new_tags" class="form-control" id="new_tags" placeholder="Nhập tag mới" value="{{ old('new_tags') }}">
+</div>
+
+<!-- Chỗ để hiển thị thông tin khi nhập tag mới -->
+<input type="hidden" name="new_tags_input" id="new_tags_input" value="{{ old('new_tags_input') }}">
+
                     <div class="mt-3">
                         <div class="flex flex-col sm:flex-row items-center">
                             <label style="min-width:70px  " class="form-select-label" for="status">Tình trạng</label>
                            
                             <select name="status"  class="form-select mt-2 sm:mr-2"   >
                                
-                                <option value ="active" {{$blog->status=='active'?'selected':''}}>Active</option>
-                                <option value = "inactive" {{$blog->status=='inactive'?'selected':''}}>Inactive</option>
+                                <option value ="pending" {{$blog->status=='pending'?'selected':''}}>Pending</option>
+                                <option value = "approved" {{$blog->status=='approved'?'selected':''}}>Approved</option>
                             </select>
                         </div>
                     </div>
@@ -136,9 +140,6 @@
         create: true
         
     });
-    @if (count($tag_ids)== 0)
-        select.clear();
-     @endif
 </script>
  
 <script>
@@ -159,8 +160,8 @@
                 // previewsContainer: ".dropzone-previews",
     Dropzone.instances[0].options.multiple = true;
     Dropzone.instances[0].options.autoQueue= true;
-    Dropzone.instances[0].options.maxFilesize =  1; // MB
-    Dropzone.instances[0].options.maxFiles =5;
+    Dropzone.instances[0].options.maxFilesize =  50; // MB
+    Dropzone.instances[0].options.maxFiles =50;
     Dropzone.instances[0].options.acceptedFiles= "image/jpeg,image/png,image/gif";
     Dropzone.instances[0].options.previewTemplate =  '<div class="col-span-5 md:col-span-2 h-28 relative image-fit cursor-pointer zoom-in">'
                                                +' <img    data-dz-thumbnail >'
@@ -229,4 +230,25 @@
         })
 
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Khởi tạo TomSelect cho trường select
+        var tagSelect = new TomSelect('#tags', {
+            create: false,  
+            maxItems: null,  // Không giới hạn số lượng tags
+            placeholder: 'Chọn tags',  // 
+            persist: false,  // Tránh tag trùng lặp trong danh sách chọn
+            tokenSeparators: [',', ' '],  // Phân tách tags bằng dấu phẩy hoặc dấu cách
+        });
+
+        // Lắng nghe sự kiện thay đổi trong ô nhập liệu tag mới
+        document.getElementById('new_tags').addEventListener('input', function() {
+            var newTags = this.value.split(',').map(tag => tag.trim()).filter(tag => tag);  // Lấy các tag mới nhập vào
+            // Cập nhật giá trị mới vào trường ẩn để gửi lên server
+            document.getElementById('new_tags_input').value = newTags.join(',');  // Nối các tag mới bằng dấu phẩy
+        });
+    });
+</script>
+
 @endsection

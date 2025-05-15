@@ -1,0 +1,36 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Xử lý trường hợp tài nguyên tĩnh bị lỗi
+    RewriteCond %{REQUEST_URI} \.(jpg|jpeg|png|gif|bmp)$ [NC]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ public/storage/default-image.jpg [L]
+
+    # Cấu hình CORS cho các file trong thư mục storage
+    <IfModule mod_headers.c>
+        <FilesMatch "\.(jpg|jpeg|png|gif|bmp)$">
+            Header set Access-Control-Allow-Origin "*"
+            Header set Access-Control-Allow-Methods "GET, OPTIONS"
+            Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+            Header set Cache-Control "max-age=86400, public"
+        </FilesMatch>
+    </IfModule>
+
+    # Tăng timeout cho việc tải file
+    <IfModule mod_php7.c>
+        php_value max_execution_time 300
+        php_value max_input_time 300
+        php_value upload_max_filesize 50M
+        php_value post_max_size 50M
+    </IfModule>
+
+    # Chuyển tiếp các yêu cầu đến public
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+AddType image/webp .webp
+AddOutputFilterByType DEFLATE image/webp 

@@ -19,3 +19,23 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Cấu hình CORS cho các file trong thư mục storage
+<IfModule mod_headers.c>
+    <FilesMatch "\.(jpg|jpeg|png|gif|bmp)$">
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+        Header set Access-Control-Allow-Headers "*"
+        Header set Access-Control-Max-Age "86400"
+        Header set Cache-Control "max-age=86400, public"
+
+        # Tăng timeout cho việc đọc file lớn
+        php_value max_execution_time 300
+        php_value max_input_time 300
+        
+        # Tránh lỗi connection closed
+        SetEnv no-gzip 1
+        Header set Connection "Keep-Alive"
+        Header set Keep-Alive "timeout=30, max=200"
+    </FilesMatch>
+</IfModule>

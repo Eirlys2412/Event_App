@@ -1,8 +1,6 @@
 @extends('backend.layouts.master')
 @section('content')
 
- 
- 
     <h2 class="intro-y text-lg font-medium mt-10">
         Danh sách bài viết
     </h2>
@@ -10,10 +8,10 @@
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
             <a href="{{route('admin.blog.create')}}" class="btn btn-primary shadow-md mr-2">Thêm bài viết</a>
             
-            <div class="hidden md:block mx-auto text-slate-500">Hiển thị trang {{$blogs->currentPage()}} trong {{$blogs->lastPage()}} trang</div>
+            <div class="hidden md:blo<xaiArtifact artifact_id="8b81501d-e709-4124-90b4-f9283b071eb9" artifact_version_id="bc0e9d87-a82f-42f9-a8ca-3132e1dd8f7e" title="index.blade.php" contentType="text/x-blade">ck mx-auto text-slate-500">Hiển thị trang {{$blogs->currentPage()}} trong {{$blogs->lastPage()}} trang</div>
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
                 <div class="w-56 relative text-slate-500">
-                    <form action="{{route('admin.blog.search')}}" method = "get">
+                    <form action="{{route('admin.blog.search')}}" method="get">
                         @csrf
                         <input type="text" name="datasearch" class="ipsearch form-control w-56 box pr-10" placeholder="Search...">
                         <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0" data-lucide="search"></i> 
@@ -30,7 +28,6 @@
                         <th class="whitespace-nowrap">DANH MỤC</th>
                         <th class="text-center whitespace-nowrap">PHOTO</th>
                         <th class="text-center whitespace-nowrap">TRẠNG THÁI</th>
-                        
                         <th></th>
                     </tr>
                 </thead>
@@ -40,45 +37,41 @@
                         <td>
                             <a target="_blank" href="" class="font-medium whitespace-nowrap">{{$item->title}}</a> 
                         </td>
-                        <td class="text-left">{{$item->cat_id?\App\Models\BlogCategory::find($item->cat_id)->title:''}}</td>
-                        <td class="w-40">
-                            <div class="flex">
-                                <div class="w-10 h-10 image-fit zoom-in">
-                                    <img  class="tooltip rounded-full" 
-                                        src="{{$item->photo}}"  >
-                                </div>
+                        <td class="text-left">{{$item->cat_id ? \App\Modules\Blog\Models\BlogCategory::find($item->cat_id)->title : ''}}</td>
+                        <td class="w-40 text-center">
+                            <div class="flex justify-center">
+                                @if (!empty($item->photo))
+                                    <img class="tooltip rounded-full w-10 h-10" src="{{ asset('storage/avatar/' . $item->photo) }}" alt="Blog photo">
+                                @else
+                                    <span>-</span>
+                                @endif
                             </div>
                         </td>
                         <td class="text-center"> 
                             <input type="checkbox" 
                             data-toggle="switchbutton" 
-                            data-onlabel="active"
-                            data-offlabel="inactive"
-                            {{$item->status=="active"?"checked":""}}
+                            data-onlabel="approved"
+                            data-offlabel="pending"
+                            {{$item->status=="approved"?"checked":""}}
                             data-size="sm"
                             name="toogle"
                             value="{{$item->id}}"
                             data-style="ios">
                         </td>
-                       
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
                                 <a href="{{route('admin.blog.edit',$item->id)}}" class="flex items-center mr-3" href="javascript:;"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
-                                <form action="{{route('admin.blog.destroy',$item->id)}}" method = "post">
+                                <form action="{{route('admin.blog.destroy',$item->id)}}" method="post">
                                     @csrf
                                     @method('delete')
                                     <a class="flex items-center text-danger dltBtn" data-id="{{$item->id}}" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
                                 </form>
-                               
                             </div>
                         </td>
                     </tr>
-
                     @endforeach
-                    
                 </tbody>
             </table>
-            
         </div>
     </div>
     <!-- END: HTML Table Data -->
@@ -87,7 +80,6 @@
             <nav class="w-full sm:w-auto sm:mr-auto">
                 {{$blogs->links('vendor.pagination.tailwind')}}
             </nav>
-           
         </div>
         <!-- END: Pagination -->
  
@@ -99,8 +91,7 @@
     $.ajaxSetup({
         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
     });
-    $('.dltBtn').click(function(e)
-    {
+    $('.dltBtn').click(function(e) {
         var form=$(this).closest('form');
         var dataID = $(this).data('id');
         e.preventDefault();
@@ -112,34 +103,23 @@
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Vâng, tôi muốn xóa!'
-            }).then((result) => {
+        }).then((result) => {
             if (result.isConfirmed) {
-                // alert(form);
                 form.submit();
-                // Swal.fire(
-                // 'Deleted!',
-                // 'Your file has been deleted.',
-                // 'success'
-                // );
             }
         });
     });
 </script>
 <script>
-    $(".ipsearch").on('keyup', function (e) {
+    $(".ipsearch").on('keyup', function(e) {
         e.preventDefault();
         if (e.key === 'Enter' || e.keyCode === 13) {
-           
-            // Do something
             var data=$(this).val();
             var form=$(this).closest('form');
-            if(data.length > 0)
-            {
+            if(data.length > 0) {
                 form.submit();
-            }
-            else
-            {
-                  Swal.fire(
+            } else {
+                Swal.fire(
                     'Không tìm được!',
                     'Bạn cần nhập thông tin tìm kiếm.',
                     'error'
@@ -161,19 +141,15 @@
             },
             success:function(response){
                 Swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: response.msg,
-                showConfirmButton: false,
-                timer: 1000
+                    position: 'top-end',
+                    icon: 'success',
+                    title: response.msg,
+                    showConfirmButton: false,
+                    timer: 1000
                 });
                 console.log(response.msg);
             }
-            
         });
-  
-});  
-    
+    });  
 </script>
- 
 @endsection

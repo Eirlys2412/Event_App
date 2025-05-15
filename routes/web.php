@@ -73,3 +73,22 @@ Route::group( ['prefix'=>'admin/','middleware'=>'admin.auth', 'as'=>'admin.'],fu
  
  
 // });
+
+// Route::get('/', [App\Http\Controllers\Frontend\IndexController::class, 'home'])->name('home');
+
+// Route::get('front/login', [App\Http\Controllers\Frontend\IndexController::class, 'viewLogin'])->name('front.login');
+// Route::post('front/login', [App\Http\Controllers\Frontend\IndexController::class, 'login'])->name('front.login.submit');  
+// Route::get('front/register', [App\Http\Controllers\Frontend\IndexController::class, 'viewRegister'])->name('front.register');
+// Route::post('front/register', [App\Http\Controllers\Frontend\IndexController::class, 'saveUser'])->name('front.register.submit'); 
+
+// // Hiển thị hồ sơ người dùng (Dashboard)
+// Route::get('front/profile', [App\Http\Controllers\Frontend\ProfileController::class, 'viewDashboard'])->name('front.profile');
+// Route::post('front/profile/changepassword', [App\Http\Controllers\Frontend\ProfileController::class, 'changePassword'])->name('front.profile.changepassword');
+// Route::get('front/profile/edit', [App\Http\Controllers\Frontend\ProfileController::class, 'createEdit'])->name('front.profile.edit');
+// Route::post('front/profile/edit', [App\Http\Controllers\Frontend\ProfileController::class, 'updateProfile'])->name('front.profile.update');
+
+//   // Trong nhóm route admin.community
+//   Route::get('group/{group_id}/posts', [App\Modules\Community\Controllers\CommunityPostController::class, 'indexByGroup'])->name('community.group.posts');
+//   Route::post('community/members/system-role', [App\Modules\Community\Controllers\CommunityMemberController::class, 'updateSystemRole'])->name('community.members.system-role');
+//   Route::post('community/members/role', [App\Modules\Community\Controllers\CommunityMemberController::class, 'updateRole'])->name('community.members.role');
+//   Route::post('community/members/status', [App\Modules\Community\Controllers\CommunityMemberController::class, 'updateStatus'])->name('community.members.status');

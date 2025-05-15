@@ -18,7 +18,7 @@
     <div class="grid grid-cols-12 gap-12 mt-5">
         <div class="intro-y col-span-12 lg:col-span-12">
             <!-- BEGIN: Form Layout -->
-            <form method="post" action="{{route('admin.blog.store')}}">
+            <form method="post" action="{{route('admin.blog.store')}}" enctype="multipart/form-data">
                 @csrf
                 <div class="intro-y box p-5">
                     <div>
@@ -51,7 +51,7 @@
                         <label for="" class="form-label">Nội dung</label>
                        
                         <textarea class="editor" name="content" id="editor2"  >
-                            {{old('description')}}
+                            {{old('content',$blog->content ?? '')}}
                         </textarea>
                     </div>
                     
@@ -67,20 +67,25 @@
                             </select>
                         </div>
                     </div>
-                    <div class="mt-3">
-                     
-                            <label for="post-form-4" class="form-label">Tags</label>
-                         
-                            <select id="select-junk" name="tag_ids[]" multiple placeholder=" ..." autocomplete="off">
-                    
-                              @foreach ($tags as $tag )
-                              <option value="{{$tag->id}}" >{{$tag->title}}</option>
-                              @endforeach
-                                
-                                 
-                            </select>
-                        
-                    </div>      
+                      <!-- Trường Tags -->
+<div class="form-group">
+    <label for="tags">Tags</label>
+    <select id="tags" name="tags[]" class="form-control" multiple>
+        @foreach ($tags as $tag)
+            <option value="{{ $tag->id }}" {{ in_array($tag->id, old('tags', [])) ? 'selected' : '' }}>{{ $tag->title }}</option>
+        @endforeach
+    </select>
+</div>
+
+<!-- Input field for new tags -->
+<div class="form-group">
+    <label for="new_tags">Nhập tags mới (cách nhau bằng dấu phẩy)</label>
+    <input type="text" name="new_tags" class="form-control" id="new_tags" placeholder="Nhập tag mới">
+</div>
+
+<!-- Chỗ để hiển thị thông tin khi nhập tag mới -->
+<input type="hidden" name="new_tags_input" id="new_tags_input">
+
                    
                     <div class="mt-3">
                         <div class="flex flex-col sm:flex-row items-center">
@@ -88,8 +93,8 @@
                            
                             <select name="status" class="form-select mt-2 sm:mr-2"   >
                                 
-                                <option value ="active" {{old('status')=='active'?'selected':''}}>Active</option>
-                                <option value = "inactive" {{old('status')=='inactive'?'selected':''}}>Inactive</option>
+                                <option value ="pending" {{old('status')=='pending'?'selected':''}}>Pending</option>
+                                <option value = "approved" {{old('status')=='approved'?'selected':''}}>Approved</option>
                             </select>
                         </div>
                     </div>
@@ -132,10 +137,10 @@
   
         Dropzone.instances[0].options.multiple = false;
         Dropzone.instances[0].options.autoQueue= true;
-        Dropzone.instances[0].options.maxFilesize =  1; // MB
-        Dropzone.instances[0].options.maxFiles =1;
+        Dropzone.instances[0].options.maxFilesize =  10; // MB
+        Dropzone.instances[0].options.maxFiles =50;
         Dropzone.instances[0].options.dictDefaultMessage = 'Drop images anywhere to upload (6 images Max)';
-        Dropzone.instances[0].options.acceptedFiles= "image/jpeg,image/png,image/gif";
+        Dropzone.instances[0].options.acceptedFiles= "image/jpeg,image/png,image/gif/JPG";
         Dropzone.instances[0].options.previewTemplate =  '<div class=" d-flex flex-column  position-relative">'
                                         +' <img    data-dz-thumbnail >'
                                         
@@ -172,6 +177,25 @@
 
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Khởi tạo TomSelect cho trường select
+        var tagSelect = new TomSelect('#tags', {
+            create: false,  
+            maxItems: null,  // Không giới hạn số lượng tags
+            placeholder: 'Chọn tags',  // 
+            persist: false,  // Tránh tag trùng lặp trong danh sách chọn
+            tokenSeparators: [',', ' '],  // Phân tách tags bằng dấu phẩy hoặc dấu cách
+        });
+
+        // Lắng nghe sự kiện thay đổi trong ô nhập liệu tag mới
+        document.getElementById('new_tags').addEventListener('input', function() {
+            var newTags = this.value.split(',').map(tag => tag.trim()).filter(tag => tag);  // Lấy các tag mới nhập vào
+            // Cập nhật giá trị mới vào trường ẩn để gửi lên server
+            document.getElementById('new_tags_input').value = newTags.join(',');  // Nối các tag mới bằng dấu phẩy
+        });
+    });
+</script>
  
 <script src="{{asset('js/js/ckeditor.js')}}"></script>
 <script>
