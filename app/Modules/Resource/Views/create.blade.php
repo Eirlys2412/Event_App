@@ -149,7 +149,7 @@
         ClassicEditor
             .create(document.querySelector('#description'), {
                 ckfinder: {
-                    uploadUrl: '{{ route('admin.upload.ckeditor') . '?_token=' . csrf_token() }}'
+                    uploadUrl: "{{ route('admin.upload.ckeditor') . '?_token=' . csrf_token() }}"
                 },
                 mediaEmbed: {
                     previewsInData: true

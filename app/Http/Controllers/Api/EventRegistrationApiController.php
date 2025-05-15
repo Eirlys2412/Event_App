@@ -140,4 +140,7 @@ class EventRegistrationApiController extends Controller
             'data' => $registration
         ]);
     }
+    
+
+
 }

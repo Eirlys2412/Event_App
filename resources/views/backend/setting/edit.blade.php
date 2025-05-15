@@ -241,8 +241,8 @@
                 // previewsContainer: ".dropzone-previews",
     Dropzone.instances[0].options.multiple = true;
     Dropzone.instances[0].options.autoQueue= true;
-    Dropzone.instances[0].options.maxFilesize =  1; // MB
-    Dropzone.instances[0].options.maxFiles =5;
+    Dropzone.instances[0].options.maxFilesize =  50; // MB
+    Dropzone.instances[0].options.maxFiles =50;
     Dropzone.instances[0].options.acceptedFiles= "image/jpeg,image/png,image/gif";
     Dropzone.instances[0].options.previewTemplate =  '<div class="col-span-5 md:col-span-2 h-28 relative image-fit cursor-pointer zoom-in">'
                                                +' <img    data-dz-thumbnail >'
@@ -281,8 +281,8 @@
 
     Dropzone.instances[1].options.multiple = true;
     Dropzone.instances[1].options.autoQueue= true;
-    Dropzone.instances[1].options.maxFilesize =  1; // MB
-    Dropzone.instances[1].options.maxFiles =1;
+    Dropzone.instances[1].options.maxFilesize =  50; // MB
+    Dropzone.instances[1].options.maxFiles =50;
     Dropzone.instances[1].options.acceptedFiles= "image/jpeg,image/png,image/gif";
     Dropzone.instances[1].options.previewTemplate =  '<div class="col-span-5 md:col-span-2 h-28 relative image-fit cursor-pointer zoom-in">'
                                                +' <img    data-dz-thumbnail >'
@@ -323,8 +323,8 @@
 
      Dropzone.instances[2].options.multiple = true;
     Dropzone.instances[2].options.autoQueue= true;
-    Dropzone.instances[2].options.maxFilesize =  1; // MB
-    Dropzone.instances[2].options.maxFiles =1;
+    Dropzone.instances[2].options.maxFilesize =  50; // MB
+    Dropzone.instances[2].options.maxFiles =50;
     Dropzone.instances[2].options.acceptedFiles= "image/jpeg,image/png,image/gif";
     Dropzone.instances[2].options.previewTemplate =  '<div class="col-span-5 md:col-span-2 h-28 relative image-fit cursor-pointer zoom-in">'
                                                +' <img    data-dz-thumbnail >'

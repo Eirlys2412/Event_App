@@ -105,7 +105,7 @@
                 // previewsContainer: ".dropzone-previews",
     Dropzone.instances[0].options.multiple = true;
     Dropzone.instances[0].options.autoQueue= true;
-    Dropzone.instances[0].options.maxFilesize =  1; // MB
+    Dropzone.instances[0].options.maxFilesize = 10; // MB
     Dropzone.instances[0].options.maxFiles =5;
     Dropzone.instances[0].options.acceptedFiles= "image/jpeg,image/png,image/gif";
     Dropzone.instances[0].options.previewTemplate =  '<div class="col-span-5 md:col-span-2 h-28 relative image-fit cursor-pointer zoom-in">'

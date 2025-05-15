@@ -18,7 +18,7 @@
     <div class="grid grid-cols-12 gap-12 mt-5">
         <div class="intro-y col-span-12 lg:col-span-12">
             <!-- BEGIN: Form Layout -->
-            <form method="post" action="{{route('admin.blog.store')}}">
+            <form method="post" action="{{route('admin.blog.store')}}" enctype="multipart/form-data">
                 @csrf
                 <div class="intro-y box p-5">
                     <div>
@@ -51,7 +51,7 @@
                         <label for="" class="form-label">Nội dung</label>
                        
                         <textarea class="editor" name="content" id="editor2"  >
-                            {{old('description')}}
+                            {{old('content',$blog->content ?? '')}}
                         </textarea>
                     </div>
                     
@@ -93,8 +93,8 @@
                            
                             <select name="status" class="form-select mt-2 sm:mr-2"   >
                                 
-                                <option value ="active" {{old('status')=='active'?'selected':''}}>Active</option>
-                                <option value = "inactive" {{old('status')=='inactive'?'selected':''}}>Inactive</option>
+                                <option value ="pending" {{old('status')=='pending'?'selected':''}}>Pending</option>
+                                <option value = "approved" {{old('status')=='approved'?'selected':''}}>Approved</option>
                             </select>
                         </div>
                     </div>
@@ -137,10 +137,10 @@
   
         Dropzone.instances[0].options.multiple = false;
         Dropzone.instances[0].options.autoQueue= true;
-        Dropzone.instances[0].options.maxFilesize =  1; // MB
-        Dropzone.instances[0].options.maxFiles =1;
+        Dropzone.instances[0].options.maxFilesize =  10; // MB
+        Dropzone.instances[0].options.maxFiles =50;
         Dropzone.instances[0].options.dictDefaultMessage = 'Drop images anywhere to upload (6 images Max)';
-        Dropzone.instances[0].options.acceptedFiles= "image/jpeg,image/png,image/gif";
+        Dropzone.instances[0].options.acceptedFiles= "image/jpeg,image/png,image/gif/JPG";
         Dropzone.instances[0].options.previewTemplate =  '<div class=" d-flex flex-column  position-relative">'
                                         +' <img    data-dz-thumbnail >'
                                         

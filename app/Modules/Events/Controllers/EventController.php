@@ -30,8 +30,9 @@ class EventController extends Controller
 
     foreach ($eventList as $event) {
         $resourceIds = json_decode($event->resources, true)['resource_ids'] ?? [];
-        $resourceUrls = Resource::whereIn('id', $resourceIds)->pluck('url')->toArray();
-        $event->setAttribute('resource_urls', $resourceUrls);
+        $resourceUrls = Resource::whereIn('id', $resourceIds)->get(['id', 'url','title', 'file_type', 'type_code']);
+        $event->resource_data = $resourceUrls;
+
     }
 
     $breadcrumb = '

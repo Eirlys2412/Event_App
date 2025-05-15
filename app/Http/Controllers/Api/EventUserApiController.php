@@ -178,4 +178,29 @@ class EventUserApiController extends Controller
             'data' => $participants
         ]);
     }
+    public function getUserEvents($userId)
+    {
+        // Lấy các bản ghi EventUser có user_id tương ứng và load cả event
+        $eventUsers = EventUser::with('event')
+            ->where('user_id', $userId)
+            ->get();
+    
+        $events = $eventUsers->map(function ($eu) {
+            return [
+                'id' => $eu->event->id,
+                'title' => $eu->event->title,
+                'description' => $eu->event->description,
+                'timestart' => $eu->event->timestart,
+                'timeend' => $eu->event->timeend,
+                'status' => 'approved', // hoặc lấy từ EventUser nếu có
+            ];
+        });
+    
+        return response()->json([
+            'status' => true,
+            'data' => $events
+        ]);
+    }
+    
+
 }

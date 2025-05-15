@@ -5,252 +5,343 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use App\Models\Blog;
+use Illuminate\Support\Facades\Storage;
+use App\Modules\Blog\Models\Blog;
 use App\Models\Tag;
 use App\Models\User;
-use App\Modules\Tuongtac\Models\TPage;
-use App\Modules\Tuongtac\Models\TPageItem;
-use App\Modules\Resource\Models\Resource;
-use Illuminate\Support\Facades\Validator;
-use App\Modules\Tuongtac\Models\TComment;
-use App\Modules\Tuongtac\Models\TNotice;
-use App\Modules\Tuongtac\Models\TTag;
-use App\Modules\Tuongtac\Models\TTagItem;
-use App\Modules\Tuongtac\Models\TMotion;
-use App\Modules\Tuongtac\Models\TMotionItem;
-use App\Modules\Tuongtac\Models\TRecommend;
-use App\Modules\Tuongtac\Models\TVoteItem;
-
+use App\Http\Controllers\HelpController;
+use App\Http\Controllers\FilesController;
+use App\Http\Controllers\TagController;
+use App\Modules\TuongTac\Models\Bookmark;
+use App\Modules\TuongTac\Models\Like;
+use App\Modules\TuongTac\Models\Vote;
 class BlogController extends Controller
 {
-    // Lấy thông tin bài viết theo ID hoặc Slug
-    public function getblog(Request $request)
+    public function getAll()
     {
-        $this->validate($request, [
-            'slug' => 'string|nullable',
-            'id' => 'integer|nullable',
+        $blogs = Blog::orderByDesc('id')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $blogs,
+        ]);
+    }
+
+    public function getBlog(Request $request)
+    {
+        $request->validate([
+            'slug' => 'nullable|string',
+            'id'   => 'nullable|integer',
+
         ]);
 
-        $blog = null;
-        if ($request->id) {
-            $blog = Blog::find($request->id);
-        }
-
-        if ($request->slug) {
-            $blog = Blog::where('slug', $request->slug)->first();
-        }
+        $blog = $request->id 
+            ? Blog::find($request->id) 
+            : Blog::where('slug', $request->slug)->first();
 
         if (!$blog) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Bài viết không tồn tại.',
-            ], 404);
+            return response()->json(['success' => false, 'message' => 'Bài viết không tồn tại.'], 404);
         }
 
-        // Lấy thông tin tác giả
         $author = User::find($blog->user_id);
         $blog->author_name = $author->full_name ?? null;
         $blog->author_photo = $author->photo ?? null;
         $blog->author_id = $author->id ?? null;
 
-        // Dữ liệu tương tác (giả lập)
-        $tuongtac = [
-            'isBookmarked' => false,
-            'countBookmarked' => 0,
-            'reactions' => [],
-            'hasComment' => 0,
-            'comments' => [],
-            'voteRecord' => null,
-        ];
-
         return response()->json([
             'success' => true,
             'blog' => $blog,
-            'tuongtac' => $tuongtac,
-        ], 200);
+            'tuongtac' => [
+                'isBookmarked' => false,
+                'countBookmarked' => 0,
+                'reactions' => [],
+                'hasComment' => 0,
+                'comments' => [],
+                'voteRecord' => null,
+            ],
+        ]);
     }
 
-    // Lấy danh sách bài viết theo danh mục hoặc tag
-    public function getBlogCat(Request $request)
+    public function filter(Request $request)
     {
-        $this->validate($request, [
-            'catId' => 'integer|nullable',
-            'tag' => 'string|nullable',
-            'page' => 'integer|required',
-            'limit' => 'integer|required',
+        $request->validate([
+            'catId' => 'nullable|integer',
+            'tag' => 'nullable|string',
+            'page' => 'required|integer',
+            'limit' => 'required|integer',
         ]);
 
-        $catId = $request->input('catId');
-        $tag = $request->input('tag');
-        $page = $request->input('page');
-        $limit = $request->input('limit');
-        $offset = ($page - 1) * $limit;
+        $query = Blog::query();
 
-        $posts = collect();
-        $total = 0;
+        if ($request->catId) {
+            $query->where('cat_id', $request->catId);
+        }
 
-        if ($tag) {
-            $tagModel = Tag::where('title', $tag)->first();
-            if ($tagModel) {
-                $posts = DB::table('blogs')
-                    ->whereJsonContains('tags', (string)$tagModel->id)
-                    ->select(
-                        'blogs.id',
-                        'blogs.title',
-                        'blogs.photo',
-                        'blogs.summary',
-                        'blogs.slug',
-                        'blogs.created_at',
-                        'blogs.tags'
-                    )
-                    ->orderBy('blogs.id', 'desc')
-                    ->offset($offset)
-                    ->limit($limit)
-                    ->get();
-
-                $total = DB::table('blogs')
-                    ->whereJsonContains('tags', (string)$tagModel->id)
-                    ->count();
-
-                $posts = $posts->map(function ($post) {
-                    $tagIds = json_decode($post->tags, true);
-                    $post->tags = Tag::whereIn('id', $tagIds)->pluck('title')->toArray();
-                    return $post;
-                });
+        if ($request->tag) {
+            $tag = Tag::where('title', $request->tag)->first();
+            if ($tag) {
+                $query->whereJsonContains('tags', (string)$tag->id);
             }
         }
 
-        if ($catId) {
-            $posts = DB::table('blogs')
-                ->select(
-                    'id',
-                    'title',
-                    'photo',
-                    'summary',
-                    'slug',
-                    'created_at',
-                    'tags'
-                )
-                ->where('cat_id', $catId)
-                ->orderBy('id', 'desc')
-                ->offset($offset)
-                ->limit($limit)
-                ->get();
-
-            $total = DB::table('blogs')
-                ->where('cat_id', $catId)
-                ->count();
-
-            $posts = $posts->map(function ($post) {
-                $tagIds = json_decode($post->tags, true);
-                $post->tags = Tag::whereIn('id', $tagIds)->pluck('title')->toArray();
-                return $post;
-            });
-        }
+        $total = $query->count();
+        $blogs = $query->orderByDesc('id')
+            ->offset(($request->page - 1) * $request->limit)
+            ->limit($request->limit)
+            ->get();
 
         return response()->json([
-            'data' => $posts,
-            'current_page' => $page,
-            'per_page' => $limit,
+            'success' => true,
+            'data' => $blogs,
+            'current_page' => $request->page,
+            'per_page' => $request->limit,
             'total' => $total,
-            'total_pages' => ceil($total / $limit),
+            'total_pages' => ceil($total / $request->limit),
         ]);
     }
 
-    // Tìm kiếm bài viết theo từ khóa
-    public function getBlogSearch(Request $request)
+    public function search(Request $request)
     {
-        $this->validate($request, [
-            'search' => 'string|nullable',
-            'page' => 'integer|required',
-            'limit' => 'integer|required',
+        $request->validate([
+            'search' => 'nullable|string',
+            'page' => 'required|integer',
+            'limit' => 'required|integer',
         ]);
 
-        $searchdata = $request->search;
-        $sdatas = explode(" ", $searchdata);
-        $searchdata = implode("%", $sdatas);
-        $page = $request->input('page');
-        $limit = $request->input('limit');
-        $offset = ($page - 1) * $limit;
+        $keyword = str_replace(' ', '%', $request->search);
 
-        $posts = DB::table('blogs')
-            ->select('id', 'title', 'photo', 'summary', 'slug', 'created_at')
-            ->where('title', 'like', '%' . $searchdata . '%')
-            ->orWhere('summary', 'like', '%' . $searchdata . '%')
-            ->orderBy('id', 'desc')
-            ->offset($offset)
-            ->limit($limit)
+        $query = Blog::query()
+            ->where('title', 'like', "%$keyword%")
+            ->orWhere('summary', 'like', "%$keyword%");
+
+        $total = $query->count();
+        $results = $query->orderByDesc('id')
+            ->offset(($request->page - 1) * $request->limit)
+            ->limit($request->limit)
             ->get();
-
-        $tempposts = DB::table('blogs')
-            ->select('id', 'title', 'photo', 'summary', 'slug', 'created_at')
-            ->where('title', 'like', '%' . $searchdata . '%')
-            ->orWhere('summary', 'like', '%' . $searchdata . '%')
-            ->orderBy('id', 'desc')
-            ->get();
-
-        $total = count($tempposts);
 
         return response()->json([
-            'data' => $posts,
-            'current_page' => $page,
-            'per_page' => $limit,
+            'success' => true,
+            'data' => $results,
+            'current_page' => $request->page,
+            'per_page' => $request->limit,
             'total' => $total,
-            'total_pages' => ceil($total / $limit),
+            'total_pages' => ceil($total / $request->limit),
         ]);
     }
 
-    // Lưu bài viết mới
     public function store(Request $request)
-    {
-        set_time_limit(6000);
+{
+    $request->validate([
+        'title' => 'required|string',
+        'summary' => 'nullable|string',
+        'content' => 'required|string',
+        'image' => 'nullable|string', // base64 image từ Flutter
+        'tag_ids' => 'nullable|string',
+        'category_id' => 'nullable|integer',
+        'status' => 'pending',
+    ]);
 
-        $this->validate($request, [
-            'title' => 'string|required',
-            'photo' => 'string|nullable',
-            'summary' => 'string|nullable',
-            'content' => 'string|required',
-            'tag_ids' => 'string|nullable',
-            'blogtype' => 'string|nullable',
-        ]);
-
-        $slug = Str::slug($request->input('title'));
-        $slug_count = Blog::where('slug', $slug)->count();
-        if ($slug_count > 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Bài viết đã có.',
-            ], 200);
+    DB::beginTransaction();
+    try {
+        $slug = Str::slug($request->title);
+        if (Blog::where('slug', $slug)->exists()) {
+            $slug .= '-' . time();
         }
 
-        $data = $request->all();
-        $data['slug'] = $slug;
+        $help = new HelpController();
+        $photoPath = null;
 
-        $helpController = new \App\Http\Controllers\HelpController();
-        $fileController = new \App\Http\Controllers\FilesController();
+        // ✅ Xử lý ảnh base64 nếu có
+        if ($request->has('image') && !empty($request->image)) {
+            $base64Image = $request->image;
+            $imageName = 'blog_' . time() . '_' . Str::random(10) . '.jpg';
+            $imagePath = 'avatar/' . $imageName;
 
-        $data['content'] = $helpController->removeImageStyle($data['content']);
-        $data['photo'] = $fileController->blogimageUpload($data['photo'] ?? 'default.jpg');
-        $data['user_id'] = auth()->user()->id;
+            // Ghi file vào storage/app/public/avatar/
+            Storage::disk('public')->put($imagePath, base64_decode($base64Image));
 
-        $blog = Blog::create($data);
+            $photoPath = asset('storage/' . $imagePath); // Đường dẫn để lưu vào DB
+        }
 
-        if ($blog) {
-            // Xử lý gắn tag cho bài viết
-            $tagcontroller = new \App\Http\Controllers\TagController();
-            $tag_ids = json_decode($data['tag_ids']);
-            $tagcontroller->store_blog_tag($blog->id, $tag_ids);
+        $blog = Blog::create([
+            'title' => $request->title,
+            'slug' => $slug,
+            'summary' => $request->summary,
+            'content' => $help->removeImageStyle($request->content),
+            'photo' => $photoPath,
+            'user_id' => Auth::id(),
+            'cat_id' => $request->category_id,
+            'status' => $request->status ?? 'active',
+        ]);
 
+        // Gán tag nếu có
+        if ($request->tag_ids) {
+            $tagIds = json_decode($request->tag_ids, true);
+            (new TagController())->store_blog_tag($blog->id, $tagIds);
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bài viết đã được lưu.',
+            'data' => $blog,
+        ], 201);
+
+    } catch (\Exception $e) {
+        DB::rollback();
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+    }
+}
+
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'title' => 'required|string',
+        'summary' => 'nullable|string',
+        'content' => 'required|string',
+        'image' => 'nullable|string', // đổi từ 'photo' thành 'image' cho đồng bộ
+        'tag_ids' => 'nullable|string',
+        'category_id' => 'nullable|integer',
+        'status' => 'pending',
+    ]);
+
+    $blog = Blog::findOrFail($id);
+
+    $help = new HelpController();
+    $photoPath = $blog->photo;
+
+    // ✅ Nếu cập nhật ảnh mới (base64)
+    if ($request->has('image') && !empty($request->image)) {
+        $base64Image = $request->image;
+        $imageName = 'blog_' . time() . '_' . Str::random(10) . '.jpg';
+        $imagePath = 'avatar/' . $imageName;
+
+        Storage::disk('public')->put($imagePath, base64_decode($base64Image));
+
+        $photoPath = asset('storage/' . $imagePath);
+    }
+
+    $blog->update([
+        'title' => $request->title,
+        'slug' => Str::slug($request->title),
+        'summary' => $request->summary,
+        'content' => $help->removeImageStyle($request->content),
+        'photo' => $photoPath,
+        'cat_id' => $request->category_id ?? $blog->cat_id,
+        'status' => $request->status ?? $blog->status,
+    ]);
+
+    if ($request->tag_ids) {
+        $tagIds = json_decode($request->tag_ids, true);
+        (new TagController())->store_blog_tag($blog->id, $tagIds);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Cập nhật thành công.',
+        'data' => $blog,
+    ]);
+}
+
+
+    public function destroy($id)
+    {
+        $blog = Blog::findOrFail($id);
+        $blog->delete();
+
+        return response()->json(['success' => true, 'message' => 'Bài viết đã được xóa.']);
+    }
+
+    public function attachTags(Request $request, $id)
+    {
+        $blog = Blog::findOrFail($id);
+        
+        $request->validate([
+            'tags' => 'required|array',
+            'tags.*' => 'exists:tags,id'
+        ]);
+
+        $blog->tags()->sync($request->tags);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tags attached successfully',
+            'data' => $blog->load('tags')
+        ]);
+    }
+
+    public function getTags($id)
+    {
+        $blog = Blog::findOrFail($id);
+        return response()->json([
+            'success' => true,
+            'data' => $blog->tags
+        ]);
+    }
+    public function getmyBlogs()
+    {
+        try {
+            $userId = Auth::id();
+            $blogs = Blog::where('user_id', $userId)
+                ->where('status', 'approved')
+                ->orderByDesc('id')
+                ->get();
             return response()->json([
                 'success' => true,
-                'message' => 'Đã lưu thành công!',
-            ], 200);
-        } else {
+                'data' => $blogs
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Lưu thất bại!',
-            ], 200);
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
+public function getBlogsByUser($id)
+{
+    $blogs = Blog::where('user_id', $id)
+                 ->where('status', 'approved')
+                 ->orderByDesc('id')
+                 ->get();
+
+    return response()->json([
+        'success' => true,
+        'data' => $blogs
+    ]);
+}
+public function getApprovedBlogs()
+{
+    $blogs = Blog::where('status', 'approved')
+        ->orderBy('created_at', 'desc')
+        ->select('id', 'title', 'slug', 'summary', 'content', 'cat_id', 'photo', 'created_at', 'updated_at', 'user_id')
+        ->paginate(10);
+
+    // Bổ sung thông tin tác giả và tương tác cho từng bài viết
+    $blogs->getCollection()->transform(function ($blog) {
+        $author = User::find($blog->user_id);
+        $blog->author_name = $author->full_name ?? null;
+        $blog->author_photo = $author->photo ?? null;
+        $blog->author_id = $author->id ?? null;
+
+        // Số lượng bookmark, like, comment, vote
+        $blog->countBookmarked = $blog->bookmarks()->count();
+        $blog->countLike = $blog->likes()->count();
+        $blog->countComment = $blog->comments()->count();
+        //$blog->vote = $blog->votes()->avg('rating'); // hoặc count nếu muốn
+
+        return $blog;
+    });
+
+    return response()->json([
+        'success' => true,
+        'blogs' => $blogs,
+    ]);
+}
+
+
+
 }

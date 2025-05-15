@@ -92,4 +92,6 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
+    'file' => 'max:204800', // 200MB (đơn vị KB)
+
 ];

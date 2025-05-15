@@ -175,7 +175,7 @@
  
     Dropzone.instances[0].options.multiple = false;
         Dropzone.instances[0].options.autoQueue= true;
-        Dropzone.instances[0].options.maxFilesize =  1; // MB
+        Dropzone.instances[0].options.maxFilesize =  10; // MB
         Dropzone.instances[0].options.maxFiles =1;
         Dropzone.instances[0].options.dictDefaultMessage = 'Drop images anywhere to upload (6 images Max)';
         Dropzone.instances[0].options.acceptedFiles= "image/jpeg,image/png,image/gif";

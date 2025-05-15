@@ -5,13 +5,21 @@ namespace App\Modules\Blog\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Modules\Events\Models\TagEvent;
-use App\Models\Like;
-use App\Models\Bookmark;
-use App\Models\Vote;
+use App\Modules\TuongTac\Models\Like;
+use App\Modules\TuongTac\Models\Bookmark;
+use App\Modules\TuongTac\Models\Vote;
 class Blog extends Model
 {
     use HasFactory;
-    protected $fillable = ['title','slug', 'tags','photo','summary','content','cat_id','user_id','status'];
+    protected $fillable = ['title',
+    'slug', 
+    'tags',
+    'photo',
+    'summary',
+    'content',
+    'cat_id',
+    'user_id',
+    'status'];
 
     public function tags()
 {
@@ -44,6 +52,12 @@ public function votes() {
 public function averageRating() {
     return $this->votes()->avg('rating');
 }
+// App\Models\Blog.php
+public function scopeApproved($query)
+{
+    return $query->where('status', 'approved');
+}
+
 
 
 }

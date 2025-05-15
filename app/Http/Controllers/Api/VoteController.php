@@ -4,49 +4,42 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Vote;
+use Illuminate\Support\Facades\Auth;
+
 
 class VoteController extends Controller
 {
-    // POST /api/v1/votes
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'votable_type' => 'required|string',
-            'votable_id'   => 'required|integer',
-            'rating'       => 'required|integer|min:1|max:5',
+        $request->validate([
+            'votable_type' => 'required|string', // 'blog' hoặc 'event'
+            'votable_id' => 'required|integer',
+            'score' => 'required|integer|min:1|max:5',
         ]);
-        $data['user_id'] = Auth::id();
 
-        // Create or update vote
+        $votableType = 'App\\Models\\' . ucfirst($request->votable_type);
+
         Vote::updateOrCreate(
             [
-                'user_id' => $data['user_id'],
-                'votable_type' => $data['votable_type'],
-                'votable_id' => $data['votable_id'],
+                'user_id' => Auth::id(),
+                'votable_type' => $votableType,
+                'votable_id' => $request->votable_id,
             ],
-            ['rating' => $data['rating']]
+            ['score' => $request->score]
         );
 
-        // Calculate average
-        $avg = Vote::where('votable_type', $data['votable_type'])
-            ->where('votable_id', $data['votable_id'])
-            ->avg('rating');
-
-        return response()->json(['average' => round($avg,1)], 200);
+        return response()->json(['message' => 'Đánh giá thành công']);
     }
 
-    // GET /api/v1/votes/average?votable_type=&votable_id=
-    public function average(Request $request)
+    public function average($type, $id)
     {
-        $data = $request->validate([
-            'votable_type' => 'required|string',
-            'votable_id'   => 'required|integer',
-        ]);
-        $avg = Vote::where('votable_type', $data['votable_type'])
-            ->where('votable_id', $data['votable_id'])
-            ->avg('rating');
-        return response()->json(['average' => round($avg,1)], 200);
+        $votableType = 'App\\Models\\' . ucfirst($type);
+
+        $average = Vote::where('votable_type', $votableType)
+            ->where('votable_id', $id)
+            ->avg('score');
+
+        return response()->json(['average' => round($average, 2)]);
     }
-} 
+}

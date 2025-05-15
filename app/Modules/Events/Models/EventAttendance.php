@@ -5,6 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Modules\Events\Models\Event;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EventAttendance extends Model {
     use HasFactory;
@@ -43,15 +45,19 @@ class EventAttendance extends Model {
         return $this->qr_token;
     }
 
-    public function checkIn($location = null) {
-        if ($this->checked_in_at) {
-            return false;
-        }
-        
-        $this->checked_in_at = Carbon::now();
-        $this->check_in_location = $location;
-        $this->status = 'active';
-        return $this->save();
+    public function checkIn($eventId, Request $request)
+    {
+        // ... các kiểm tra khác
+
+        $userId = Auth::id();
+
+        $attendance = EventAttendance::create([
+            'event_id' => $eventId,
+            'user_id' => $userId,
+            'checked_in_at' => now(),
+            'qr_token' => $request->qr_token
+        ]);
+        // ...
     }
 
     public function isCheckedIn() {

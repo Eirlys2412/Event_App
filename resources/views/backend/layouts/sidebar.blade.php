@@ -9,7 +9,7 @@
             </li> 
            
         <!-- Blog -->
-        <li>
+        <!-- <li>
             <a href="javascript:;.html" class="side-menu side-menu{{( $active_menu=='blog_list'|| $active_menu=='blog_add'||$active_menu=='blogcat_list'|| $active_menu=='blogcat_add' )?'--active':''}}">
                 <div class="side-menu__icon"> <i data-lucide="align-center"></i> </div>
                 <div class="side-menu__title">
@@ -38,7 +38,7 @@
                     </a>
                 </li>
           </ul>
-        </li>
+        </li> -->
          <!-- Group Sidebar Menu -->
         <li>
             <a href="javascript:;.html" class="side-menu side-menu{{( $active_menu=='group_list'|| $active_menu=='group_add' )?'--active':''}}">
@@ -67,7 +67,7 @@
 
 
         <!-- student -->
-        <li>
+        <!-- <li>
             <a href="javascript:;" class="side-menu side-menu{{ ($active_menu == 'student_list' || $active_menu == 'student_add') ? '--active' : '' }}">
                 <div class="side-menu__icon"> <i data-lucide="user"></i> </div>
                 <div class="side-menu__title">
@@ -89,10 +89,10 @@
                     </a>
                 </li>
             </ul>
-        </li>
+        </li> -->
         
         {{-- nganh --}}
-        <li>
+        <!-- <li>
             <a href="javascript:;" class="side-menu side-menu{{ ($active_menu == 'nganh_list' || $active_menu == 'nganh_add') ? '--active' : '' }}">
                 <div class="side-menu__icon"> <i data-lucide="align-center"></i> </div>
                 <div class="side-menu__title">
@@ -150,7 +150,7 @@
                     </a>
                 </li>
             </ul>
-        </li>
+        </li> -->
         <!-- Resource  -->
         <li>
             <a href="javascript:;" class="side-menu {{($active_menu=='resource_list'|| $active_menu=='resource_add'|| $active_menu=='resourcetype_list'|| $active_menu=='resourcelinktype_list')?'side-menu--active':''}}">
@@ -191,7 +191,7 @@
         
 
         <!-- Motion -->
-    <li>
+    <!-- <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='motion_list'|| $active_menu=='motion_add')?'side-menu--active':''}}">
             <div class="side-menu__icon"> <i data-lucide="smile"></i> </div>
             <div class="side-menu__title">
@@ -213,9 +213,9 @@
                 </a>
             </li>
             </ul>
-        </li>
+        </li> -->
         <!-- Donvi -->
-        <li>
+        <!-- <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='donvi_list' || $active_menu=='donvi_add')?'side-menu--active':''}}">
             <div class="side-menu__icon"> <i data-lucide="users"></i> </div>
             <div class="side-menu__title">
@@ -237,10 +237,10 @@
                 </a>
             </li>
         </ul>
-    </li>
+    </li> -->
 
     <!-- Class -->
-    <li>
+    <!-- <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='class_list' || $active_menu=='class_add')?'side-menu--active':''}}">
             <div class="side-menu__icon"> <i data-lucide="users"></i> </div>
             <div class="side-menu__title">
@@ -262,7 +262,7 @@
                 </a>
             </li>
         </ul>
-    </li>
+    </li> -->
 
 
     <!-- Event -->
@@ -581,7 +581,7 @@
     </li>
 
     <!-- Sidebar Chương Trình Đào Tạo -->
-    <li>
+    <!-- <li>
         <a href="javascript:;" class="side-menu side-menu{{($active_menu=='chuongtrinhdaotao_list'||$active_menu=='chuongtrinhdaotao_add'||$active_menu=='chuongtrinhdaotao_edit') ? '--active' : ''}}">
             <div class="side-menu__icon"> <i data-lucide="book"></i> </div>
             <div class="side-menu__title">
@@ -604,7 +604,7 @@
                 </a>
             </li>
         </ul>
-    </li>
+    </li> -->
 
          <!-- setting menu -->
          <li>
@@ -687,7 +687,7 @@
     </ul>
 </li>
          <!-- teacher -->
-         <li>
+         <!-- <li>
             <a href="javascript:;" class="side-menu {{($active_menu=='teacher_list'|| $active_menu=='teacher_add')?'side-menu--active':''}}">
                 <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
                 <div class="side-menu__title">
@@ -709,9 +709,9 @@
                     </a>
                 </li>
             </ul>
-        </li>
+        </li> -->
          <!-- Chi tiết chương trình -->
-         <li>
+         <!-- <li>
             <a href="javascript:;" class="side-menu {{($active_menu=='program_details_list'|| $active_menu=='program_details_add')?'side-menu--active':''}}">
                 <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
                 <div class="side-menu__title">
@@ -733,9 +733,9 @@
                     </a>
                 </li>
             </ul>
-        </li>
+        </li> -->
         <!-- Bộ đề trắc nghiệm -->
-    <li>
+    <!-- <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='bode_tracnghiem_list'|| $active_menu=='bode_tracnghiem_add')?'side-menu--active':''}}">
             <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
             <div class="side-menu__title">
@@ -757,9 +757,9 @@
                 </a>
             </li>
         </ul>
-    </li>
+    </li> -->
      <!-- Bộ đề tự luận -->
-     <li>
+     <!-- <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='bode_tuluans_list'|| $active_menu=='bode_tuluans_add')?'side-menu--active':''}}">
             <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
             <div class="side-menu__title">
@@ -781,9 +781,9 @@
                 </a>
             </li>
         </ul>
-    </li>
+    </li> -->
          <!-- phân công -->
-<li>
+<!-- <li>
     <a href="javascript:;" class="side-menu {{($active_menu=='phancong_list'|| $active_menu=='phancong_add')?'side-menu--active':''}}">
         <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
         <div class="side-menu__title">
@@ -805,9 +805,9 @@
             </a>
         </li>
     </ul>
-</li>
+</li> -->
 <!-- Nhóm phân công -->
-<li>
+<!-- <li>
     <a href="javascript:;" class="side-menu {{ ($active_menu == 'phanconggroup_list' || $active_menu == 'phanconggroup_add') ? 'side-menu--active' : '' }}">
         <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
         <div class="side-menu__title">
@@ -829,9 +829,9 @@
             </a>
         </li>
     </ul>
-</li>
+</li> -->
 <!-- Loại chứng chỉ -->
-<li>
+<!-- <li>
     <a href="javascript:;" class="side-menu {{ ($active_menu == 'loai_chungchi_list' || $active_menu == 'loai_chungchi_add') ? 'side-menu--active' : '' }}">
         <div class="side-menu__icon"> <i data-lucide="award"></i> </div>
         <div class="side-menu__title">
@@ -853,10 +853,10 @@
             </a>
         </li>
     </ul>
-</li>
+</li> -->
 
         <!-- Điểm danh -->
-        <li>
+        <!-- <li>
     <a href="javascript:;" class="side-menu {{ ($active_menu == 'diemdanh_list' || $active_menu == 'diemdanh_add') ? 'side-menu--active' : '' }}">
         <div class="side-menu__icon"> <i data-lucide="check-circle"></i> </div>
         <div class="side-menu__title">
@@ -878,9 +878,9 @@
             </a>
         </li>
     </ul>
-</li>
+</li> -->
 <!-- Enrollment -->
-<li>
+<!-- <li>
     <a href="javascript:;" class="side-menu {{ ($active_menu == 'enrollment_list' || $active_menu == 'enrollment_add') ? 'side-menu--active' : '' }}">
         <div class="side-menu__icon"> <i data-lucide="book-open"></i> </div>
         <div class="side-menu__title">
@@ -902,9 +902,9 @@
             </a>
         </li>
     </ul>
-</li>
+</li> -->
 <!-- Enrollresult -->
-<li>
+<!-- <li>
     <a href="javascript:;" class="side-menu {{ ($active_menu == 'enroll_results_list' || $active_menu == 'enroll_results_add') ? 'side-menu--active' : '' }}">
         <div class="side-menu__icon"> <i data-lucide="book-open"></i> </div>
         <div class="side-menu__title">
@@ -926,9 +926,9 @@
             </a>
         </li>
     </ul>
-</li>
+</li> -->
     <!-- Thời khóa biểu -->
-    <li>
+    <!-- <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='thoikhoabieu_list'|| $active_menu=='bode_tracnghiem_add')?'side-menu--active':''}}">
             <div class="side-menu__icon"><i data-lucide="calendar"></i>
             </div>
@@ -945,10 +945,11 @@
                 </a>
             </li>
         </ul>
-    </li>
+    </li> -->
 
     <!-- Lịch thi -->
-    <li>
+
+    <!-- <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='lichthi_list'|| $active_menu=='lichthi_add')?'side-menu--active':''}}">
             <div class="side-menu__icon"><i data-lucide="calendar"></i>
             </div>
@@ -965,8 +966,10 @@
                 </a>
             </li>
         </ul>
-    </li>
+    </li> -->
+
     <!-- Attendance: Sự tham dự -->
+     
     <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='attendance_list'|| $active_menu=='bode_tracnghiem_add')?'side-menu--active':''}}">
             <div class="side-menu__icon"> <i data-lucide="check-square"></i> <!-- Biểu tượng phù hợp cho điểm danh -->
@@ -985,6 +988,7 @@
             </li>
         </ul>
     </li>
+
     <!-- enrollcertificates: Chứng nhận -->
     <li>
         <a href="javascript:;" class="side-menu {{($active_menu=='enrollcertificates_list'|| $active_menu=='bode_tracnghiem_add')?'side-menu--active':''}}">

@@ -149,6 +149,18 @@ class User extends Authenticatable
     {
         return $this->hasOne(EventUser::class, 'user_id');
     }
+
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->photo) {
+            return asset('storage/' . $this->photo);
+        }
+        return asset('storage/resources/default.png');
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
 }   
 class OauthClient extends Model
 {

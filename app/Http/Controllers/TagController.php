@@ -13,11 +13,9 @@ class TagController extends Controller
 {
     //
     protected $pagesize;
-    public function __construct( )
+    public function __construct()
     {
         $this->pagesize = env('NUMBER_PER_PAGE','20');
-        $this->middleware('auth');
-        
     }
     public function store_blog_tag($blog_id,$tag_ids)
     {
@@ -384,18 +382,11 @@ class TagController extends Controller
 
     public function index()
     {
-        $func = "tag_list";
-        if(!$this->check_function($func))
-        {
-            return redirect()->route('unauthorized');
-        }
-        //
-        $active_menu="tag_list";
-        $breadcrumb = '
-        <li class="breadcrumb-item"><a href="#">/</a></li>
-        <li class="breadcrumb-item active" aria-current="page"> tags </li>';
-        $tags=Tag::orderBy('id','DESC')->paginate($this->pagesize);
-        return view('backend.tags.index',compact('tags','breadcrumb','active_menu'));
+        $tags = Tag::orderBy('hit', 'DESC')->get();
+        return response()->json([
+            'success' => true,
+            'data' => $tags
+        ]);
     }
     public function tagSearch(Request $request)
     {
@@ -499,7 +490,11 @@ class TagController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $tag = Tag::findOrFail($id);
+        return response()->json([
+            'success' => true,
+            'data' => $tag
+        ]);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Notifications\DatabaseNotification;
 
 class NotificationController extends Controller
 {
@@ -12,7 +13,9 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $notifications = $user->notifications()->orderBy('created_at','desc')->get();
+        $notifications = DatabaseNotification::where('notifiable_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
         return response()->json($notifications, 200);
     }
 

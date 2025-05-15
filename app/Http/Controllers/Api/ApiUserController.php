@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\RoleController;
+use App\Models\Role;
 
 class ApiUserController extends Controller
 {
@@ -95,7 +100,7 @@ class ApiUserController extends Controller
 }
 public function show($id)
 {
-    $user = User::with('roles')->findOrFail($id);
+    $user = User::with('role')->findOrFail($id);
 
     return response()->json([
         'status' => true,
@@ -105,8 +110,8 @@ public function show($id)
             'email' => $user->email,
             'photo' => asset($user->photo ?? 'backend/images/profile-6.jpg'),
             'description' => $user->description,
-            'roles' => $user->roles->pluck('name'),
-            'vote_average' => $user->votes()->avg('rating'), // nếu có bảng votes
+            'role' => $user->role,
+            //'vote_average' => $user->votes()->avg('rating'), // nếu có bảng votes
         ]
     ]);
 }

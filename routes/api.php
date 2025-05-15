@@ -14,7 +14,7 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     // Authentication
     Route::post('login', [\App\Http\Controllers\Api\AuthenticationController::class, 'store']);
     Route::post('logout', [\App\Http\Controllers\Api\AuthenticationController::class, 'destroy'])->middleware('auth:api');
-    Route::post('register', [\App\Http\Controllers\Api\AuthenticationController::class, 'savenewUser']);
+    Route::post('/register', [\App\Http\Controllers\Api\AuthenticationController::class, 'savenewUser']);
     Route::post('google-sign-in', [\App\Http\Controllers\Api\AuthenticationController::class, 'googleSignIn']);
     Route::post('/password/send-reset-code', [\App\Http\Controllers\Api\PasswordRecoveryController::class, 'sendResetCode']);
     Route::post('/password/reset', [\App\Http\Controllers\Api\PasswordRecoveryController::class, 'resetPassword']);
@@ -29,7 +29,7 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('updateprofile', [\App\Http\Controllers\Api\ApiUserController::class, 'updateProfile'])->middleware('auth:api');
     Route::get('profile', [\App\Http\Controllers\Api\ApiUserController::class, 'viewProfile'])->middleware('auth:api');
     Route::post('upload-photo', [\App\Http\Controllers\Api\ApiUserController::class, 'uploadPhoto'])->middleware('auth:api');
-    Route::get('/users/{id}', [\App\Http\Controllers\Api\ApiUserController::class, 'show']);
+    Route::get('/users/{id}', [\App\Http\Controllers\Api\ApiUserController::class, 'show'])->middleware('auth:api');
 
 
     //Student
@@ -68,17 +68,19 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::get('/event-users/{id}', [\App\Http\Controllers\Api\EventUserApiController::class, 'show']); // Xem chi tiết 1 người dùng sự kiện
     Route::put('/event-users/{id}', [\App\Http\Controllers\Api\EventUserApiController::class, 'update']); // Cập nhật
     Route::delete('/event-users/{id}', [\App\Http\Controllers\Api\EventUserApiController::class, 'destroy']); // Xóa
-    
+    Route::get('/event-users/user/{userId}', [\App\Http\Controllers\Api\EventUserApiController::class, 'getUserEvents']);
+
+
     Route::post('/join', [\App\Http\Controllers\Api\EventUserApiController::class, 'joinEvent']); // Người dùng tham gia sự kiện
     Route::get('/event/{eventId}/participants', [\App\Http\Controllers\Api\EventUserApiController::class, 'listParticipants']); // Lấy danh sách người tham gia sự kiện theo event_id
       
-    Route::get('/event-attendance', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'index']);// lấy danh sách sự kiện đã điểm danh
-    Route::post('/event-attendance', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'store']);// điểm danh sự kiện
-    Route::get('/event-attendance/{id}', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'show']);// xem chi tiết sự kiện đã điểm danh
-    Route::put('/event-attendance/{id}', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'update']);// cập nhật sự kiện đã điểm danh
-    Route::delete('/event-attendance/{id}', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'destroy']);// xóa sự kiện đã điểm danh
-    Route::post('/check-in/{eventId}', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'checkInByQr']);// điểm danh sự kiện bằng mã QR
-
+    Route::get('/event-attendance', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'index']);
+    Route::post('/event-attendance', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'store']);
+    Route::get('/event-attendance/{id}', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'show']);
+    Route::put('/event-attendance/{id}', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'update']);
+    Route::delete('/event-attendance/{id}', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'destroy']);
+    Route::post('/check-in/{eventId}', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'checkInByQr'])->middleware('auth:api');
+    Route::post('/event-attendance/check-in', [\App\Http\Controllers\Api\EventAttendanceApiController::class, 'checkInByQr'])->middleware('auth:api');
     Route::post('/event_registrations', [\App\Http\Controllers\Api\EventRegistrationApiController::class, 'register']);// đăng ký sự kiện
     Route::get('/event_registrations/my-registrations', [\App\Http\Controllers\Api\EventRegistrationApiController::class, 'myRegistrations']);// lấy danh sách sự kiện đã đăng ký của người dùng    
     Route::get('/event_registrations/{id}', [\App\Http\Controllers\Api\EventRegistrationApiController::class, 'show']);// xem chi tiết sự kiện đã đăng ký       
@@ -105,11 +107,12 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('/community/upload-cover', [\App\Http\Controllers\Api\CommunityController::class, 'uploadCover'])->middleware('auth:api');// tải ảnh bìa nhóm
   
     // Thêm các route cho CommentController
-    Route::get('comments', [\App\Http\Controllers\Api\CommentController::class, 'index'])->name('comments.index');// lấy danh sách bình luận
-    Route::post('comments', [\App\Http\Controllers\Api\CommentController::class, 'store'])->middleware('auth:api')->name('comments.store');// tạo bình luận
-    Route::put('comments/{id}', [\App\Http\Controllers\Api\CommentController::class, 'update'])->middleware('auth:api')->name('comments.update');  // cập nhật bình luận
-    Route::delete('comments/{id}', [\App\Http\Controllers\Api\CommentController::class, 'destroy'])->middleware('auth:api')->name('comments.destroy');// xóa bình luận
-    
+    Route::get('comments', [\App\Http\Controllers\Api\CommentController::class, 'index'])->name('comments.index');
+    Route::post('comments', [\App\Http\Controllers\Api\CommentController::class, 'store'])->middleware('auth:api')->name('comments.store');
+    Route::put('comments/{id}', [\App\Http\Controllers\Api\CommentController::class, 'update'])->middleware('auth:api')->name('comments.update');
+    Route::delete('comments/{id}', [\App\Http\Controllers\Api\CommentController::class, 'destroy'])->middleware('auth:api')->name('comments.destroy');
+    Route::post('/comments/{id}/reply', [\App\Http\Controllers\Api\CommentController::class, 'reply']); // 👉 Route trả lời bình luận
+
     Route::get('community/groups', [\App\Http\Controllers\Api\CommunityController::class, 'index']);// lấy danh sách nhóm
     Route::post('community/groups', [\App\Http\Controllers\Api\CommunityController::class, 'store'])->middleware('auth:api');// tạo nhóm    
     Route::get('community/groups/{id}', [\App\Http\Controllers\Api\CommunityController::class, 'show']);// lấy chi tiết nhóm
@@ -121,28 +124,61 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('/community/upload-cover', [\App\Http\Controllers\Api\CommunityController::class, 'uploadCover'])->middleware('auth:api');// tải ảnh bìa nhóm
     
     // Blog
-    Route::post('luubai2', [\App\Http\Controllers\Api\BlogController::class, 'store'])->middleware('auth:api');// tạo bài viết
-    Route::get('blog', [\App\Http\Controllers\Api\BlogController::class, 'getblog']) ;// lấy danh sách bài viết
-    Route::get('blogcat', [\App\Http\Controllers\Api\BlogController::class, 'getBlogCat']) ;// lấy danh sách danh mục bài viết
-    Route::get('blogsearch', [\App\Http\Controllers\Api\BlogController::class, 'getBlogSearch']) ;// tìm kiếm bài viết
-    Route::post('/create-post', [\App\Http\Controllers\Api\BlogController::class, 'createPost']);// tạo bài viết    
-    Route::get('blog/{id}', [\App\Http\Controllers\Api\BlogController::class, 'getBlogById']);// lấy chi tiết bài viết
-
-
+    
+        // Danh sách tất cả bài viết
+        Route::get('blogs', [\App\Http\Controllers\Api\BlogController::class, 'getAll']);
+    
+        // Lấy chi tiết 1 bài viết theo id hoặc slug
+        Route::get('blog', [\App\Http\Controllers\Api\BlogController::class, 'getBlog']);
+    
+        // Lọc bài viết theo danh mục hoặc tag
+        Route::get('blogs/filter', [\App\Http\Controllers\Api\BlogController::class, 'filter']);
+    
+        // Tìm kiếm bài viết theo từ khóa
+        Route::get('blogs/search', [\App\Http\Controllers\Api\BlogController::class, 'search']);
+    
+        // Tạo mới bài viết (yêu cầu đăng nhập)
+        Route::post('blog/store', [\App\Http\Controllers\Api\BlogController::class, 'store'])->middleware('auth:api');
+    
+        // Cập nhật bài viết (yêu cầu đăng nhập)
+        Route::put('blog/{id}', [\App\Http\Controllers\Api\BlogController::class, 'update'])->middleware('auth:api');
+    
+        // Xóa bài viết (yêu cầu đăng nhập)
+        Route::delete('blog/{id}', [\App\Http\Controllers\Api\BlogController::class, 'destroy'])->middleware('auth:api');
+        Route::get('/blogcat', [\App\Http\Controllers\Api\BlogCategoryController::class, 'index']); // Lấy tất cả danh mục
+        Route::get('/blogcat/{id}', [\App\Http\Controllers\Api\BlogCategoryController::class, 'show']); // Lấy chi tiết theo id
+        Route::get('/my-blogs', [\App\Http\Controllers\Api\BlogController::class, 'getmyBlogs'])->middleware('auth:api'); // Lấy danh sách bài viết của người dùng
+        Route::get('/blogs/user/{id}', [\App\Http\Controllers\Api\BlogController::class, 'getBlogsByUser']);
+        Route::get('blogs/approved', [\App\Http\Controllers\Api\BlogController::class, 'getApprovedBlogs']);
+        // Lấy danh sách bài viết đã duyệt
     // Social interactions
     // Likes
-    Route::post('likes/toggle', [\App\Http\Controllers\Api\LikeController::class, 'toggle'])->middleware('auth:api')->name('likes.toggle');
+    Route::post('likes/toggle', [\App\Http\Controllers\Api\LikeController::class, 'toggle'])->middleware('auth:api');
 
     // Bookmarks
     Route::post('bookmarks/toggle', [\App\Http\Controllers\Api\BookmarkController::class, 'toggle'])->middleware('auth:api')->name('bookmarks.toggle');
 
     // Votes (Rating)
-    Route::post('votes', [\App\Http\Controllers\Api\VoteController::class, 'store'])->middleware('auth:api')->name('votes.store');
-    Route::get('votes/average', [\App\Http\Controllers\Api\VoteController::class, 'average'])->middleware('auth:api')->name('votes.average');
+    Route::post('votes', [\App\Http\Controllers\Api\VoteController::class, 'store'])->middleware('auth:api');
+    Route::get('votes/average/{type}/{id}', [\App\Http\Controllers\Api\VoteController::class, 'average'])->middleware('auth:api');
 
     // Notifications
     Route::get('notifications', [\App\Http\Controllers\Api\NotificationController::class, 'index'])->middleware('auth:api')->name('notifications.index');
     Route::post('notifications/mark-read', [\App\Http\Controllers\Api\NotificationController::class, 'markAsRead'])->middleware('auth:api')->name('notifications.markRead');
+
+    // Tags
+    Route::get('blogs/{id}/tags', [\App\Http\Controllers\Api\BlogController::class, 'getTags']); // Lấy tags của blog
+    Route::get('events/{id}/tags', [\App\Http\Controllers\Api\EventController::class, 'getTags']); // Lấy tags của event
+    
+    // Tag management
+    Route::get('tags', [\App\Http\Controllers\TagController::class, 'index']); // Lấy tất cả tags
+    Route::get('tags/{id}', [\App\Http\Controllers\TagController::class, 'show']); // Chi tiết tag
+    Route::post('tags', [\App\Http\Controllers\TagController::class, 'store'])->middleware('auth:api'); // Tạo tag mới
+    Route::put('tags/{id}', [\App\Http\Controllers\TagController::class, 'update'])->middleware('auth:api'); // Cập nhật tag
+    Route::delete('tags/{id}', [\App\Http\Controllers\TagController::class, 'destroy'])->middleware('auth:api'); // Xóa tag
+    
+    Route::post('blogs/{id}/tags', [\App\Http\Controllers\Api\BlogController::class, 'attachTags'])->middleware('auth:api'); // Gắn tags vào blog
+    Route::post('events/{id}/tags', [\App\Http\Controllers\Api\EventController::class, 'attachTags'])->middleware('auth:api'); // Gắn tags vào event
 });
     
     

@@ -10,6 +10,7 @@ use App\Modules\Events\Models\Event;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class EventAttendanceApiController extends Controller
 {
@@ -105,76 +106,72 @@ class EventAttendanceApiController extends Controller
         ]);
     }
 
-    // Điểm danh bằng QR code - Updated to use directly for both old and new routes
-    public function checkInByQr(Request $request, $eventId = null)
+    // Điểm danh bằng QR code
+    public function checkInByQr(Request $request)
     {
-        $request->validate([
-            'qr_data' => 'required_without:event_id|string',
-            'location' => 'nullable|string'
-        ]);
+        try {
+            $request->validate([
+                'event_id' => 'required|exists:event,id',
+                'qr_token' => 'required|string'
+            ]);
 
-        // Lấy event_id từ QR code hoặc từ route parameter
-        $eventId = $eventId ?? $request->qr_data;
-        
-        // Kiểm tra sự kiện tồn tại
-        $event = Event::find($eventId);
-        if (!$event) {
+            $userId = Auth::id();
+
+            // Kiểm tra sự kiện tồn tại
+            $event = Event::find($request->event_id);
+            if (!$event) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Sự kiện không tồn tại.'
+                ], 404);
+            }
+
+            // Kiểm tra người dùng có tham gia sự kiện không
+            $eventUser = EventUser::where('event_id', $request->event_id)
+                                ->where('user_id', $userId)
+                                ->first();
+            if (!$eventUser) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bạn chưa đăng ký tham gia sự kiện này.'
+                ], 403);
+            }
+
+            // Kiểm tra đã điểm danh chưa
+            $existing = EventAttendance::where('event_id', $request->event_id)
+                                      ->where('user_id', $userId)
+                                      ->first();
+            if ($existing && $existing->checked_in_at) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bạn đã điểm danh sự kiện này trước đó.',
+                    'checked_in_at' => $existing->checked_in_at
+                ], 409);
+            }
+
+            // Tạo điểm danh mới
+            $checkIn = new EventAttendance();
+            $checkIn->event_id = $request->event_id;
+            $checkIn->user_id = $userId;
+            $checkIn->checked_in_at = Carbon::now();
+            $checkIn->qr_token = $request->qr_token;
+            $checkIn->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Điểm danh thành công!',
+                'data' => [
+                    'event_name' => $event->title,
+                    'checked_in_at' => $checkIn->checked_in_at,
+                    'user_id' => $checkIn->user_id
+                ]
+            ]);
+
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Sự kiện không tồn tại.'
-            ], 404);
+                'message' => 'Đã có lỗi xảy ra khi điểm danh: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Lấy ID người dùng đang đăng nhập
-        $userId = Auth::id();
-        if (!$userId) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Bạn cần đăng nhập để điểm danh.'
-            ], 401);
-        }
-
-        // Kiểm tra người dùng có tham gia sự kiện không
-        $eventUser = EventUser::where('event_id', $eventId)
-                            ->where('user_id', $userId)
-                            ->first();
-
-        if (!$eventUser) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Bạn chưa đăng ký tham gia sự kiện này.'
-            ], 403);
-        }
-
-        // Kiểm tra đã điểm danh chưa
-        $existing = EventAttendance::where('event_id', $eventId)
-                                   ->where('user_id', $userId)
-                                   ->first();
-
-        if ($existing && $existing->checked_in_at) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Bạn đã điểm danh sự kiện này trước đó.',
-                'checked_in_at' => $existing->checked_in_at
-            ], 409);
-        }
-
-        // Tạo điểm danh mới hoặc cập nhật điểm danh hiện tại
-        $checkIn = $existing ?? new EventAttendance();
-        $checkIn->event_id = $eventId;
-        $checkIn->user_id = $userId;
-        $checkIn->checked_in_at = Carbon::now();
-        $checkIn->location = $request->location;
-        $checkIn->save();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Điểm danh thành công!',
-            'data' => [
-                'event_name' => $event->title,
-                'checked_in_at' => $checkIn->checked_in_at,
-                'location' => $checkIn->location
-            ]
-        ]);
     }
 }

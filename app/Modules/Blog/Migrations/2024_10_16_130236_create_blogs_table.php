@@ -16,12 +16,12 @@ return new class extends Migration
             $table->string('title') ;// tên 
             $table->string('slug')->unique();//
             $table->integer('hit')->default(0);// 
-            $table->mediumText('photo');
+            $table->string('photo')->nullable();
             $table->mediumText('summary')->nullable();
             $table->longText('content')->nullable();
             $table->unsignedBigInteger('cat_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->enum('status',['active','inactive'])->default('active');
+            $table->enum('status', ['pending', 'approved'])->default('pending');
             $table->timestamps();
         });
     }

@@ -29,6 +29,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/{id}/edit', [EventController::class, 'edit'])->name('edit');
         Route::put('/{id}', [EventController::class, 'update'])->name('update');
         Route::delete('/{id}', [EventController::class, 'destroy'])->name('destroy');
+        Route::delete('/{eventId}/resource/{resourceId}', [EventController::class, 'removeResource'])->name('resource.destroy');
+
     });
 
     // Routes cho nhóm sự kiện

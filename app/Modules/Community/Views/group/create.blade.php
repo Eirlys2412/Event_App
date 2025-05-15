@@ -79,7 +79,7 @@ $(document).ready(function() {
         method: "post",
         maxFiles: 1,
         paramName: "file",
-        maxFilesize: 5, // MB
+        maxFilesize: 10, // MB
         acceptedFiles: "image/*",
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -97,7 +97,7 @@ $(document).ready(function() {
         method: "post",
         maxFiles: 1,
         paramName: "file",
-        maxFilesize: 5, // MB
+        maxFilesize: 50, // MB
         acceptedFiles: "image/*",
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

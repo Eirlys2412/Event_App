@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Hash;
  
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
+use Illuminate\Support\Facades\DB;
 class ResourceSeeder extends Seeder
 {
     /**
@@ -15,14 +15,14 @@ class ResourceSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        \DB::table('resource_link_types')->insert([
+        DB::table('resource_link_types')->insert([
             [   
                 'title'=>"youtube",
                 'code'=>"youtube",
                  
             ],
         ]);
-        \DB::table('resource_types')->insert([
+        DB::table('resource_types')->insert([
             [
                 'title'=>"anh",
                 "code"=>"image",
@@ -46,7 +46,7 @@ class ResourceSeeder extends Seeder
             
            
         ]);
-        \DB::table('resources')->insert([
+        DB::table('resources')->insert([
             [   
                 'title'=>"baihat",
                 'slug'=>"baihat",

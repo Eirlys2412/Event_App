@@ -42,17 +42,16 @@
                         <td class="w-40">
                             <div class="flex">
                                 <div class="w-10 h-10 image-fit zoom-in">
-                                    <img  class="tooltip rounded-full" 
-                                        src="{{$item->photo}}"  >
+                                    <img class="tooltip rounded-full" src="{{ !empty($item->photo) ?? null
                                 </div>
                             </div>
                         </td>
                         <td class="text-center"> 
                             <input type="checkbox" 
                             data-toggle="switchbutton" 
-                            data-onlabel="active"
-                            data-offlabel="inactive"
-                            {{$item->status=="active"?"checked":""}}
+                            data-onlabel="approved"
+                            data-offlabel="pending"
+                            {{$item->status=="approved"?"checked":""}}
                             data-size="sm"
                             name="toogle"
                             value="{{$item->id}}"

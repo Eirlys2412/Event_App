@@ -107,4 +107,5 @@ class EventRegistrationController extends Controller
         return redirect()->route('admin.event_registration.index')
             ->with('success', 'Đăng ký sự kiện đã được xóa thành công.');
     }
+    
 } 

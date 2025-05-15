@@ -9,6 +9,7 @@ use App\Modules\Comments\Models\Comment;
 use App\Modules\Community\Models\CommunityPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Modules\Events\Models\Event;
 
 class CommentController extends Controller
 {
@@ -19,6 +20,7 @@ class CommentController extends Controller
 
     public function index(Request $request)
     {
+       $events = $request->query('event');
         $itemId = $request->query('item_id');
         $itemCode = $request->query('item_code');
     
@@ -35,12 +37,13 @@ class CommentController extends Controller
         // Truyền biến `$active_menu`
         $active_menu = 'comments';
     
-        return view('Comments::comments.index', compact('comments', 'itemId', 'itemCode', 'active_menu'));
+        return view('Comments::comments.index', compact('comments', 'itemId', 'itemCode', 'active_menu', 'events'));
     }
     
 
 public function search(Request $request)
 {
+    $events = $request->query('event');
     $itemId = $request->query('item_id');
     $itemCode = $request->query('item_code');
     $search = $request->query('datasearch');
@@ -56,43 +59,43 @@ public function search(Request $request)
     $item = null;
     if ($itemCode === 'blog') {
         $item = Blog::find($itemId);
-    } elseif ($itemCode === 'community_post') {
+    } elseif ($itemCode === 'event') {
         $item = CommunityPost::find($itemId);
     }
 
     $active_menu = 'comments';
 
-    return view('Comments::comments.index', compact('comments', 'itemId', 'itemCode', 'item', 'active_menu'));
+    return view('Comments::comments.index', compact('comments', 'itemId', 'itemCode', 'item', 'active_menu','events'));
 }
 
-    public function create(Request $request)
-    {
-        $itemId = $request->query('item_id');
-        $itemCode = $request->query('item_code');
-    
-        // Lấy danh sách blogs và community posts để chọn
-        $blogs = Blog::all(['id', 'title']);
-        $communityPosts = \App\Modules\Community\Models\CommunityPost::all(['id', 'title']);
-    
-        // Lấy danh sách bình luận cha (nếu có item_id và item_code)
-        $parentComments = [];
-        if ($itemId && $itemCode) {
-            $parentComments = Comment::where('item_id', $itemId)
-                ->where('item_code', $itemCode)
-                ->whereNull('parent_id')
-                ->get(['id', 'content']);
-        }
-    
-        $active_menu = 'comments';
-    
-        return view('Comments::comments.create', compact('itemId', 'itemCode', 'blogs', 'communityPosts', 'parentComments', 'active_menu'));
+public function create(Request $request)
+{
+    $itemId = $request->query('item_id');
+    $itemCode = $request->query('item_code');
+
+    $blogs = Blog::all();
+    $events = Event::all();
+
+    $parentComments = collect();
+    if ($itemId && $itemCode) {
+        $parentComments = Comment::where('item_id', $itemId)
+            ->where('item_code', $itemCode)
+            ->whereNull('parent_id')
+            ->get();
     }
+
+    $active_menu = 'comments';
+
+    return view('Comments::comments.create', compact(
+        'itemId', 'itemCode', 'blogs', 'events', 'parentComments', 'active_menu'
+    ));
+}
 
     public function store(Request $request)
 {
     $request->validate([
         'item_id' => 'required|integer',
-        'item_type' => 'required|string|in:blog,community_post', // Đổi thành item_type
+        'item_type' => 'required|string|in:blog,event', // Đổi thành item_type
         'content' => 'required|string',
         'parent_id' => 'nullable|integer|exists:comments,id',
         'comment_resources' => 'nullable|file|mimes:jpeg,png,gif|max:2048',
@@ -121,12 +124,13 @@ public function search(Request $request)
 
     public function edit($id)
     {
+        $events = request()->query('event');
         $comment = Comment::findOrFail($id);
         if ($comment->user_id !== Auth::id()) {
             return redirect()->back()->with('error', 'Bạn không có quyền chỉnh sửa.');
         }
         $active_menu = 'comments';
-        return view('Comments::comments.edit', compact('comment', 'active_menu'));
+        return view('Comments::comments.edit', compact('comment', 'active_menu','events'));
     }
 
     public function update(Request $request, $id)

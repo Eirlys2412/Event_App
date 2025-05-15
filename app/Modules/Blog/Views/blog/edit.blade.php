@@ -16,7 +16,7 @@
     <div class="grid grid-cols-12 gap-12 mt-5">
         <div class="intro-y col-span-12 lg:col-span-12">
             <!-- BEGIN: Form Layout -->
-            <form method="post" action="{{route('admin.blog.update',$blog->id)}}">
+            <form method="post" action="{{route('admin.blog.update',$blog->id)}}" enctype="multipart/form-data">
                 @csrf
                 @method('patch')
                 <div class="intro-y box p-5">
@@ -105,8 +105,8 @@
                            
                             <select name="status"  class="form-select mt-2 sm:mr-2"   >
                                
-                                <option value ="active" {{$blog->status=='active'?'selected':''}}>Active</option>
-                                <option value = "inactive" {{$blog->status=='inactive'?'selected':''}}>Inactive</option>
+                                <option value ="pending" {{$blog->status=='pending'?'selected':''}}>Pending</option>
+                                <option value = "approved" {{$blog->status=='approved'?'selected':''}}>Approved</option>
                             </select>
                         </div>
                     </div>
@@ -160,8 +160,8 @@
                 // previewsContainer: ".dropzone-previews",
     Dropzone.instances[0].options.multiple = true;
     Dropzone.instances[0].options.autoQueue= true;
-    Dropzone.instances[0].options.maxFilesize =  1; // MB
-    Dropzone.instances[0].options.maxFiles =5;
+    Dropzone.instances[0].options.maxFilesize =  50; // MB
+    Dropzone.instances[0].options.maxFiles =50;
     Dropzone.instances[0].options.acceptedFiles= "image/jpeg,image/png,image/gif";
     Dropzone.instances[0].options.previewTemplate =  '<div class="col-span-5 md:col-span-2 h-28 relative image-fit cursor-pointer zoom-in">'
                                                +' <img    data-dz-thumbnail >'

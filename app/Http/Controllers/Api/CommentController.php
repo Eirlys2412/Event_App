@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Comments\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Modules\Comments\Models\Comment;
-use App\Models\User;
-use App\Notifications\NewCommentNotification;
 
 class CommentController extends Controller
 {
@@ -16,64 +14,105 @@ class CommentController extends Controller
         $this->middleware('auth:api'); // Yêu cầu xác thực qua API
     }
 
-    // GET /api/v1/comments?commentable_type=&commentable_id=
+    // Lấy danh sách bình luận theo item_id và item_code
     public function index(Request $request)
-    {
-        $type = $request->query('commentable_type');
-        $id   = $request->query('commentable_id');
-        $comments = Comment::with('user')
-            ->where('commentable_type', $type)
-            ->where('commentable_id', $id)
-            ->orderBy('created_at', 'asc')
-            ->get();
-        return response()->json($comments, 200);
-    }
+{
+    $itemType = $request->query('item_type'); // chuẩn param
+    $itemId = $request->query('item_id');
 
-    // POST /api/v1/comments
+    $comments = Comment::with('user')
+                       ->where('item_code', $itemType) // chuẩn column DB
+                       ->where('item_id', $itemId)
+                       ->orderBy('created_at', 'asc')
+                       ->get();
+
+    return response()->json($comments, 200);
+}
+
+
+    // Tạo bình luận mới
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'commentable_type' => 'required|string',
-            'commentable_id'   => 'required|integer',
-            'content'          => 'required|string',
-            'parent_id'        => 'nullable|integer',
+        $request->validate([
+            'item_id' => 'required|integer',
+            'item_code' => 'required|string|in:blog,event',
+            'content' => 'required|string',
+            'parent_id' => 'nullable|integer|exists:comments,id',
+            'comment_resources' => 'nullable|file|mimes:jpeg,png,gif,jpg|max:5120', // 5MB
         ]);
-        $data['user_id'] = Auth::id();
-        $comment = Comment::create($data);
-
-        // Notify owner if not self
-        $modelClass = $data['commentable_type'];
-        if (class_exists($modelClass)) {
-            $model = $modelClass::find($data['commentable_id']);
-            if ($model && isset($model->user_id) && $model->user_id !== Auth::id()) {
-                User::find($model->user_id)
-                    ->notify(new NewCommentNotification($comment));
-            }
+    
+        $commentData = [
+            'item_id' => $request->item_id,
+            'item_code' => $request->item_code,
+            'user_id' => Auth::id(),
+            'content' => $request->content,
+            'parent_id' => $request->parent_id,
+        ];
+    
+        if ($request->hasFile('comment_resources')) {
+            $file = $request->file('comment_resources');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('comments', $filename, 'public');
+            $commentData['comment_resources'] = $path;
         }
-
-        return response()->json($comment, 201);
+    
+        $comment = Comment::create($commentData);
+    
+        return response()->json([
+            'comment' => $comment->load('user'),
+            'image_url' => $comment->comment_resources 
+                ? url('storage/' . $comment->comment_resources) 
+                : null
+        ], 201);
     }
 
-    // PUT /api/v1/comments/{id}
+    // Cập nhật bình luận
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'content' => 'required|string',
+        ]);
+
         $comment = Comment::findOrFail($id);
         if ($comment->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        $data = $request->validate(['content' => 'required|string']);
-        $comment->update($data);
-        return response()->json($comment, 200);
+
+        $comment->update(['content' => $request->content]);
+        return response()->json($comment);
     }
 
-    // DELETE /api/v1/comments/{id}
+    // Xóa bình luận
     public function destroy($id)
     {
         $comment = Comment::findOrFail($id);
         if ($comment->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
+
         $comment->delete();
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Comment deleted']);
     }
+    public function reply(Request $request, $id)
+{
+    $request->validate([
+        'content' => 'required|string',
+    ]);
+
+    $parentComment = Comment::findOrFail($id);
+
+    $reply = Comment::create([
+        'item_id' => $parentComment->item_id,
+        'item_code' => $parentComment->item_code,
+        'user_id' => Auth::id(),
+        'content' => $request->content,
+        'parent_id' => $id,
+    ]);
+
+    return response()->json([
+        'reply' => $reply->load('user'),
+    ], 201);
+}
+
+
 }

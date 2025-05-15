@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use App\Models\Blog;
 use App\Models\BlogCategory;
@@ -28,7 +30,11 @@ use App\Modules\Events\Models\Event;
 use App\Models\Like;
 use App\Models\Bookmark;
 use App\Models\Vote;
- 
+use App\Modules\UserPage\Models\UserPage;
+use App\Http\Controllers\Api\NotificationController;
+use App\Modules\Motion\Models\MotionItem;
+use App\Models\JCongviec;
+
 class TuongtacController extends Controller
 {
     public function saveCommentArr($data)
@@ -44,7 +50,7 @@ class TuongtacController extends Controller
             $user = User::find($data['user_id']);
             $notice['title'] =  $user->full_name .' thêm bình luận bài viết';
             $notice['url_view'] = route('front.tblogs.show',$blog->slug);
-            TNotice::create($notice);
+            Notification::create($notice);
         }
         if($data['item_code'] == 'blog')
         {
@@ -61,13 +67,17 @@ class TuongtacController extends Controller
         if($data['item_code'] == 'congviec')
         {
             $notice = array();
-            $congviec = JCongviec::findOrFail($data['item_id']);
-            $notice['user_id'] = $congviec->user_id;
-            $notice['item_id'] =  $data['item_id'] ;
-            $notice['item_code'] =  $data['item_code'] ;
+            $like = Like::where([
+                'likeable_type' => 'App\\Models\\Congviec',
+                'likeable_id' => $data['item_id']
+            ])->first();
+            
+            $notice['user_id'] = $like->user_id;
+            $notice['item_id'] = $data['item_id'];
+            $notice['item_code'] = $data['item_code'];
             $user = User::find($data['user_id']);
-            $notice['title'] =  $user->full_name .' thêm bình luận việc làm';
-            $notice['url_view'] = route('front.vieclam.chitietvieclam',$congviec->id);
+            $notice['title'] = $user->full_name .' thêm bình luận việc làm';
+            $notice['url_view'] = route('front.vieclam.chitietvieclam', $data['item_id']);
             TNotice::create($notice);
         }
         if($data['item_code'] == 'ads')
@@ -85,7 +95,7 @@ class TuongtacController extends Controller
             $notice['item_id'] =  $data['item_id'] ;
             $notice['item_code'] =  $data['item_code'] ;
             $user = User::find($data['user_id']);
-            $notice['title'] =  $user->full_name .' thêm bình luận cắt lỗ xả hàng';
+            $notice['title'] =  $user->full_name .' thêm bình luận ';
             $notice['url_view'] = route('front.ad.view',$ad->slug);
             TNotice::create($notice);
         }
@@ -113,7 +123,7 @@ class TuongtacController extends Controller
             'parent_id'=>'numeric|required',
         ]);
         $data = $request->all();
-        $user = auth()->user();
+        $user = Auth::user();
         if(!$user)
         {
             return response()->json(['msg'=>'chưa đăng nhập','status'=>false]);
@@ -123,7 +133,7 @@ class TuongtacController extends Controller
         $comment->full_name = $user->full_name;
         $comment->photo = $user->photo;
 
-        TUserpage::add_points(auth()->id(),1);
+        UserPage::add_points(Auth::id(),1);
 
 
         return response()->json(['msg'=>$comment,'status'=>true]);
@@ -136,7 +146,7 @@ class TuongtacController extends Controller
             'id'=>'numeric|required',
         ]);
         $data = $request->all();
-        $user = auth()->user();
+        $user = Auth::user();
         if(!$user)
         {
             return response()->json(['msg'=>'chưa đăng nhập','status'=>false]);
@@ -159,7 +169,7 @@ class TuongtacController extends Controller
         $this->validate($request,[
             'id'=>'numeric|required',
         ]);
-        $user= auth()->user();
+        $user= Auth::user();
         if(!$user)
         {
             return response()->json(['msg'=>'chưa đăng nhập','status'=>false]);
@@ -186,7 +196,7 @@ class TuongtacController extends Controller
             'point' => 'required|integer|min:1|max:5', // Điểm (1-5)
         ]);
     
-        $userId = \Auth::id();
+        $userId = Auth::id();
         if(!$userId)
             return response()->json(['success' => false, 'msg' =>  'Bạn cần đăng nhập!']);
         $itemCode = $request->input('item_code');
@@ -200,7 +210,7 @@ class TuongtacController extends Controller
             ->first();
        
             ///
-        TUserpage::add_points(auth()->id(),1);
+        UserPage::add_points(Auth::id(),1);
 
         if (!$voteRecord) {
             // Nếu chưa có bản ghi, tạo mới
@@ -214,7 +224,7 @@ class TuongtacController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
-            $voteRecord = TVoteItem::Create($data);
+            $voteRecord = Vote::Create($data);
         } 
         
         // Nếu đã có bản ghi, cập nhật
@@ -249,7 +259,7 @@ class TuongtacController extends Controller
     }
     public function toggleBookmark(Request $request )
     {
-        if(!auth()->id())
+        if(!Auth::id())
         {
             return response()->json(['success' => false, 'msg' => 'Bạn phải đăng nhập']);
         }
@@ -259,15 +269,15 @@ class TuongtacController extends Controller
            
         ]);
         $data= $request->all();
-        $userId = auth()->id(); // Lấy ID của người dùng hiện tại
+        $userId = Auth::id(); // Lấy ID của người dùng hiện tại
         $itemCode = $data['item_code']; // Loại mục (ví dụ: blog)
         $postId = $data['item_id'];
 
         ///
-        TUserpage::add_points(auth()->id(),1);
+        Userpage::add_points(Auth::id(),1);
         
         // Kiểm tra xem bài viết đã được bookmark chưa
-        $bookmarkExists = \DB::table('t_recommends')
+        $bookmarkExists = DB::table('t_recommends')
             ->where('user_id', $userId)
             ->where('item_id', $postId)
             ->where('item_code', $itemCode)
@@ -275,7 +285,7 @@ class TuongtacController extends Controller
     
         if ($bookmarkExists) {
             // Nếu đã bookmark, xóa bookmark
-            \DB::table('t_recommends')
+            DB::table('t_recommends')
                 ->where('user_id', $userId)
                 ->where('item_id', $postId)
                 ->where('item_code', $itemCode)
@@ -284,12 +294,12 @@ class TuongtacController extends Controller
             $status = 'removed';
         } else {
             // Nếu chưa bookmark, thêm bookmark
-            \DB::table('t_recommends')->insert([
+            DB::table('t_recommends')->insert([
                 'user_id' => $userId,
                 'item_id' => $postId,
                 'item_code' => $itemCode,
-                'created_at' => now(), // Nếu cần thêm thời gian
-                'updated_at' => now(), // Nếu cần thêm thời gian
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
     
             $status = 'added';
@@ -297,62 +307,27 @@ class TuongtacController extends Controller
     
         return response()->json(['status' => $status]);
     }
-    public function react(Request $request)
-    {
-        
-        if(!auth()->id())
-        {
-            return response()->json(['success' => false, 'msg' => 'Bạn phải đăng nhập']);
-        }
-        $request->validate([
-            'item_id' => 'required|integer', 
-              'item_code'=> 'required|string', 
-            'reaction_id' => 'required|string', // Ví dụ: 'like', 'love', ...
+    public function likeBlog(Request $request)
+{
+    $userId = Auth::id();
+    $blogId = $request->input('blog_id');
+
+    $existing = DB::table('blog_likes')
+        ->where('user_id', $userId)
+        ->where('blog_id', $blogId)
+        ->first();
+
+    if ($existing) {
+        DB::table('blog_likes')->where('id', $existing->id)->delete();
+        return response()->json(['status' => false, 'message' => 'Đã bỏ thích']);
+    } else {
+        DB::table('blog_likes')->insert([
+            'user_id' => $userId,
+            'blog_id' => $blogId,
+            'created_at' => now()
         ]);
-        $validReactions = TMotion::pluck('title')->toArray();
-        ///
-        TUserpage::add_points(auth()->id(),1);
-        // Lưu lại danh sách reactions
-        $motionitem = TMotionItem::where('item_id', $request->item_id)->where('item_code',$request->item_code)->first();
-        if(!$motionitem)
-        {
-            $data['item_id'] = $request->item_id;
-            $data['item_code'] = $request->item_code;
-            $motionitem = TMotionItem::create($data);
-           
-        }
-       
-        $reactionType = $request->input('reaction_id');
-        $reactions = $motionitem->motions ?? array_fill_keys($validReactions, 0);
-        // Tăng số lượng reaction tương ứng
-        if (isset($reactions[$reactionType])) {
-            $reactions[$reactionType]++;
-        }
-       
-        $motionitem->motions = $reactions;
-       
-        $userId = auth()->id(); // ID người dùng hiện tại
-      
-        $userreactions = $motionitem->user_motions??  array_fill_keys($validReactions, []);
-        foreach ($userreactions as $key => $userIds) {
-            $userreactions[$key] = array_filter($userIds, fn($id) => $id != $userId);
-        }
-
-         // Thêm ID người dùng vào reaction mới
- 
-        if (isset($userreactions[$reactionType])) {
-            $userreactions[$reactionType][] = $userId;
-        }
-        
-        foreach ($userreactions as $key => $values) {
-            $reactions[$key] = count(array_filter($values, function ($value) {
-                return !is_null($value); // Bỏ qua các giá trị null
-            }));
-        }
-        $motionitem->user_motions = $userreactions;
-        $motionitem->motions = $reactions;
-        $motionitem->save();
-
-        return response()->json(['success' => true, 'reactions' => $motionitem->motions ]);
+        return response()->json(['status' => true, 'message' => 'Đã thích']);
     }
+}
+
 }

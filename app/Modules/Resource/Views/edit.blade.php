@@ -115,16 +115,16 @@
         create: true
         
     });
-    @if (count($tag_ids)== 0)
+    @if (count($tag_ids) == 0)
         select.clear();
-     @endif
+    @endif
 </script>
     <script src="{{ asset('js/js/ckeditor.js') }}"></script>
     <script>
         ClassicEditor
             .create(document.querySelector('#description'), {
                 ckfinder: {
-                    uploadUrl: '{{ route('admin.upload.ckeditor') . '?_token=' . csrf_token() }}'
+                    uploadUrl: "{{ route('admin.upload.ckeditor') . '?_token=' . csrf_token() }}"
                 },
                 mediaEmbed: {
                     previewsInData: true

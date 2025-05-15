@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Modules\Events\Models\Event;
 
 class Tag extends Model
 {
@@ -20,5 +21,15 @@ class Tag extends Model
                 $tag->slug = Str::slug($tag->title);
             }
         });
+    }
+
+    public function blogs()
+    {
+        return $this->belongsToMany(Blog::class, 'tag_blogs');
+    }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'tag_events');
     }
 }

@@ -17,7 +17,9 @@ Route::group( ['prefix'=>'admin/'  , 'as' => 'admin.' ],function(){
      Route::post('blog_status',[ BlogController::class,'blogStatus'])->name('blog.status');
      Route::get('blog_search',[ BlogController::class,'blogSearch'])->name('blog.search');
      Route::get('category/{slug}',[BlogController::class,'categoryView'])->name('front.category.view');
- 
+     Route::post('/admin/upload/blog-photo', [\App\Modules\Blog\Controllers\UploadController::class, 'uploadBlogPhoto'])->name('admin.upload.blogphoto');
+     Route::post('/upload/avatar', [\App\Modules\Blog\Controllers\UploadController::class, 'upload'])->name('admin.upload.avatar');
+
 });
 
 

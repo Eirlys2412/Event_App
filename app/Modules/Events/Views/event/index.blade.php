@@ -46,16 +46,33 @@
                             {{ $event->description ?? 'Chưa có mô tả' }}
                         </td> -->
                         <td class="text-center">
-                            @if (!empty($event->resource_urls))
-                                @foreach ($event->resource_urls as $url)
-                                    <a href="{{ asset($url) }}" target="_blank">
-                                        {{ Str::limit($url, 30) }}
-                                    </a><br>
-                                @endforeach
-                            @else
-                                N/A
-                            @endif
-                        </td>
+    @if (!empty($event->resource_data) && count($event->resource_data))
+        @foreach ($event->resource_data as $res)
+            <div class="mb-2">
+                @if (Str::contains($res->file_type, 'image'))
+                    <img src="{{ asset($res->url) }}" alt="{{ $res->title }}" width="100" class="rounded shadow">
+                @elseif (Str::contains($res->file_type, 'video'))
+                    <video width="160" height="90" controls>
+                        <source src="{{ asset($res->url) }}" type="{{ $res->file_type }}">
+                        Trình duyệt của bạn không hỗ trợ video.
+                    </video>
+                @elseif (Str::contains($res->file_type, 'audio'))
+                    <audio controls>
+                        <source src="{{ asset($res->url) }}" type="{{ $res->file_type }}">
+                        Trình duyệt không hỗ trợ audio.
+                    </audio>
+                @else
+                    <a href="{{ asset($res->url) }}" target="_blank" class="text-blue-500 hover:underline">
+                        📄 {{ $res->title ?? 'Tài liệu' }}
+                    </a>
+                @endif
+            </div>
+        @endforeach
+    @else
+        <span class="text-gray-400 italic">Không có tài nguyên</span>
+    @endif
+</td>
+
                         <td class="text-center">
                             {{ $event->eventType->title ?? 'Chưa có loại sự kiện' }}
                         </td>

@@ -5,10 +5,22 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Modules\Events\Models\Event;
+use App\Modules\Events\Models\EventTicket;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\URL;
+use App\Modules\Resource\Models\Resource;
+use App\Modules\VNPay\Models\VNPayTransaction;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class EventController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     // Lấy danh sách sự kiện
     public function index()
     {
@@ -18,6 +30,22 @@ class EventController extends Controller
                 'timestart', 'timeend', 'event_type_id', 'tags', 
                 'created_at', 'updated_at'
             )->get();
+
+            $events = $events->map(function ($event) {
+                $resourceIds = json_decode($event->resources, true)['resource_ids'] ?? [];
+                $resources = Resource::whereIn('id', $resourceIds)->get();
+
+                $event->resources_data = $resources->map(function ($res) {
+                    return [
+                        'id' => $res->id,
+                        'title' => $res->title,
+                        'type' => $res->file_type,
+                        'url' => URL::to($res->url), // URL đầy đủ (dùng cho frontend load ảnh/video)
+                    ];
+                });
+
+                return $event;
+            });
 
             return response()->json([
                 'success' => true,
@@ -31,30 +59,46 @@ class EventController extends Controller
         }
     }
 
-    public function getEventById( $id)
-{
-    try {
-         
-          $event = Event::find($id);
-        if (!$event) {
+    public function getEventById($id)
+    {
+        try {
+            $event = Event::find($id);
+
+            if (!$event) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy sự kiện',
+                ], 404);
+            }
+
+            // Parse resource_ids
+            $resourceIds = json_decode($event->resources, true)['resource_ids'] ?? [];
+
+            // Lấy danh sách tài nguyên liên quan
+            $resources = Resource::whereIn('id', $resourceIds)->get();
+
+            // Gắn dữ liệu tài nguyên vào
+            $event->resources_data = $resources->map(function ($res) {
+                return [
+                    'id'    => $res->id,
+                    'title' => $res->title,
+                    'type'  => $res->file_type,
+                    'url'   => URL::to($res->url),
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $event,
+            ], 200);
+
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy sự kiện',
-            ], 404);
+                'message' => 'Lỗi khi lấy chi tiết sự kiện: ' . $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $event,
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Lỗi khi lấy chi tiết sự kiện: ' . $e->getMessage(),
-        ], 500);
     }
-}
-
 
     // Tạo sự kiện mới
     public function store(Request $request)
@@ -257,6 +301,44 @@ class EventController extends Controller
                 'message' => 'Có lỗi xảy ra khi xử lý thanh toán'
             ], 500);
         }
+    }
+
+    public function uploadEventImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB
+            'title' => 'nullable|string|max:255'
+        ]);
+
+        $file = $request->file('image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+
+        // Resize và nén ảnh
+        $img = Image::make($file->getRealPath())
+            ->resize(1024, null, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            })
+            ->encode('webp', 80);
+
+        $path = 'uploads/resources/' . $filename . '.webp';
+        Storage::disk('public')->put($path, $img);
+
+        // Lưu vào bảng resource
+        $resource = Resource::create([
+            'title' => $request->title ?? $filename,
+            'file_type' => 'image/webp',
+            'url' => 'storage/' . $path,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'resource' => [
+                'id' => $resource->id,
+                'title' => $resource->title,
+                'url' => URL::to($resource->url),
+            ]
+        ]);
     }
 }
 

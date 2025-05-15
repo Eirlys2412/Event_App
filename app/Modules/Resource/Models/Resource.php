@@ -63,7 +63,12 @@ class Resource extends Model
             $url = $filesController->store($file, $folder);
 
             $data['file_name'] = $file->getClientOriginalName();
-            $data['file_type'] = $file->getClientMimeType();
+            
+            // Tạo file_type dựa trên phần mở rộng của file gốc
+            $extension = strtolower($file->getClientOriginalExtension());
+            $fileType = self::getMimeTypeFromExtension($extension);
+            $data['file_type'] = $fileType;
+            
             $data['file_size'] = $file->getSize();
             $data['url'] = $url;
         }
@@ -112,7 +117,12 @@ class Resource extends Model
 
             // Cập nhật dữ liệu file vào resource
             $data['file_name'] = $file->getClientOriginalName();
-            $data['file_type'] = $file->getClientMimeType();
+            
+            // Sử dụng phần mở rộng gốc để xác định file_type
+            $extension = strtolower($file->getClientOriginalExtension());
+            $fileType = self::getMimeTypeFromExtension($extension);
+            $data['file_type'] = $fileType;
+            
             $data['file_size'] = $file->getSize();
             $data['url'] = $url;
         }
@@ -132,6 +142,43 @@ class Resource extends Model
         $this->save();
 
         return $this;
+    }
+
+    /**
+     * Tạo MIME type từ phần mở rộng của file
+     *
+     * @param string $extension
+     * @return string
+     */
+    private static function getMimeTypeFromExtension($extension)
+    {
+        $mimeTypes = [
+            'jpg' => 'image/jpg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'bmp' => 'image/bmp',
+            'svg' => 'image/svg+xml',
+            'webp' => 'image/webp',
+            'mp4' => 'video/mp4',
+            'avi' => 'video/avi',
+            'mov' => 'video/quicktime',
+            'wmv' => 'video/x-ms-wmv',
+            'mp3' => 'audio/mpeg',
+            'wav' => 'audio/wav',
+            'ogg' => 'audio/ogg',
+            'pdf' => 'application/pdf',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'xls' => 'application/vnd.ms-excel',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'ppt' => 'application/vnd.ms-powerpoint',
+            'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'zip' => 'application/zip',
+            'rar' => 'application/x-rar-compressed'
+        ];
+        
+        return $mimeTypes[$extension] ?? 'application/octet-stream';
     }
 
 
