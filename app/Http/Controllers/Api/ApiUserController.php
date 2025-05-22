@@ -100,7 +100,18 @@ class ApiUserController extends Controller
 }
 public function show($id)
 {
-    $user = User::with('role')->findOrFail($id);
+    // Tải trước mối quan hệ 'role' và 'blogs' (điều chỉnh 'blogs' nếu tên quan hệ khác)
+    $user = User::with(['role', 'blogs'])->findOrFail($id);
+
+    // Tính điểm trung bình nếu relationship 'votes' tồn tại và có dữ liệu
+    $voteAverage = null;
+    // Giả sử relationship là 'votes' và cột điểm là 'rating' hoặc 'score'
+    // Kiểm tra xem user có relationship 'votes' và có vote nào không trước khi tính avg
+    if (method_exists($user, 'votes') && $user->votes()->exists()) {
+         // Điều chỉnh 'rating' hoặc 'score' tùy thuộc vào cột điểm trong bảng vote
+        $voteAverage = round($user->votes()->avg('rating'), 2); 
+        // Hoặc nếu cột là 'score': $voteAverage = round($user->votes()->avg('score'), 2);
+    }
 
     return response()->json([
         'status' => true,
@@ -111,7 +122,11 @@ public function show($id)
             'photo' => asset($user->photo ?? 'backend/images/profile-6.jpg'),
             'description' => $user->description,
             'role' => $user->role,
-            //'vote_average' => $user->votes()->avg('rating'), // nếu có bảng votes
+            'phone' => $user->phone,
+            'address' => $user->address,
+            'budget' => $user->budget,
+            'blogs' => $user->blogs, // Thêm danh sách bài viết của user
+            'vote_average' => $voteAverage, // Thêm điểm trung bình (nếu tính được)
         ]
     ]);
 }

@@ -6,7 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "intervention/image": "3.0",
+        "intervention/image": "^3.2",
         "laravel/framework": "^11.9",
         "laravel/passport": "^12.4",
         "laravel/tinker": "^2.9",

@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use App\Http\Controllers\Api\EventImageController; // Sửa lại import controller
+use App\Http\Controllers\Api\CommentController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -112,7 +114,8 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::put('comments/{id}', [\App\Http\Controllers\Api\CommentController::class, 'update'])->middleware('auth:api')->name('comments.update');
     Route::delete('comments/{id}', [\App\Http\Controllers\Api\CommentController::class, 'destroy'])->middleware('auth:api')->name('comments.destroy');
     Route::post('/comments/{id}/reply', [\App\Http\Controllers\Api\CommentController::class, 'reply']); // 👉 Route trả lời bình luận
-
+    Route::post('/comments/{id}/toggle-like', [CommentController::class, 'toggleLike']); // 👉 Route thích/bỏ thích bình luận
+    // Community
     Route::get('community/groups', [\App\Http\Controllers\Api\CommunityController::class, 'index']);// lấy danh sách nhóm
     Route::post('community/groups', [\App\Http\Controllers\Api\CommunityController::class, 'store'])->middleware('auth:api');// tạo nhóm    
     Route::get('community/groups/{id}', [\App\Http\Controllers\Api\CommunityController::class, 'show']);// lấy chi tiết nhóm
@@ -179,9 +182,19 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     
     Route::post('blogs/{id}/tags', [\App\Http\Controllers\Api\BlogController::class, 'attachTags'])->middleware('auth:api'); // Gắn tags vào blog
     Route::post('events/{id}/tags', [\App\Http\Controllers\Api\EventController::class, 'attachTags'])->middleware('auth:api'); // Gắn tags vào event
+    
+    Route::post('/events/{eventId}/images', [App\Http\Controllers\Api\EventImageController::class, 'uploadEventImage']);
+    Route::delete('/events/{eventId}/images/{resourceId}', [App\Http\Controllers\Api\EventImageController::class, 'deleteEventImage']);
+    
+    Route::post('/events/{event}/images', [EventImageController::class, 'store']);
+        
+        
+    
 });
-    
-    
+
+// Resource routes
+
+// Event Image routes
 
 
 
