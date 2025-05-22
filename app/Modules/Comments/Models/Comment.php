@@ -3,6 +3,7 @@
 namespace App\Modules\Comments\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Modules\TuongTac\Models\Like;
 
 class Comment extends Model
 {
@@ -36,5 +37,23 @@ class Comment extends Model
         return $this->comment_resources 
             ? url('storage/' . $this->comment_resources) 
             : null;
+    }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function getLikesCountAttribute()
+    {
+        return $this->likes()->count();
+    }
+
+    public function getIsLikedAttribute()
+    {
+        if (auth('api')->check()) {
+            return $this->likes()->where('user_id', auth('api')->id())->exists();
+        }
+        return false;
     }
 }

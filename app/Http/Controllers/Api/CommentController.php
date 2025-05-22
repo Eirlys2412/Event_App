@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Comments\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Modules\TuongTac\Models\Like;
 
 class CommentController extends Controller
 {
@@ -16,19 +17,23 @@ class CommentController extends Controller
 
     // Lấy danh sách bình luận theo item_id và item_code
     public function index(Request $request)
-{
-    $itemType = $request->query('item_type'); // chuẩn param
-    $itemId = $request->query('item_id');
+    {
+        $itemType = $request->query('item_type'); // chuẩn param
+        $itemId = $request->query('item_id');
 
-    $comments = Comment::with('user')
-                       ->where('item_code', $itemType) // chuẩn column DB
-                       ->where('item_id', $itemId)
-                       ->orderBy('created_at', 'asc')
-                       ->get();
+        $comments = Comment::with(['user', 'likes'])
+                           ->where('item_code', $itemType) // chuẩn column DB
+                           ->where('item_id', $itemId)
+                           ->orderBy('created_at', 'asc')
+                           ->get();
 
-    return response()->json($comments, 200);
-}
+        // Append accessors to each comment
+        $comments->each(function ($comment) {
+            $comment->append(['likes_count', 'is_liked']);
+        });
 
+        return response()->json($comments, 200);
+    }
 
     // Tạo bình luận mới
     public function store(Request $request)
@@ -79,7 +84,7 @@ class CommentController extends Controller
         }
 
         $comment->update(['content' => $request->content]);
-        return response()->json($comment);
+        return response()->json($comment->append(['likes_count', 'is_liked']));
     }
 
     // Xóa bình luận
@@ -93,26 +98,63 @@ class CommentController extends Controller
         $comment->delete();
         return response()->json(['message' => 'Comment deleted']);
     }
+
     public function reply(Request $request, $id)
-{
-    $request->validate([
-        'content' => 'required|string',
-    ]);
+    {
+        $request->validate([
+            'content' => 'required|string',
+        ]);
 
-    $parentComment = Comment::findOrFail($id);
+        $parentComment = Comment::findOrFail($id);
 
-    $reply = Comment::create([
-        'item_id' => $parentComment->item_id,
-        'item_code' => $parentComment->item_code,
-        'user_id' => Auth::id(),
-        'content' => $request->content,
-        'parent_id' => $id,
-    ]);
+        $reply = Comment::create([
+            'item_id' => $parentComment->item_id,
+            'item_code' => $parentComment->item_code,
+            'user_id' => Auth::id(),
+            'content' => $request->content,
+            'parent_id' => $id,
+        ]);
 
-    return response()->json([
-        'reply' => $reply->load('user'),
-    ], 201);
-}
+        // Load user relationship and append accessors for the reply
+        $reply->load('user');
+        $reply->append(['likes_count', 'is_liked']);
 
+        return response()->json([
+            'reply' => $reply,
+        ], 201);
+    }
 
+    // API để thích/bỏ thích bình luận
+    public function toggleLike($id)
+    {
+        $comment = Comment::findOrFail($id);
+        $user = Auth::user();
+
+        $like = $comment->likes()->where('user_id', $user->id)->first();
+
+        if ($like) {
+            // Nếu người dùng đã thích, hãy bỏ thích
+            $like->delete();
+            $isLiked = false;
+        } else {
+            // Nếu người dùng chưa thích, hãy thích
+            $comment->likes()->create([
+                'user_id' => $user->id,
+                'likeable_id' => $comment->id,
+                'likeable_type' => get_class($comment),
+            ]);
+            $isLiked = true;
+        }
+
+        // Trả về số lượt thích mới và trạng thái thích của người dùng
+        $comment->refresh(); // Làm mới model để lấy số lượt thích mới nhất
+        $comment->append(['likes_count', 'is_liked']);
+
+        return response()->json([
+            'success' => true,
+            'message' => $isLiked ? 'Bình luận đã được thích.' : 'Bình luận đã được bỏ thích.',
+            'likes_count' => $comment->likes_count,
+            'is_liked' => $comment->is_liked,
+        ]);
+    }
 }

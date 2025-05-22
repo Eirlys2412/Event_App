@@ -41,6 +41,7 @@ class EventController extends Controller
                         'title' => $res->title,
                         'type' => $res->file_type,
                         'url' => URL::to($res->url), // URL đầy đủ (dùng cho frontend load ảnh/video)
+                        'user_id' => $res->user_id,
                     ];
                 });
 
@@ -84,6 +85,7 @@ class EventController extends Controller
                     'title' => $res->title,
                     'type'  => $res->file_type,
                     'url'   => URL::to($res->url),
+                    'user_id' => $res->user_id,
                 ];
             });
 

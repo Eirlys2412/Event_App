@@ -150,23 +150,37 @@ class Resource extends Model
      * @param string $extension
      * @return string
      */
-    private static function getMimeTypeFromExtension($extension)
+    public static function getMimeTypeFromExtension($extension)
     {
         $mimeTypes = [
             'jpg' => 'image/jpg',
+            'JPG' => 'image/jpg',
             'jpeg' => 'image/jpeg',
+            'JPEG' => 'image/jpeg',
             'png' => 'image/png',
+            'PNG' => 'image/png',
             'gif' => 'image/gif',
+            'GIF' => 'image/gif',
             'bmp' => 'image/bmp',
+            'BMP' => 'image/bmp',
             'svg' => 'image/svg+xml',
+            'SVG' => 'image/svg+xml',
             'webp' => 'image/webp',
+            'WEBP' => 'image/webp',
             'mp4' => 'video/mp4',
+            'MP4' => 'video/mp4',
             'avi' => 'video/avi',
+            'AVI' => 'video/avi',
             'mov' => 'video/quicktime',
+            'MOV' => 'video/quicktime',
             'wmv' => 'video/x-ms-wmv',
+            'WMV' => 'video/x-ms-wmv',
             'mp3' => 'audio/mpeg',
+            'MP3' => 'audio/mpeg',
             'wav' => 'audio/wav',
+            'WAV' => 'audio/wav',
             'ogg' => 'audio/ogg',
+            'OGG' => 'audio/ogg',
             'pdf' => 'application/pdf',
             'doc' => 'application/msword',
             'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -237,7 +251,7 @@ class Resource extends Model
 
 
     // Lấy ID YouTube từ URL.
-    private static function getYouTubeID($url)
+    public static function getYouTubeID($url)
     {
         $pattern = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|.+\?v=)|youtu\.be\/)([^&\n?#]+)/';
         preg_match($pattern, $url, $matches);
@@ -245,7 +259,7 @@ class Resource extends Model
     }
 
     // Xác định loại resource từ mimeType của file
-    private static function determineResourceType($file)
+    public static function determineResourceType($file)
     {
         if ($file instanceof \Illuminate\Http\UploadedFile) {
             $mimeType = $file->getMimeType();
@@ -257,7 +271,7 @@ class Resource extends Model
         return 'Document';
     }
     //   Sinh mã link_code từ URL.
-    private static function generateLinkCode($url)
+    public static function generateLinkCode($url)
     {
         $linkType = ResourceLinkType::where('viewcode', 'LIKE', "%$url%")->first();
 

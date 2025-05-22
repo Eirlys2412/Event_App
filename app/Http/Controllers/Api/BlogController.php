@@ -22,6 +22,15 @@ class BlogController extends Controller
     public function getAll()
     {
         $blogs = Blog::orderByDesc('id')->get();
+        
+        // Thêm thông tin tác giả cho mỗi blog
+        $blogs->transform(function ($blog) {
+            $author = User::find($blog->user_id);
+            $blog->author_name = $author->full_name ?? null;
+            $blog->author_photo = $author->avatar_url ?? null;
+            $blog->author_id = $author->id ?? null;
+            return $blog;
+        });
 
         return response()->json([
             'success' => true,
@@ -47,7 +56,7 @@ class BlogController extends Controller
 
         $author = User::find($blog->user_id);
         $blog->author_name = $author->full_name ?? null;
-        $blog->author_photo = $author->photo ?? null;
+        $blog->author_photo = $author->avatar_url ?? null;
         $blog->author_id = $author->id ?? null;
 
         return response()->json([
@@ -92,6 +101,15 @@ class BlogController extends Controller
             ->limit($request->limit)
             ->get();
 
+        // Thêm thông tin tác giả cho mỗi blog
+        $blogs->transform(function ($blog) {
+            $author = User::find($blog->user_id);
+            $blog->author_name = $author->full_name ?? null;
+            $blog->author_photo = $author->avatar_url ?? null;
+            $blog->author_id = $author->id ?? null;
+            return $blog;
+        });
+
         return response()->json([
             'success' => true,
             'data' => $blogs,
@@ -121,6 +139,15 @@ class BlogController extends Controller
             ->offset(($request->page - 1) * $request->limit)
             ->limit($request->limit)
             ->get();
+
+        // Thêm thông tin tác giả cho mỗi blog
+        $results->transform(function ($blog) {
+            $author = User::find($blog->user_id);
+            $blog->author_name = $author->full_name ?? null;
+            $blog->author_photo = $author->avatar_url ?? null;
+            $blog->author_id = $author->id ?? null;
+            return $blog;
+        });
 
         return response()->json([
             'success' => true,
@@ -290,6 +317,14 @@ public function update(Request $request, $id)
                 ->where('status', 'approved')
                 ->orderByDesc('id')
                 ->get();
+            // Thêm thông tin tác giả cho mỗi blog
+            $blogs->transform(function ($blog) {
+                $author = User::find($blog->user_id);
+                $blog->author_name = $author->full_name ?? null;
+                $blog->author_photo = $author->avatar_url ?? null;
+                $blog->author_id = $author->id ?? null;
+                return $blog;
+            });
             return response()->json([
                 'success' => true,
                 'data' => $blogs
@@ -308,6 +343,15 @@ public function getBlogsByUser($id)
                  ->orderByDesc('id')
                  ->get();
 
+    // Thêm thông tin tác giả cho mỗi blog
+    $blogs->transform(function ($blog) {
+        $author = User::find($blog->user_id);
+        $blog->author_name = $author->full_name ?? null;
+        $blog->author_photo = $author->avatar_url ?? null;
+        $blog->author_id = $author->id ?? null;
+        return $blog;
+    });
+
     return response()->json([
         'success' => true,
         'data' => $blogs
@@ -324,7 +368,7 @@ public function getApprovedBlogs()
     $blogs->getCollection()->transform(function ($blog) {
         $author = User::find($blog->user_id);
         $blog->author_name = $author->full_name ?? null;
-        $blog->author_photo = $author->photo ?? null;
+        $blog->author_photo = $author->avatar_url ?? null;
         $blog->author_id = $author->id ?? null;
 
         // Số lượng bookmark, like, comment, vote

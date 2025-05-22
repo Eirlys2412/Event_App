@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Modules\Events\Models\EventManager;
 use App\Modules\Events\Models\EventRegistration;
 use App\Modules\Events\Models\EventUser;
+use App\Modules\Blog\Models\Blog;
+use App\Modules\TuongTac\Models\Vote;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -153,13 +155,30 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute()
     {
         if ($this->photo) {
-            return asset('storage/' . $this->photo);
+            // Kiểm tra nếu photo đã là một URL đầy đủ (bắt đầu bằng http hoặc https) hoặc đã chứa 'storage/'
+            if (filter_var($this->photo, FILTER_VALIDATE_URL) || Str::startsWith($this->photo, 'storage/')) {
+                return asset($this->photo);
+            } else {
+                // Nếu chỉ là tên file hoặc đường dẫn tương đối trong storage
+                return asset('storage/' . $this->photo);
+            }
         }
+        // Đường dẫn mặc định nếu không có ảnh đại diện
         return asset('storage/resources/default.png');
     }
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+    public function blogs()
+    {
+        return $this->hasMany(Blog::class, 'user_id');
+    }
+    public function votes() {
+        return $this->morphMany(Vote::class, 'votable');
+    }
+    public function averageRating() {
+        return $this->votes()->avg('rating');
     }
 }   
 class OauthClient extends Model
