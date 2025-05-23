@@ -4,42 +4,111 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Vote;
+use App\Modules\TuongTac\Models\Vote;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Modules\UserPage\Models\UserPage;
+use App\Models\User;
 
 
 class VoteController extends Controller
 {
-    public function store(Request $request)
+    public function vote(Request $request)
     {
         $request->validate([
-            'votable_type' => 'required|string', // 'blog' hoặc 'event'
-            'votable_id' => 'required|integer',
-            'score' => 'required|integer|min:1|max:5',
+            'item_id' => 'required|integer',
+            'item_code' => 'required|string', // Tên model: App\Models\Blog, App\Models\Event, App\Models\User
+            'point' => 'required|integer|min:1|max:5',
         ]);
+    
+        $userId = Auth::id();
+        if (!$userId) {
+            return response()->json(['success' => false, 'msg' => 'Bạn cần đăng nhập!']);
+        }
 
-        $votableType = 'App\\Models\\' . ucfirst($request->votable_type);
+        $itemId = $request->item_id;
+        $itemCode = $request->item_code; // VD: 'App\Models\Blog', 'App\Models\Event', 'App\Models\User'
+        $point = $request->point;
 
-        Vote::updateOrCreate(
+        // Cộng điểm cho user
+        User::add_points($userId, 1);
+
+        // Tạo hoặc cập nhật vote
+        $vote = Vote::updateOrCreate(
             [
-                'user_id' => Auth::id(),
-                'votable_type' => $votableType,
-                'votable_id' => $request->votable_id,
+                'user_id' => $userId,
+                'votable_id' => $itemId,
+                'votable_type' => $itemCode
             ],
-            ['score' => $request->score]
+            [
+                'rating' => $point
+            ]
         );
 
-        return response()->json(['message' => 'Đánh giá thành công']);
+        // Tính điểm trung bình và số lượng vote cho đối tượng này
+        $averagePoint = Vote::where('votable_id', $itemId)
+            ->where('votable_type', $itemCode)
+            ->avg('rating');
+        $count = Vote::where('votable_id', $itemId)
+            ->where('votable_type', $itemCode)
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'averagePoint' => round($averagePoint, 2),
+            'count' => $count
+        ]);
     }
 
-    public function average($type, $id)
+    public function like(Request $request)
     {
-        $votableType = 'App\\Models\\' . ucfirst($type);
+        $request->validate([
+            'item_id' => 'required|integer',
+            'item_code' => 'required|string',
+        ]);
+    
+        $userId = Auth::id();
+        if (!$userId) {
+            return response()->json(['success' => false, 'msg' => 'Bạn cần đăng nhập!']);
+        }
 
-        $average = Vote::where('votable_type', $votableType)
-            ->where('votable_id', $id)
-            ->avg('score');
+        $itemId = $request->item_id;
+        $itemCode = $request->item_code;
 
-        return response()->json(['average' => round($average, 2)]);
+        // Kiểm tra xem user đã like chưa
+        $existingLike = Vote::where([
+            'user_id' => $userId,
+            'votable_id' => $itemId,
+            'votable_type' => $itemCode,
+            'rating' => 1
+        ])->first();
+
+        if ($existingLike) {
+            // Nếu đã like thì unlike (xóa)
+            $existingLike->delete();
+            $isLiked = false;
+        } else {
+            // Nếu chưa like thì tạo mới
+            Vote::create([
+                'user_id' => $userId,
+                'votable_id' => $itemId,
+                'votable_type' => $itemCode,
+                'rating' => 1
+            ]);
+            $isLiked = true;
+        }
+
+        // Đếm tổng số like
+        $totalLikes = Vote::where([
+            'votable_id' => $itemId,
+            'votable_type' => $itemCode,
+            'rating' => 1
+        ])->count();
+
+        return response()->json([
+            'success' => true,
+            'isLiked' => $isLiked,
+            'totalLikes' => $totalLikes
+        ]);
     }
 }

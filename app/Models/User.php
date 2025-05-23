@@ -160,7 +160,7 @@ class User extends Authenticatable
                 return asset($this->photo);
             } else {
                 // Nếu chỉ là tên file hoặc đường dẫn tương đối trong storage
-                return asset('storage/' . $this->photo);
+            return asset('storage/' . $this->photo);
             }
         }
         // Đường dẫn mặc định nếu không có ảnh đại diện
