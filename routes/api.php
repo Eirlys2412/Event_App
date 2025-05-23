@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use App\Http\Controllers\Api\EventImageController; // Sửa lại import controller
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\VoteController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -58,6 +59,7 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::put('/event/{id}', [\App\Http\Controllers\Api\EventController::class, 'update']);// cập nhật sự kiện
     Route::delete('/event/{id}', [\App\Http\Controllers\Api\EventController::class, 'destroy']);// xóa sự kiện
     Route::get('/event/{id}', [\App\Http\Controllers\Api\EventController::class, 'getEventById']);// lấy chi tiết sự kiện
+    Route::post('/event/{id}/rate', [\App\Http\Controllers\Api\EventController::class, 'rateEvent']);// đánh giá sự kiện
 
     Route::get('/event-types', [\App\Http\Controllers\Api\EventTypeController::class, 'index']); // Lấy danh sách loại sự kiện
     Route::get('/event-types/{id}', [\App\Http\Controllers\Api\EventTypeController::class, 'getEventTypeById']); // Lấy chi tiết loại sự kiện
@@ -162,7 +164,7 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('bookmarks/toggle', [\App\Http\Controllers\Api\BookmarkController::class, 'toggle'])->middleware('auth:api')->name('bookmarks.toggle');
 
     // Votes (Rating)
-    Route::post('votes', [\App\Http\Controllers\Api\VoteController::class, 'store'])->middleware('auth:api');
+    Route::post('vote', [\App\Http\Controllers\Api\VoteController::class, 'vote'])->middleware('auth:api');
     Route::get('votes/average/{type}/{id}', [\App\Http\Controllers\Api\VoteController::class, 'average'])->middleware('auth:api');
 
     // Notifications
@@ -187,9 +189,9 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::delete('/events/{eventId}/images/{resourceId}', [App\Http\Controllers\Api\EventImageController::class, 'deleteEventImage']);
     
     Route::post('/events/{event}/images', [EventImageController::class, 'store']);
-        
-        
     
+    Route::post('/like', [VoteController::class, 'like']);
+        
 });
 
 // Resource routes

@@ -16,4 +16,13 @@ class UserPage extends Model
         'summary',
         'items',
     ];
+
+    public static function add_points($userId, $points)
+    {
+        $userPage = self::where('user_id', $userId)->first();
+        if ($userPage) {
+            $userPage->points += $points;
+            $userPage->save();
+        }
+    }
 }

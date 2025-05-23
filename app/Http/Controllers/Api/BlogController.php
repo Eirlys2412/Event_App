@@ -22,7 +22,7 @@ class BlogController extends Controller
     public function getAll()
     {
         $blogs = Blog::orderByDesc('id')->get();
-        
+
         // Thêm thông tin tác giả cho mỗi blog
         $blogs->transform(function ($blog) {
             $author = User::find($blog->user_id);

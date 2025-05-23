@@ -13,6 +13,7 @@ use App\Modules\VNPay\Models\VNPayTransaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use App\Modules\TuongTac\Models\Vote;
 
 class EventController extends Controller
 {
@@ -88,6 +89,56 @@ class EventController extends Controller
                     'user_id' => $res->user_id,
                 ];
             });
+
+            // Thêm thông tin đánh giá
+            $event->rating_info = [
+                'average_rating' => round(Vote::where([
+                    'votable_id' => $id,
+                    'votable_type' => 'App\Modules\Events\Models\Event'
+                ])->avg('rating'), 2),
+                'total_votes' => Vote::where([
+                    'votable_id' => $id,
+                    'votable_type' => 'App\Modules\Events\Models\Event'
+                ])->count(),
+                'rating_distribution' => [
+                    '5_stars' => Vote::where([
+                        'votable_id' => $id,
+                        'votable_type' => 'App\Modules\Events\Models\Event',
+                        'rating' => 5
+                    ])->count(),
+                    '4_stars' => Vote::where([
+                        'votable_id' => $id,
+                        'votable_type' => 'App\Modules\Events\Models\Event',
+                        'rating' => 4
+                    ])->count(),
+                    '3_stars' => Vote::where([
+                        'votable_id' => $id,
+                        'votable_type' => 'App\Modules\Events\Models\Event',
+                        'rating' => 3
+                    ])->count(),
+                    '2_stars' => Vote::where([
+                        'votable_id' => $id,
+                        'votable_type' => 'App\Modules\Events\Models\Event',
+                        'rating' => 2
+                    ])->count(),
+                    '1_star' => Vote::where([
+                        'votable_id' => $id,
+                        'votable_type' => 'App\Modules\Events\Models\Event',
+                        'rating' => 1
+                    ])->count(),
+                ]
+            ];
+
+            // Thêm đánh giá của user hiện tại nếu đã đăng nhập
+            if (Auth::check()) {
+                $userVote = Vote::where([
+                    'user_id' => Auth::id(),
+                    'votable_id' => $id,
+                    'votable_type' => 'App\Modules\Events\Models\Event'
+                ])->first();
+
+                $event->user_rating = $userVote ? $userVote->rating : null;
+            }
 
             return response()->json([
                 'success' => true,
@@ -341,6 +392,70 @@ class EventController extends Controller
                 'url' => URL::to($resource->url),
             ]
         ]);
+    }
+
+    public function rateEvent(Request $request, $eventId)
+    {
+        try {
+            $request->validate([
+                'rating' => 'required|integer|min:1|max:5'
+            ]);
+
+            $event = Event::findOrFail($eventId);
+            $userId = Auth::id();
+
+            // Tìm đánh giá hiện tại của user
+            $existingVote = Vote::where([
+                'user_id' => $userId,
+                'votable_id' => $eventId,
+                'votable_type' => 'App\Modules\Events\Models\Event'
+            ])->first();
+
+            if ($existingVote) {
+                // Nếu đã đánh giá thì cập nhật điểm
+                $existingVote->update([
+                    'rating' => $request->rating
+                ]);
+                $message = 'Cập nhật đánh giá thành công';
+            } else {
+                // Nếu chưa đánh giá thì tạo mới
+                Vote::create([
+                    'user_id' => $userId,
+                    'votable_id' => $eventId,
+                    'votable_type' => 'App\Modules\Events\Models\Event',
+                    'rating' => $request->rating
+                ]);
+                $message = 'Đánh giá thành công';
+            }
+
+            // Tính điểm trung bình
+            $averageRating = Vote::where([
+                'votable_id' => $eventId,
+                'votable_type' => 'App\Modules\Events\Models\Event'
+            ])->avg('rating');
+
+            // Đếm số lượt đánh giá
+            $totalVotes = Vote::where([
+                'votable_id' => $eventId,
+                'votable_type' => 'App\Modules\Events\Models\Event'
+            ])->count();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'data' => [
+                    'rating' => $request->rating,
+                    'average_rating' => round($averageRating, 2),
+                    'total_votes' => $totalVotes
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi đánh giá: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
 
