@@ -17,6 +17,9 @@ use App\Http\Controllers\TagController;
 use App\Modules\TuongTac\Models\Bookmark;
 use App\Modules\TuongTac\Models\Like;
 use App\Modules\TuongTac\Models\Vote;
+use App\Modules\Comments\Models\Comment;
+use Illuminate\Support\Facades\Log; // Import Log facade
+
 class BlogController extends Controller
 {
     public function getAll()
@@ -43,12 +46,12 @@ class BlogController extends Controller
         $request->validate([
             'slug' => 'nullable|string',
             'id'   => 'nullable|integer',
-
         ]);
 
+        // Sử dụng withCount để đếm số like và comment
         $blog = $request->id 
-            ? Blog::find($request->id) 
-            : Blog::where('slug', $request->slug)->first();
+            ? Blog::withCount(['comments', 'likes'])->find($request->id) 
+            : Blog::withCount(['comments', 'likes'])->where('slug', $request->slug)->first();
 
         if (!$blog) {
             return response()->json(['success' => false, 'message' => 'Bài viết không tồn tại.'], 404);
@@ -59,17 +62,31 @@ class BlogController extends Controller
         $blog->author_photo = $author->avatar_url ?? null;
         $blog->author_id = $author->id ?? null;
 
+        // Bổ sung thông tin like và comment vào đối tượng blog
+        $blog->countComment = $blog->comments_count; // Gán comments_count vào countComment
+        $blog->countLike = $blog->likes_count; // Gán likes_count vào countLike
+        
+        // Kiểm tra trạng thái đã thích của người dùng hiện tại
+        $blog->is_liked = false;
+        if (Auth::check()) {
+            $blog->is_liked = $blog->likes()->where('user_id', Auth::id())->exists();
+        }
+
+        // Phần 'tuongtac' có vẻ không cần thiết nếu thông tin được thêm vào blog object
+        // Nếu cần giữ lại, bạn có thể điền dữ liệu vào đây từ blog object
+        // $tuongtacData = [
+        //     'isBookmarked' => false, // Cần logic để kiểm tra bookmark
+        //     'countBookmarked' => 0, // Cần logic để đếm bookmark
+        //     'reactions' => [], // Cần định nghĩa reactions
+        //     'hasComment' => $blog->comments_count > 0, // Hoặc chỉ cần countComment
+        //     'comments' => [], // Nếu muốn hiển thị comment list, cần load relationship comments
+        //     'voteRecord' => null, // Cần logic để lấy vote record
+        // ];
+
         return response()->json([
             'success' => true,
             'blog' => $blog,
-            'tuongtac' => [
-                'isBookmarked' => false,
-                'countBookmarked' => 0,
-                'reactions' => [],
-                'hasComment' => 0,
-                'comments' => [],
-                'voteRecord' => null,
-            ],
+            // 'tuongtac' => $tuongtacData, // Tùy chọn giữ lại hoặc xóa
         ]);
     }
 
@@ -160,120 +177,119 @@ class BlogController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'title' => 'required|string',
-        'summary' => 'nullable|string',
-        'content' => 'required|string',
-        'image' => 'nullable|string', // base64 image từ Flutter
-        'tag_ids' => 'nullable|string',
-        'category_id' => 'nullable|integer',
-        'status' => 'pending',
-    ]);
+    {
+        $request->validate([
+            'title' => 'required|string',
+            'summary' => 'nullable|string',
+            'content' => 'required|string',
+            'image' => 'nullable|string', // base64 image từ Flutter
+            'tag_ids' => 'nullable|string',
+            'category_id' => 'nullable|integer',
+            'status' => 'pending',
+        ]);
 
-    DB::beginTransaction();
-    try {
-        $slug = Str::slug($request->title);
-        if (Blog::where('slug', $slug)->exists()) {
-            $slug .= '-' . time();
+        DB::beginTransaction();
+        try {
+            $slug = Str::slug($request->title);
+            if (Blog::where('slug', $slug)->exists()) {
+                $slug .= '-' . time();
+            }
+
+            $help = new HelpController();
+            $photoPath = null;
+
+            // ✅ Xử lý ảnh base64 nếu có
+            if ($request->has('image') && !empty($request->image)) {
+                $base64Image = $request->image;
+                $imageName = 'blog_' . time() . '_' . Str::random(10) . '.jpg';
+                $imagePath = 'avatar/' . $imageName;
+
+                // Ghi file vào storage/app/public/avatar/
+                Storage::disk('public')->put($imagePath, base64_decode($base64Image));
+
+                $photoPath = asset('storage/' . $imagePath); // Đường dẫn để lưu vào DB
+            }
+
+            $blog = Blog::create([
+                'title' => $request->title,
+                'slug' => $slug,
+                'summary' => $request->summary,
+                'content' => $help->removeImageStyle($request->content),
+                'photo' => $photoPath,
+                'user_id' => Auth::id(),
+                'cat_id' => $request->category_id,
+                'status' => $request->status ?? 'active',
+            ]);
+
+            // Gán tag nếu có
+            if ($request->tag_ids) {
+                $tagIds = json_decode($request->tag_ids, true);
+                (new TagController())->store_blog_tag($blog->id, $tagIds);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Bài viết đã được lưu.',
+                'data' => $blog,
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|string',
+            'summary' => 'nullable|string',
+            'content' => 'required|string',
+            'image' => 'nullable|string', // đổi từ 'photo' thành 'image' cho đồng bộ
+            'tag_ids' => 'nullable|string',
+            'category_id' => 'nullable|integer',
+            'status' => 'pending',
+        ]);
+
+        $blog = Blog::findOrFail($id);
 
         $help = new HelpController();
-        $photoPath = null;
+        $photoPath = $blog->photo;
 
-        // ✅ Xử lý ảnh base64 nếu có
+        // ✅ Nếu cập nhật ảnh mới (base64)
         if ($request->has('image') && !empty($request->image)) {
             $base64Image = $request->image;
             $imageName = 'blog_' . time() . '_' . Str::random(10) . '.jpg';
             $imagePath = 'avatar/' . $imageName;
 
-            // Ghi file vào storage/app/public/avatar/
             Storage::disk('public')->put($imagePath, base64_decode($base64Image));
 
-            $photoPath = asset('storage/' . $imagePath); // Đường dẫn để lưu vào DB
+            $photoPath = asset('storage/' . $imagePath);
         }
 
-        $blog = Blog::create([
+        $blog->update([
             'title' => $request->title,
-            'slug' => $slug,
+            'slug' => Str::slug($request->title),
             'summary' => $request->summary,
             'content' => $help->removeImageStyle($request->content),
             'photo' => $photoPath,
-            'user_id' => Auth::id(),
-            'cat_id' => $request->category_id,
-            'status' => $request->status ?? 'active',
+            'cat_id' => $request->category_id ?? $blog->cat_id,
+            'status' => $request->status ?? $blog->status,
         ]);
 
-        // Gán tag nếu có
         if ($request->tag_ids) {
             $tagIds = json_decode($request->tag_ids, true);
             (new TagController())->store_blog_tag($blog->id, $tagIds);
         }
 
-        DB::commit();
-
         return response()->json([
             'success' => true,
-            'message' => 'Bài viết đã được lưu.',
+            'message' => 'Cập nhật thành công.',
             'data' => $blog,
-        ], 201);
-
-    } catch (\Exception $e) {
-        DB::rollback();
-        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        ]);
     }
-}
-
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'title' => 'required|string',
-        'summary' => 'nullable|string',
-        'content' => 'required|string',
-        'image' => 'nullable|string', // đổi từ 'photo' thành 'image' cho đồng bộ
-        'tag_ids' => 'nullable|string',
-        'category_id' => 'nullable|integer',
-        'status' => 'pending',
-    ]);
-
-    $blog = Blog::findOrFail($id);
-
-    $help = new HelpController();
-    $photoPath = $blog->photo;
-
-    // ✅ Nếu cập nhật ảnh mới (base64)
-    if ($request->has('image') && !empty($request->image)) {
-        $base64Image = $request->image;
-        $imageName = 'blog_' . time() . '_' . Str::random(10) . '.jpg';
-        $imagePath = 'avatar/' . $imageName;
-
-        Storage::disk('public')->put($imagePath, base64_decode($base64Image));
-
-        $photoPath = asset('storage/' . $imagePath);
-    }
-
-    $blog->update([
-        'title' => $request->title,
-        'slug' => Str::slug($request->title),
-        'summary' => $request->summary,
-        'content' => $help->removeImageStyle($request->content),
-        'photo' => $photoPath,
-        'cat_id' => $request->category_id ?? $blog->cat_id,
-        'status' => $request->status ?? $blog->status,
-    ]);
-
-    if ($request->tag_ids) {
-        $tagIds = json_decode($request->tag_ids, true);
-        (new TagController())->store_blog_tag($blog->id, $tagIds);
-    }
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Cập nhật thành công.',
-        'data' => $blog,
-    ]);
-}
-
 
     public function destroy($id)
     {
@@ -309,6 +325,7 @@ public function update(Request $request, $id)
             'data' => $blog->tags
         ]);
     }
+
     public function getmyBlogs()
     {
         try {
@@ -336,56 +353,102 @@ public function update(Request $request, $id)
             ], 500);
         }
     }
-public function getBlogsByUser($id)
-{
-    $blogs = Blog::where('user_id', $id)
-                 ->where('status', 'approved')
-                 ->orderByDesc('id')
-                 ->get();
 
-    // Thêm thông tin tác giả cho mỗi blog
-    $blogs->transform(function ($blog) {
-        $author = User::find($blog->user_id);
-        $blog->author_name = $author->full_name ?? null;
-        $blog->author_photo = $author->avatar_url ?? null;
-        $blog->author_id = $author->id ?? null;
-        return $blog;
-    });
+    public function getBlogsByUser($id)
+    {
+        $blogs = Blog::where('user_id', $id)
+                     ->where('status', 'approved')
+                     ->orderByDesc('id')
+                     ->get();
 
-    return response()->json([
-        'success' => true,
-        'data' => $blogs
-    ]);
-}
-public function getApprovedBlogs()
-{
-    $blogs = Blog::where('status', 'approved')
-        ->orderBy('created_at', 'desc')
-        ->select('id', 'title', 'slug', 'summary', 'content', 'cat_id', 'photo', 'created_at', 'updated_at', 'user_id')
-        ->paginate(10);
+        // Thêm thông tin tác giả cho mỗi blog
+        $blogs->transform(function ($blog) {
+            $author = User::find($blog->user_id);
+            $blog->author_name = $author->full_name ?? null;
+            $blog->author_photo = $author->avatar_url ?? null;
+            $blog->author_id = $author->id ?? null;
+            return $blog;
+        });
 
-    // Bổ sung thông tin tác giả và tương tác cho từng bài viết
-    $blogs->getCollection()->transform(function ($blog) {
-        $author = User::find($blog->user_id);
-        $blog->author_name = $author->full_name ?? null;
-        $blog->author_photo = $author->avatar_url ?? null;
-        $blog->author_id = $author->id ?? null;
+        return response()->json([
+            'success' => true,
+            'data' => $blogs
+        ]);
+    }
 
-        // Số lượng bookmark, like, comment, vote
-        $blog->countBookmarked = $blog->bookmarks()->count();
-        $blog->countLike = $blog->likes()->count();
-        $blog->countComment = $blog->comments()->count();
-        //$blog->vote = $blog->votes()->avg('rating'); // hoặc count nếu muốn
+    public function getApprovedBlogs()
+    {
+        $blogs = Blog::where('status', 'approved')
+            ->orderBy('created_at', 'desc')
+            ->select('id', 'title', 'slug', 'summary', 'content', 'cat_id', 'photo', 'created_at', 'updated_at', 'user_id')
+            ->withCount('comments')
+            ->paginate(10);
 
-        return $blog;
-    });
+        // Bổ sung thông tin tác giả và tương tác cho từng bài viết
+        $blogs->getCollection()->transform(function ($blog) {
+            $author = User::find($blog->user_id);
+            $blog->author_name = $author->full_name ?? null;
+            $blog->author_photo = $author->avatar_url ?? null;
+            $blog->author_id = $author->id ?? null;
 
-    return response()->json([
-        'success' => true,
-        'blogs' => $blogs,
-    ]);
-}
+            // Số lượng bookmark, like, vote đã được đếm đúng cách
+            // Số lượng comment bây giờ có sẵn trong thuộc tính comments_count nhờ withCount
+            $blog->countBookmarked = $blog->bookmarks()->count();
+            $blog->countLike = $blog->likes()->count();
+            // $blog->countComment = $blog->comments()->count(); // Xóa dòng này
+            $blog->toggleLike = $blog->votes()->avg('rating'); // hoặc count nếu muốn
 
+            // Bạn có thể giữ lại countComment và gán comments_count vào đó
+             $blog->countComment = $blog->comments_count;
 
+            return $blog;
+        });
 
+        return response()->json([
+            'success' => true,
+            'blogs' => $blogs,
+        ]);
+    }
+
+    public function toggleLike($id)
+    {
+        try {
+            $blog = Blog::where('id', $id)
+                       ->where('status', 'approved')
+                       ->firstOrFail();
+            
+            $user = Auth::user();
+            $like = $blog->likes()->where('user_id', $user->id)->first();
+
+            if ($like) {
+                // Nếu đã like thì bỏ like
+                $like->delete();
+                $isLiked = false;
+            } else {
+                // Nếu chưa like thì thêm like mới
+                $blog->likes()->create([
+                    'user_id' => $user->id,
+                    'likeable_id' => $blog->id,
+                    'likeable_type' => get_class($blog)
+                ]);
+                $isLiked = true;
+            }
+
+            // Làm mới model để lấy số lượt like mới nhất
+            $blog->refresh();
+
+            return response()->json([
+                'success' => true,
+                'message' => $isLiked ? 'Đã thích bài viết' : 'Đã bỏ thích bài viết',
+                'likes_count' => $blog->likes()->count(),
+                'is_liked' => $isLiked
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy bài viết hoặc bài viết chưa được duyệt'
+            ], 404);
+        }
+    }
 }
