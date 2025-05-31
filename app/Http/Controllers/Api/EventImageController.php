@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str; // Import Str facade nếu cần cho pathinfo
 use Illuminate\Support\Facades\Log; // Thêm dòng này để import facade Log
+use App\Modules\TuongTac\Models\Like; // Import model Like từ Module TuongTac
 
 class EventImageController extends Controller
 {
@@ -182,6 +183,79 @@ class EventImageController extends Controller
             ], 500);
         }
     }
+
+   /**
+ * Bật/tắt trạng thái thích (like) cho một ảnh sự kiện (Resource).
+ *
+ * @param  int  $resourceId ID của Resource (ảnh).
+ * @return \Illuminate\Http\JsonResponse
+ */
+public function toggleLike($resourceId)
+{
+    try {
+        $userId = Auth::id();
+        if (!$userId) {
+            return response()->json(['success' => false, 'message' => 'Bạn cần đăng nhập!'], 401);
+        }
+
+        // Kiểm tra Resource (ảnh) tồn tại
+        $resource = Resource::findOrFail($resourceId);
+
+        // Xác định likeable_type cho model Resource
+        $likeableType = 'App\\Modules\\Resource\\Models\\Resource';
+
+        // Tìm kiếm like hiện tại của user cho Resource này
+        $existingLike = Like::where([
+            'user_id' => $userId,
+            'likeable_type' => $likeableType,
+            'likeable_id' => $resourceId
+        ])->first();
+
+        $isLiked = false;
+        if ($existingLike) {
+            // Nếu đã like thì unlike (xóa)
+            $existingLike->delete();
+            $message = 'Bỏ thích ảnh thành công';
+            $isLiked = false;
+        } else {
+            // Nếu chưa like thì tạo mới
+            Like::create([
+                'user_id' => $userId,
+                'likeable_type' => $likeableType,
+                'likeable_id' => $resourceId
+            ]);
+            $message = 'Thích ảnh thành công';
+            $isLiked = true;
+        }
+
+        // Đếm tổng số like cho Resource này
+        $totalLikes = Like::where([
+            'likeable_type' => $likeableType,
+            'likeable_id' => $resourceId
+        ])->count();
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'data' => [
+                'is_liked' => $isLiked, // Sửa thành is_liked
+                'total_likes' => $totalLikes // Sửa thành total_likes
+            ]
+        ]);
+
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+         return response()->json([
+             'success' => false,
+             'message' => 'Không tìm thấy ảnh.'
+         ], 404);
+    } catch (\Exception $e) {
+        Log::error("Toggle like ảnh lỗi: " . $e->getMessage(), ['exception' => $e]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Đã xảy ra lỗi khi xử lý thích/bỏ thích: ' . $e->getMessage()
+        ], 500);
+    }
+}
 
     // Có thể xóa phương thức store này nếu không dùng đến
     // public function store(Request $request, Event $event)

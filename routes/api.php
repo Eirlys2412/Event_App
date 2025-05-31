@@ -6,6 +6,9 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use App\Http\Controllers\Api\EventImageController; // Sửa lại import controller
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\VoteController;
+use App\Http\Controllers\Api\BlogController;
+use App\Http\Controllers\Api\StatisticController;
+use App\Http\Controllers\Api\EventUserApiController; // Đảm bảo EventUserApiController được import đúng
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -71,7 +74,7 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('/event-users', [\App\Http\Controllers\Api\EventUserApiController::class, 'store']); // Thêm mới người dùng vào sự kiện
     Route::get('/event-users/{id}', [\App\Http\Controllers\Api\EventUserApiController::class, 'show']); // Xem chi tiết 1 người dùng sự kiện
     Route::put('/event-users/{id}', [\App\Http\Controllers\Api\EventUserApiController::class, 'update']); // Cập nhật
-    Route::delete('/event-users/{id}', [\App\Http\Controllers\Api\EventUserApiController::class, 'destroy']); // Xóa
+    Route::delete('/event-users/{id}', [EventUserApiController::class, 'destroy']); // Xóa, sửa namespace
     Route::get('/event-users/user/{userId}', [\App\Http\Controllers\Api\EventUserApiController::class, 'getUserEvents']);
 
 
@@ -154,7 +157,7 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
         Route::get('/blogcat/{id}', [\App\Http\Controllers\Api\BlogCategoryController::class, 'show']); // Lấy chi tiết theo id
         Route::get('/my-blogs', [\App\Http\Controllers\Api\BlogController::class, 'getmyBlogs'])->middleware('auth:api'); // Lấy danh sách bài viết của người dùng
         Route::get('/blogs/user/{id}', [\App\Http\Controllers\Api\BlogController::class, 'getBlogsByUser']);
-        Route::get('blogs/approved', [\App\Http\Controllers\Api\BlogController::class, 'getApprovedBlogs']);
+        Route::get('blogs/approved', [\App\Http\Controllers\Api\BlogController::class, 'getApprovedBlogs'])->middleware('auth:api');
         // Lấy danh sách bài viết đã duyệt
     // Social interactions
     // Likes
@@ -185,18 +188,18 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('blogs/{id}/tags', [\App\Http\Controllers\Api\BlogController::class, 'attachTags'])->middleware('auth:api'); // Gắn tags vào blog
     Route::post('events/{id}/tags', [\App\Http\Controllers\Api\EventController::class, 'attachTags'])->middleware('auth:api'); // Gắn tags vào event
     
-    Route::post('/events/{eventId}/images', [App\Http\Controllers\Api\EventImageController::class, 'uploadEventImage']);
-    Route::delete('/events/{eventId}/images/{resourceId}', [App\Http\Controllers\Api\EventImageController::class, 'deleteEventImage']);
-    
-    Route::post('/events/{event}/images', [EventImageController::class, 'store']);
+    Route::post('/events/{eventId}/images', [EventImageController::class, 'uploadEventImage']);
+    Route::delete('/events/{eventId}/images/{resourceId}', [EventImageController::class, 'deleteEventImage']);
     
     Route::post('/like', [VoteController::class, 'like']);
+    Route::post('/event-images/{resourceId}/toggle-like', [EventImageController::class, 'toggleLike'])->middleware('auth:api');
+    
+    Route::post('blogs/{id}/toggle-like', [BlogController::class, 'toggleLike'])->middleware('auth:api');
         
+    Route::get('/statistics/top', [StatisticController::class, 'getTopStatistics']);
 });
 
 // Resource routes
-
-// Event Image routes
 
 
 
